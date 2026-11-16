@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>倒立摆迈步动画</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>运控细化 · 线性倒立摆：走路就是不断迈步接住重心</h1>
+<p class="sub">配套笔记：02-motion-control-deep-dive.md §5.3。质心高度 z<sub>c</sub> = 0.9 m，ẍ = (g/z<sub>c</sub>)(x − p)。开始时质心以 0.4 m/s 往前。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 400"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">时间</div><div class="v" id="st">0.0 s</div></div>
+<div class="stat"><div class="l">迈步：质心速度</div><div class="v good" id="s1">—</div></div>
+<div class="stat"><div class="l">不迈步：状态</div><div class="v" id="s2">—</div></div>
+</div>
+<div class="row ctl"><label>步长 L = <b id="lv">0.30</b> m</label><input id="l" type="range" min="10" max="50" step="5" value="30"></div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 重来</button></div>
+<p class="note">看点：质心（圆点）在脚（三角）前面就会越倒越快——倒立摆天生不稳。上面每 0.4 s 按"捕获点 ξ = x + ẋ/ω"往前放一只脚，正好接住，速度稳定在一个范围里；下面脚一直不动，质心越跑越快，很快就倒了。拖动步长，走得越快每步要迈得越远。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');const G=9.81,Z=0.9,W=Math.sqrt(G/Z),T=0.4,DT=0.002,SUB=20,N=100,PX=260;
+const lanes=[{n:'迈步：每 0.4 s 把脚放到捕获点附近',top:20,step:true},{n:'不迈步：脚钉在原地',top:210,step:false}];
+const H=150;
+lanes.forEach(L=>{txt(L.n,{x:20,y:L.top+14},sv);el('line',{x1:20,y1:L.top+H,x2:660,y2:L.top+H,stroke:'var(--line)','stroke-width':2},sv);
+  L.g=el('g',{},sv);L.leg=el('line',{stroke:'var(--muted)','stroke-width':4},sv);L.com=el('circle',{r:12,fill:L.step?'var(--accent)':'var(--warm)'},sv);
+  L.trail=el('polyline',{fill:'none',stroke:L.step?'var(--accent)':'var(--warm)','stroke-width':1.2,'stroke-dasharray':'3 3'},sv);L.lab=txt('',{x:500,y:L.top+40},sv)});
+let k,t,Ls,b;
+function reset(){k=0;t=0;Ls=+$('l').value/100;b=Ls/(Math.exp(W*T)-1);
+  lanes.forEach(L=>{L.x=0;L.xd=0.4;L.p=0;L.feet=[0];L.tr=[];L.fell=false;L.ts=0;L.lab.textContent=''});draw()}
+function next(){if(k>=N)return false;k++;
+  for(let s=0;s<SUB;s++){t+=DT;lanes.forEach(L=>{if(L.fell)return;
+    L.xd+=W*W*(L.x-L.p)*DT;L.x+=L.xd*DT;L.ts+=DT;
+    if(L.step&&L.ts>=T-1e-9){L.ts=0;const xi=L.x+L.xd/W;L.p=xi-b;L.feet.push(L.p)}
+    if(!L.step&&L.x-L.p>0.55){L.fell=true;L.lab.textContent='摔倒！'}})}
+  lanes.forEach(L=>L.tr.push([L.x,t]));draw();return true}
+function draw(){
+  lanes.forEach(L=>{if(!L.fell)L.cam=L.x-0.6;const cam=L.cam;const sx=x=>20+(x-cam)*PX;clear(L.g);
+    L.feet.forEach((f,i)=>{const x=sx(f);if(x>0&&x<680)el('polygon',{points:`${x-8},${L.top+H} ${x+8},${L.top+H} ${x},${L.top+H-12}`,fill:i===L.feet.length-1?'var(--text)':'var(--line)'},L.g)});
+    const ang=L.fell?1.2:0;
+    const cx=L.fell?sx(L.p)+120*Math.sin(ang):sx(L.x),cy=L.top+H-120*(L.fell?Math.cos(ang):1);
+    const fx=sx(L.p);L.leg.setAttribute('x1',fx);L.leg.setAttribute('y1',L.top+H);L.leg.setAttribute('x2',cx);L.leg.setAttribute('y2',cy);
+    L.com.setAttribute('cx',cx);L.com.setAttribute('cy',cy);
+    L.trail.setAttribute('points',L.tr.map(p=>[sx(p[0]),L.top+H-120].join(',')).join(' '))});
+  $('st').textContent=t.toFixed(1)+' s';$('s1').textContent=lanes[0].xd.toFixed(2)+' m/s';
+  const L1=lanes[1];$('s2').textContent=L1.fell?'摔倒':L1.xd.toFixed(2)+' m/s 加速中';$('s2').className='v '+(L1.fell?'bad':'')}
+$('l').oninput=()=>{$('lv').textContent=(+$('l').value/100).toFixed(2);ANIM.stop();reset()};
+setupPlayer({captureSeed:1,reset,next},40);
+</script></body></html>

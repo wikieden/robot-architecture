@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分层闭环动画</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>第 1 章 · 分层闭环：慢层给目标，快层追目标</h1>
+<p class="sub">配套讲义：<a href="../lessons/01-layered-loops.html">第 1 章 · 总图：一台机器人 = 一组快慢嵌套的闭环</a>。L4 任务层整段只出 2 个子目标；L2 策略层按设定频率给目标；L1 控制层每 10 ms 追一次。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 400"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">时间</div><div class="v" id="st">0.00 s</div></div>
+<div class="stat"><div class="l">L2 已出目标</div><div class="v" id="s2">0 次</div></div>
+<div class="stat"><div class="l">L1 已执行</div><div class="v" id="s1">0 次</div></div>
+<div class="stat"><div class="l">跟踪误差</div><div class="v" id="se">—</div></div>
+</div>
+<div class="row ctl"><label>策略频率 <b id="fv">10</b> Hz</label><input id="f" type="range" min="2" max="25" value="10"></div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 重来</button></div>
+<p class="note">看点：阶梯线是策略层给的目标，平滑曲线是控制层追出来的实际位置。策略频率越低，阶梯越粗，实际曲线要"等"下一个目标，反应越慢。底部三行刻度显示三层各自"算一次"的时刻。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');const N=100,X0=60,W=600,DX=W/N;const TOP=20,H=230;
+const Y=v=>TOP+H-v*H;
+el('rect',{x:X0,y:TOP,width:W,height:H,fill:'var(--bg)',stroke:'var(--line)'},sv);
+txt('位置',{x:8,y:TOP+14,class:'m'},sv);
+const goalL=el('polyline',{fill:'none',stroke:'var(--teal)','stroke-width':6,opacity:.3},sv);
+const spL=el('polyline',{fill:'none',stroke:'var(--purple)','stroke-width':1.8},sv);
+const xL=el('polyline',{fill:'none',stroke:'var(--warm)','stroke-width':2.6},sv);
+const rows=[{n:'L4 任务',y:285,c:'var(--teal)'},{n:'L2 策略',y:320,c:'var(--purple)'},{n:'L1 控制',y:355,c:'var(--warm)'}];
+rows.forEach(r=>{txt(r.n,{x:4,y:r.y+4,class:'m'},sv);el('line',{x1:X0,y1:r.y,x2:X0+W,y2:r.y,stroke:'var(--line)'},sv);r.g=el('g',{},sv)});
+txt('粗青 = 任务子目标　紫阶梯 = 策略目标　橙 = 实际位置（时间 0–1 s）',{x:X0,y:392,class:'m'},sv);
+const goal=t=>t<50?0.75:0.25;
+let t,x,sp,pts,spPts,nP,nC,errSum;
+const per=()=>Math.round(100/ +$('f').value);
+function tick(r,tt,h){el('line',{x1:X0+tt*DX,y1:r.y-h,x2:X0+tt*DX,y2:r.y+h,stroke:r.c,'stroke-width':1.4},r.g)}
+function reset(){t=0;x=0.1;sp=0.1;pts=[[X0,Y(x)]];spPts=[];nP=0;nC=0;errSum=0;rows.forEach(r=>clear(r.g));tick(rows[0],0,9);policy();draw()}
+function policy(){const g=goal(t);sp=sp+(g-sp)*0.55;nP++;tick(rows[1],t,7);spPts.push([X0+t*DX,Y(sp)])}
+function next(){if(t>=N)return false;
+  x+= 0.18*(sp-x);nC++;tick(rows[2],t,3);t++;
+  if(t===50)tick(rows[0],50,9);
+  if(t%per()===0&&t<N)policy();
+  pts.push([X0+t*DX,Y(x)]);errSum+=Math.abs(goal(t-1)-x);draw();return true}
+function draw(){
+  const g=[];for(let i=0;i<=t;i++)g.push([X0+i*DX,Y(goal(Math.min(i,N-1)))]);
+  goalL.setAttribute('points',g.map(p=>p.join(',')).join(' '));
+  const s=[];spPts.forEach((p,i)=>{const xe=i+1<spPts.length?spPts[i+1][0]:X0+t*DX;s.push(p,[xe,p[1]])});
+  spL.setAttribute('points',s.map(p=>p.join(',')).join(' '));
+  xL.setAttribute('points',pts.map(p=>p.join(',')).join(' '));
+  $('st').textContent=(t/100).toFixed(2)+' s';$('s2').textContent=nP+' 次';$('s1').textContent=nC+' 次';
+  $('se').textContent=t?(errSum/t).toFixed(3):'—'}
+$('f').oninput=()=>{$('fv').textContent=$('f').value;ANIM.stop();reset()};
+setupPlayer({captureSeed:1,reset,next},60);
+</script></body></html>

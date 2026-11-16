@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>域随机化动画</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>第 9 章 · 域随机化：窄参数训练 vs 宽参数训练</h1>
+<p class="sub">配套讲义：<a href="../lessons/09-sim-data-deploy.html">第 9 章 · 仿真、数据与部署闭环</a>。一个玩具模型：策略在训练见过的摩擦附近表现好，离得越远越差；见过的范围越宽，峰值越低一点。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 400"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">训练回合</div><div class="v" id="sk">0</div></div>
+<div class="stat"><div class="l">真机摩擦 μ</div><div class="v" id="smu">—</div></div>
+<div class="stat"><div class="l">窄训练 真机成功率</div><div class="v" id="s1">—</div></div>
+<div class="stat"><div class="l">宽训练 真机成功率</div><div class="v" id="s2">—</div></div>
+</div>
+<div class="row ctl"><label>真机摩擦 μ = <b id="mv">0.90</b></label><input id="mu" type="range" min="20" max="140" step="5" value="90"></div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 重来</button></div>
+<p class="note">看点：点是训练时抽到的摩擦值。曲线是"在这个摩擦下的成功率"，随训练逐渐成形。红线是真机的摩擦——训练时并不知道它在哪。宽训练在哪都"还行"，窄训练只在 0.5 附近好。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');const X0=60,W=580,MU0=0.1,MU1=1.5;const xs=m=>X0+(m-MU0)/(MU1-MU0)*W;
+const lanes=[{n:'窄训练：μ 固定 0.5',top:20,lo:.5,hi:.5,col:'var(--bad)',id:'s1'},{n:'宽训练：μ ∈ [0.2, 1.4] 随机',top:200,lo:.2,hi:1.4,col:'var(--good)',id:'s2'}];
+const H=140;
+lanes.forEach(L=>{txt(L.n,{x:X0,y:L.top+12},sv);el('rect',{x:X0,y:L.top+20,width:W,height:H,fill:'var(--bg)',stroke:'var(--line)'},sv);
+  el('rect',{x:xs(L.lo)-2,y:L.top+20,width:Math.max(4,xs(L.hi)-xs(L.lo)+4),height:H,fill:L.col,opacity:.08},sv);
+  L.dots=el('g',{},sv);L.curve=el('polyline',{fill:'none',stroke:L.col,'stroke-width':2.5},sv);L.real=el('line',{stroke:'var(--bad)','stroke-width':2},sv);L.rt=txt('',{class:'m'},sv)});
+[0.2,0.5,0.9,1.4].forEach(m=>txt(m.toFixed(1),{x:xs(m)-8,y:380,class:'m'},sv));txt('摩擦系数 μ',{x:X0+W-60,y:396,class:'m'},sv);
+const K=60;let k;
+function succ(L,m,seen){if(!seen.length)return 0;const w=L.hi-L.lo;const peak=0.97-0.12*w/1.2;const sig=0.12+0.0*w;
+  let best=0;seen.forEach(s=>{best=Math.max(best,Math.exp(-((m-s)**2)/(2*sig*sig)))});
+  const cov=Math.min(1,seen.length/12);return peak*cov*best}
+function reset(){k=0;lanes.forEach(L=>{L.seen=[];clear(L.dots)});draw()}
+function next(){if(k>=K)return false;k++;lanes.forEach(L=>{const m=L.lo+(L.hi-L.lo)*rnd();L.seen.push(m);
+  el('circle',{cx:xs(m)+(L.hi===L.lo?gauss()*3:0),cy:L.top+20+H-6-rnd()*14,r:3,fill:L.col,opacity:.7},L.dots)});draw();return true}
+function draw(){const mu=+$('mu').value/100;$('mv').textContent=mu.toFixed(2);$('smu').textContent=mu.toFixed(2);$('sk').textContent=k;
+  lanes.forEach(L=>{const pts=[];for(let i=0;i<=120;i++){const m=MU0+(MU1-MU0)*i/120;pts.push([xs(m),L.top+20+H-succ(L,m,L.seen)*(H-24)])}
+    L.curve.setAttribute('points',pts.map(p=>p.join(',')).join(' '));
+    L.real.setAttribute('x1',xs(mu));L.real.setAttribute('x2',xs(mu));L.real.setAttribute('y1',L.top+20);L.real.setAttribute('y2',L.top+20+H);
+    const s=succ(L,mu,L.seen);L.rt.setAttribute('x',xs(mu)+4);L.rt.setAttribute('y',L.top+34);L.rt.textContent='真机 '+Math.round(s*100)+'%';
+    $(L.id).textContent=Math.round(s*100)+'%';$(L.id).className='v '+(s>0.6?'good':'bad')})}
+$('mu').oninput=()=>draw();
+setupPlayer({captureSeed:3,reset:s=>{seed(s);reset()},next},90);
+</script></body></html>

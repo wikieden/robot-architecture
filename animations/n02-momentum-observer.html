@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>动量观测器碰撞检测动画</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>运控细化 · 动量观测器：不加传感器也能发现碰撞</h1>
+<p class="sub">配套笔记：02-motion-control-deep-dive.md §4.2。单关节以 0.6 rad/s 匀速转动，转到 0.5 rad 处有一块挡板。观测器只用关节角、角速度和指令力矩，估计外力矩 r。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 430"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">时间</div><div class="v" id="st">0.00 s</div></div>
+<div class="stat"><div class="l">检测延迟</div><div class="v" id="sd">—</div></div>
+<div class="stat"><div class="l">不检测：最大外力矩</div><div class="v bad" id="s1">0</div></div>
+<div class="stat"><div class="l">检测后退让：最大外力矩</div><div class="v good" id="s2">0</div></div>
+</div>
+<div class="row ctl"><label>观测器增益 K<sub>O</sub> = <b id="kv">50</b></label><input id="k" type="range" min="5" max="200" step="5" value="50"></div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 重来</button></div>
+<p class="note">看点：碰上挡板后，真实外力矩（粗淡线）开始上升，观测器残差 r（彩色线）几乎同步跟上。r 超过阈值（虚线 3 N·m）就判定碰撞：下面那只立刻改目标、后退 0.05 rad，外力矩很快归零；上面那只不检测，PD 继续往前推，力越压越大。K<sub>O</sub> 越大，r 跟得越快，但对噪声也越敏感。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');const I=0.5,KP=200,KD=20,WALL=0.5,KW=2000,DT=0.001,SUB=20,N=80,TH=3,V=0.6;
+const lanes=[{n:'不检测：PD 一直往前推',cx:170,det:false,col:'var(--bad)',id:'s1'},{n:'动量观测器检测 → 后退',cx:510,det:true,col:'var(--good)',id:'s2'}];
+const R=120,CY=170;
+lanes.forEach(L=>{txt(L.n,{x:L.cx-110,y:24},sv);
+  const a=WALL;el('line',{x1:L.cx,y1:CY,x2:L.cx+(R+20)*Math.cos(-a),y2:CY+(R+20)*Math.sin(-a),stroke:'var(--muted)','stroke-width':8},sv);
+  txt('挡板',{x:L.cx+(R+26)*Math.cos(-a),y:CY+(R+26)*Math.sin(-a),class:'m'},sv);
+  L.tg=el('line',{x1:L.cx,y1:CY,stroke:L.col,'stroke-width':1.5,'stroke-dasharray':'4 3'},sv);
+  L.link=el('line',{x1:L.cx,y1:CY,stroke:'var(--text)','stroke-width':7,'stroke-linecap':'round'},sv);
+  el('circle',{cx:L.cx,cy:CY,r:8,fill:'var(--text)'},sv);L.flag=txt('',{x:L.cx-40,y:CY+40},sv)});
+const GX=60,GY=250,GW=580,GH=150,TMAX=1.6,FMAX=100;
+el('rect',{x:GX,y:GY,width:GW,height:GH,fill:'var(--bg)',stroke:'var(--line)'},sv);
+const gy=v=>GY+GH-Math.min(v,FMAX)/FMAX*GH;
+el('line',{x1:GX,y1:gy(TH),x2:GX+GW,y2:gy(TH),stroke:'var(--amber)','stroke-dasharray':'5 4'},sv);txt('阈值 3',{x:GX+GW+4,y:gy(TH)+4,class:'m'},sv);
+[25,50,100].forEach(v=>txt(String(v),{x:GX+GW+4,y:gy(v)+4,class:'m'},sv));
+txt('外力矩 (N·m)：粗淡线 = 真实值，彩色细线 = 观测器估计 r',{x:GX,y:GY-8,class:'m'},sv);
+lanes.forEach(L=>{L.cT=el('polyline',{fill:'none',stroke:L.col,'stroke-width':6,opacity:.22},sv);L.cR=el('polyline',{fill:'none',stroke:L.col,'stroke-width':1.8},sv)});
+let k,t,KO,tc;
+function reset(){k=0;t=0;KO=+$('k').value;tc=null;$('sd').textContent='—';
+  lanes.forEach(L=>{L.q=0;L.qd=0;L.integ=0;L.r=0;L.te=0;L.hit=null;L.qs=null;L.max=0;L.pT=[];L.pR=[];L.flag.textContent='';$(L.id).textContent='0'});draw()}
+function next(){if(k>=N)return false;k++;
+  for(let s=0;s<SUB;s++){t+=DT;lanes.forEach(L=>{
+    let qs=V*t,vs=V;if(L.hit!=null){qs=L.qs;vs=0}
+    const tau=KP*(qs-L.q)+KD*(vs-L.qd);
+    const te=L.q>WALL?-KW*(L.q-WALL)-5*Math.max(0,L.qd):0;L.te=te;
+    if(te!==0&&tc==null)tc=t;
+    L.qd+=(tau+te)/I*DT;L.q+=L.qd*DT;
+    const p=I*L.qd;L.integ+=(tau+L.r)*DT;L.r=KO*(p-L.integ);
+    if(L.det&&L.hit==null&&Math.abs(L.r)>TH){L.hit=t;L.qs=L.q-0.05;L.flag.textContent='检测到碰撞！后退';if(tc!=null)$('sd').textContent=((t-tc)*1000).toFixed(0)+' ms'}
+    L.max=Math.max(L.max,-te)})}
+  lanes.forEach(L=>{const x=GX+t/TMAX*GW;L.pT.push([x,gy(-L.te)]);L.pR.push([x,gy(Math.max(0,-L.r))]);if(!L.det&&-L.te>20)L.flag.textContent='一直硬顶'});
+  draw();return true}
+function draw(){lanes.forEach(L=>{const a=L.q;L.link.setAttribute('x2',L.cx+R*Math.cos(-a));L.link.setAttribute('y2',CY+R*Math.sin(-a));
+  const ta=L.hit!=null?L.qs:V*t;L.tg.setAttribute('x2',L.cx+R*Math.cos(-ta));L.tg.setAttribute('y2',CY+R*Math.sin(-ta));
+  L.cT.setAttribute('points',L.pT.map(p=>p.join(',')).join(' '));L.cR.setAttribute('points',L.pR.map(p=>p.join(',')).join(' '));
+  $(L.id).textContent=L.max.toFixed(1)+' N·m'});$('st').textContent=t.toFixed(2)+' s'}
+$('k').oninput=()=>{$('kv').textContent=$('k').value;ANIM.stop();reset()};
+setupPlayer({captureSeed:1,reset,next},50);
+</script></body></html>

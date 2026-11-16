@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RRT-Connect 动画</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>规划细化 · RRT-Connect：两棵树对着长，再把路拉直</h1>
+<p class="sub">配套笔记：03-planning-deep-dive.md §3.2。二维平面当作"构型空间"，灰块是障碍。每一帧：一棵树往随机点长一步，另一棵树朝新节点一路长过去（connect），然后两棵树交换角色。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 440"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">阶段</div><div class="v" id="sp">长树</div></div>
+<div class="stat"><div class="l">节点数</div><div class="v" id="sn">0</div></div>
+<div class="stat"><div class="l">碰撞检测次数</div><div class="v" id="sc">0</div></div>
+<div class="stat"><div class="l">路径长度</div><div class="v" id="sl">—</div></div>
+</div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 换随机数</button></div>
+<p class="note">看点：蓝树从起点长，橙树从终点长，两棵树一碰上就得到一条路（橙红折线），弯弯曲曲。接着做"捷径化"：随机挑路上两个点，如果直线连接不撞，就把中间那段删掉——路越来越短、越来越直（绿线）。碰撞检测次数是规划里最主要的耗时。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');const X0=20,Y0=20,S=640,H=400;const SC=v=>[X0+v[0]*S,Y0+(1-v[1])*H];
+const obs=[[0.22,0,0.08,0.62],[0.45,0.38,0.08,0.62],[0.70,0,0.08,0.55],[0.70,0.70,0.08,0.30]];
+el('rect',{x:X0,y:Y0,width:S,height:H,fill:'var(--bg)',stroke:'var(--line)'},sv);
+obs.forEach(o=>{const a=SC([o[0],o[1]+o[3]]);el('rect',{x:a[0],y:a[1],width:o[2]*S,height:o[3]*H,fill:'var(--muted)',opacity:.55},sv)});
+const START=[0.06,0.1],GOAL=[0.94,0.9],STEP=0.035;
+const gT=el('g',{},sv),gP=el('g',{},sv);
+[[START,'起点','var(--accent)'],[GOAL,'终点','var(--warm)']].forEach(([p,s,c])=>{const q=SC(p);el('circle',{cx:q[0],cy:q[1],r:7,fill:c},sv);txt(s,{x:q[0]+9,y:q[1]-8},sv)});
+let A,B,path,phase,checks,k,sw;
+const free=p=>p[0]>=0&&p[0]<=1&&p[1]>=0&&p[1]<=1&&!obs.some(o=>p[0]>o[0]&&p[0]<o[0]+o[2]&&p[1]>o[1]&&p[1]<o[1]+o[3]);
+function segFree(a,b){const d=Math.hypot(b[0]-a[0],b[1]-a[1]);const n=Math.max(2,Math.ceil(d/0.008));for(let i=0;i<=n;i++){checks++;const p=[a[0]+(b[0]-a[0])*i/n,a[1]+(b[1]-a[1])*i/n];if(!free(p))return false}return true}
+function nearest(T,p){let bi=0,bd=1e9;T.forEach((n,i)=>{const d=(n.p[0]-p[0])**2+(n.p[1]-p[1])**2;if(d<bd){bd=d;bi=i}});return bi}
+function extend(T,p){const i=nearest(T,p),q=T[i].p;const d=Math.hypot(p[0]-q[0],p[1]-q[1]);const nw=d<=STEP?p:[q[0]+(p[0]-q[0])/d*STEP,q[1]+(p[1]-q[1])/d*STEP];
+  if(!segFree(q,nw))return null;T.push({p:nw,par:i});el('line',{x1:SC(q)[0],y1:SC(q)[1],x2:SC(nw)[0],y2:SC(nw)[1],stroke:T.col,'stroke-width':1.2,opacity:.8},gT);return T.length-1}
+function trace(T,i){const r=[];while(i!=null&&i>=0){r.push(T[i].p);i=T[i].par}return r}
+function plen(P){let s=0;for(let i=1;i<P.length;i++)s+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);return s}
+function drawPath(col,w){clear(gP);if(!path)return;el('polyline',{points:path.map(p=>SC(p).join(',')).join(' '),fill:'none',stroke:col,'stroke-width':w,'stroke-linejoin':'round'},gP)}
+function reset(){A=[{p:START,par:-1}];B=[{p:GOAL,par:-1}];A.col='var(--accent)';B.col='var(--warm)';path=null;phase='grow';checks=0;k=0;sw=false;clear(gT);clear(gP);stats()}
+function stats(){$('sp').textContent=phase==='grow'?'长树':phase==='short'?'捷径化':'完成';$('sn').textContent=A.length+B.length;$('sc').textContent=checks;$('sl').textContent=path?plen(path).toFixed(2):'—'}
+function next(){k++;if(phase==='done'||k>220)return false;
+  if(phase==='grow'){for(let rep=0;rep<2&&phase==='grow';rep++){const T1=sw?B:A,T2=sw?A:B;const r=[rnd(),rnd()];const ni=extend(T1,r);
+      if(ni!=null){const tgt=T1[ni].p;let last=null;for(let g=0;g<60;g++){const j=extend(T2,tgt);if(j==null)break;last=j;if(Math.hypot(T2[j].p[0]-tgt[0],T2[j].p[1]-tgt[1])<1e-9){
+            const pa=trace(T1,ni),pb=trace(T2,j);const fromA=sw?pb:pa,fromB=sw?pa:pb;path=fromA.reverse().concat(fromB.slice(1));phase='short';k=0;drawPath('var(--bad)',3);break}}}
+      sw=!sw}}
+  else if(phase==='short'){if(k>40){phase='done';drawPath('var(--good)',3.5);stats();return false}
+    for(let rep=0;rep<3;rep++){const n=path.length;if(n<3)break;let i=Math.floor(rnd()*n),j=Math.floor(rnd()*n);if(i>j)[i,j]=[j,i];if(j-i<2)continue;if(segFree(path[i],path[j]))path=path.slice(0,i+1).concat(path.slice(j))}
+    drawPath('var(--good)',3)}
+  stats();return true}
+setupPlayer({captureSeed:11,reset:s=>{seed(s);reset()},next},90);
+</script></body></html>

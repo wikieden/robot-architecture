@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>阻抗控制动画</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>第 6 章 · 阻抗控制：硬弹簧 vs 软弹簧撞墙</h1>
+<p class="sub">配套讲义：<a href="../lessons/06-low-level-control.html">第 6 章 · 底层控制：电流环 → 速度环 → 位置环，再到阻抗与全身控制</a>。手（等效质量 0.5 kg）追一个匀速前进的目标，目标最后停在墙后 2 cm。控制律 F = K(x* − x) + D(ẋ* − ẋ)，D 取临界阻尼 2√(Km)。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 420"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">时间</div><div class="v" id="st">0.00 s</div></div>
+<div class="stat"><div class="l">硬 K=<span id="k1">5000</span> 稳态 / 峰值接触力</div><div class="v bad" id="f1">0 N</div></div>
+<div class="stat"><div class="l">软 K=<span id="k2">300</span> 稳态 / 峰值接触力</div><div class="v good" id="f2">0 N</div></div>
+</div>
+<div class="row ctl"><label>软的那只 K = <b id="kv">300</b> N/m</label><input id="k" type="range" min="50" max="2000" step="50" value="300"></div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 重来</button></div>
+<p class="note">看点：虚线方框是目标 x*，实心方块是手。碰墙前两只都在追；碰墙后硬的那只接触力冲到上百牛，软的只有几牛。稳态力 ≈ K × 2 cm：硬的 100 N，软的 6 N。刚碰上那一下的冲击峰值主要由手的速度和等效质量决定（第 3 章的反射惯量），阻抗控制管的是之后压多紧。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');const X0=40,PX=1500,WALL=0.30,m=0.5,KW=2e4,DW=150,dt=0.0005,SUB=20;
+const lanes=[{top:30,K:5000,col:'var(--bad)',id:'f1'},{top:150,K:300,col:'var(--good)',id:'f2'}];
+lanes.forEach(L=>{el('line',{x1:X0,y1:L.top+60,x2:X0+WALL*PX,y2:L.top+60,stroke:'var(--line)'},sv);
+  el('rect',{x:X0+WALL*PX,y:L.top,width:14,height:70,fill:'var(--muted)'},sv);
+  L.lab=txt('',{x:X0,y:L.top+12},sv);
+  L.spring=el('polyline',{fill:'none',stroke:L.col,'stroke-width':1.5},sv);
+  L.tg=el('rect',{y:L.top+20,width:26,height:36,fill:'none',stroke:L.col,'stroke-dasharray':'4 3'},sv);
+  L.hand=el('rect',{y:L.top+20,width:26,height:36,fill:L.col,rx:3},sv)});
+const GY=290,GH=110,GW=600;txt('接触力 (N，对数纵轴)',{x:X0,y:GY-8,class:'m'},sv);
+el('rect',{x:X0,y:GY,width:GW,height:GH,fill:'var(--bg)',stroke:'var(--line)'},sv);
+[1,10,100,1000].forEach(v=>{const y=GY+GH-Math.log10(v+1)/3.3*GH;el('line',{x1:X0,y1:y,x2:X0+GW,y2:y,stroke:'var(--line)','stroke-dasharray':'2 3'},sv);txt(String(v),{x:X0+GW+4,y:y+4,class:'m'},sv)});
+lanes.forEach(L=>L.curve=el('polyline',{fill:'none',stroke:L.col,'stroke-width':2},sv));
+const N=160;let k,t;
+function tgt(t){const a=0.02+0.25*t;return Math.min(a,WALL+0.02)}
+function reset(){k=0;t=0;lanes[1].K=+$('k').value;$('k2').textContent=lanes[1].K;
+  lanes.forEach(L=>{L.x=0.02;L.v=0;L.F=0;L.max=0;L.pts=[];L.lab.textContent='K = '+L.K+' N/m'});draw()}
+function next(){if(k>=N)return false;k++;
+  for(let s=0;s<SUB;s++){t+=dt;const xt=tgt(t),vt=xt<WALL+0.02?0.25:0;
+    lanes.forEach(L=>{const D=2*Math.sqrt(L.K*m);const Fc=L.K*(xt-L.x)+D*(vt-L.v);
+      const pen=L.x-WALL;const Fw=pen>0?KW*pen+DW*Math.max(0,L.v):0;L.F=Fw;L.max=Math.max(L.max,Fw);
+      L.v+=(Fc-Fw)/m*dt;L.x+=L.v*dt})}
+  lanes.forEach(L=>L.pts.push([X0+k/N*GW,GY+GH-Math.log10(L.F+1)/3.3*GH]));draw();return true}
+function draw(){lanes.forEach(L=>{const xh=X0+L.x*PX-26,xt=X0+tgt(t)*PX-26;
+  L.hand.setAttribute('x',xh);L.tg.setAttribute('x',xt);
+  const sp=[];const a=X0,b=xh;for(let i=0;i<=16;i++)sp.push([a+(b-a)*i/16,L.top+38+(i%2?-6:6)*(i>0&&i<16)]);
+  L.spring.setAttribute('points',sp.map(p=>p.join(',')).join(' '));
+  L.curve.setAttribute('points',L.pts.map(p=>p.join(',')).join(' '));$(L.id).textContent=L.F.toFixed(0)+' / '+L.max.toFixed(0)+' N'});
+  $('st').textContent=t.toFixed(2)+' s'}
+$('k').oninput=()=>{$('kv').textContent=$('k').value;ANIM.stop();reset()};
+setupPlayer({captureSeed:1,reset,next},40);
+</script></body></html>

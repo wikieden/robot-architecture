@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>安全降级动画</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>第 10 章 · 故障降级：正常 → 降速 → 保护停止 → STO</h1>
+<p class="sub">配套讲义：<a href="../lessons/10-safety-and-cases.html">第 10 章 · 安全、可靠性与整机案例：怎么设计一台机器人</a>。三个事件：有人进入协作区、主站心跳丢失、急停按下。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 400"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">时间</div><div class="v" id="st">0.0 s</div></div>
+<div class="stat"><div class="l">当前状态</div><div class="v" id="ss">正常</div></div>
+<div class="stat"><div class="l">关节速度</div><div class="v" id="sv2">—</div></div>
+</div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 重来</button></div>
+<p class="note">看点：降速和 SS1 都是"沿斜坡"慢下来（受控减速）；STO 是直接切断动力，速度靠抱闸很快归零。心跳那一行的空缺超过 3 拍，看门狗就触发 SS1。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');const X0=60,W=600,N=200;const PX=W/N;
+const ST={ok:['正常','var(--good)'],slow:['降速','var(--amber)'],ss1:['保护停止 SS1','var(--warm)'],sto:['STO','var(--bad)']};
+txt('状态',{x:8,y:52,class:'m'},sv);txt('速度',{x:8,y:150,class:'m'},sv);txt('心跳',{x:8,y:300,class:'m'},sv);
+el('rect',{x:X0,y:80,width:W,height:150,fill:'var(--bg)',stroke:'var(--line)'},sv);
+const sg=el('g',{},sv),hb=el('g',{},sv),ev=el('g',{},sv);const vl=el('polyline',{fill:'none',stroke:'var(--accent)','stroke-width':2.4},sv);
+const evs=[[30,'有人进入'],[60,'人离开'],[95,'心跳丢失'],[130,'复位'],[165,'急停']];
+evs.forEach(([k,s])=>{el('line',{x1:X0+k*PX,y1:30,x2:X0+k*PX,y2:320,stroke:'var(--muted)','stroke-dasharray':'3 3'},ev);txt(s,{x:X0+k*PX+3,y:345,class:'m'},ev)});
+let k,state,v,pts,miss;
+const Y=v=>80+150-v*130;
+function reset(){k=0;state='ok';v=1;pts=[];miss=0;clear(sg);clear(hb);draw()}
+function next(){if(k>=N)return false;k++;
+  const beat=!(k>=95&&k<101);if(beat){miss=0;el('line',{x1:X0+k*PX,y1:290,x2:X0+k*PX,y2:306,stroke:'var(--teal)'},hb)}else miss++;
+  if(k===30&&state==='ok')state='slow';if(k===60&&state==='slow')state='ok';
+  if(miss>3&&state!=='sto')state='ss1';if(k===130&&state==='ss1')state='ok';if(k===165)state='sto';
+  const goal={ok:1,slow:0.5,ss1:0,sto:0}[state];const rate=state==='sto'?0.35:0.04;
+  if(state==='sto')v=Math.max(0,v-rate);else v+=Math.max(-rate,Math.min(rate,goal-v));
+  pts.push([X0+k*PX,Y(v)]);el('rect',{x:X0+(k-1)*PX,y:36,width:PX+0.5,height:22,fill:ST[state][1]},sg);draw();return true}
+function draw(){vl.setAttribute('points',pts.map(p=>p.join(',')).join(' '));$('st').textContent=(k/20).toFixed(1)+' s';
+  $('ss').textContent=ST[state][0];$('ss').style.color=ST[state][1];$('sv2').textContent=Math.round(v*100)+'%'}
+setupPlayer({captureSeed:1,reset,next},45);
+</script></body></html>

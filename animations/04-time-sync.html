@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>时间同步动画</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>第 4 章 · 时间同步：延迟 Δt 让抓取差 v·Δt</h1>
+<p class="sub">配套讲义：<a href="../lessons/04-sensors.html">第 4 章 · 传感器：知道自己在哪，看见外面的世界</a>。传送带 0.5 m/s，相机每 0.4 s 拍一张，图片晚 Δt 才到机器人手里，机器人收到就去抓。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 360"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">延迟 Δt</div><div class="v" id="sdt">—</div></div>
+<div class="stat"><div class="l">理论误差 v·Δt</div><div class="v" id="se">—</div></div>
+<div class="stat"><div class="l">不补偿 命中</div><div class="v" id="s1">0 / 0</div></div>
+<div class="stat"><div class="l">补偿 命中</div><div class="v" id="s2">0 / 0</div></div>
+</div>
+<div class="row ctl"><label>延迟 <b id="dv">80</b> ms</label><input id="d" type="range" min="0" max="150" value="80" step="10"></div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 重来</button></div>
+<p class="note">看点：浅色虚框是"照片里方块的位置"（已经过时 Δt），橙色竖线是夹爪落点。不补偿时落点在方块后面；按时间戳补偿时，用 x + v·Δt 预测，正好落在方块上。夹爪宽 ±2 cm 算命中。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');const X0=40,W=600,PX=W/1.6;const v=0.5,dt=0.02;let k=0;
+const lanes=[{n:'不补偿：去照片里的位置',top:40,comp:false,id:'s1'},{n:'按时间戳补偿：x + v·Δt',top:200,comp:true,id:'s2'}];
+lanes.forEach(L=>{txt(L.n,{x:X0,y:L.top-8},sv);el('rect',{x:X0,y:L.top+60,width:W,height:12,fill:'var(--card)',stroke:'var(--line)'},sv);
+  L.g=el('g',{},sv);L.box=el('rect',{y:L.top+30,width:24,height:30,fill:'var(--accent)',rx:3},sv);L.ghost=el('rect',{y:L.top+30,width:24,height:30,fill:'none',stroke:'var(--muted)','stroke-dasharray':'3 2'},sv);L.cam=el('circle',{cx:X0+40,cy:L.top+8,r:6,fill:'var(--muted)'},sv)});
+txt('相机',{x:X0+50,y:52,class:'m'},sv);
+let t,x0,pend,dl;
+function reset(){t=0;k=0;x0=0.02;pend=[];dl=+$('d').value/1000;lanes.forEach(L=>{clear(L.g);L.hit=0;L.n2=0;L.ghost.setAttribute('opacity',0)});
+  $('sdt').textContent=Math.round(dl*1000)+' ms';$('se').textContent=(v*dl*100).toFixed(1)+' cm';draw()}
+function pos(tt){return x0+v*tt}
+function next(){if(k>=150)return false;k++;t=k*dt;
+  if(k%20===0){pend.push({shot:t,x:pos(t)});lanes.forEach(L=>{L.cam.setAttribute('fill','var(--warm)');L.ghost.setAttribute('x',X0+pos(t)*PX-12);L.ghost.setAttribute('opacity',1)})}
+  else lanes.forEach(L=>L.cam.setAttribute('fill','var(--muted)'));
+  pend=pend.filter(p=>{if(t-p.shot>=dl-1e-6){const real=pos(t);lanes.forEach(L=>{let aim=L.comp?p.x+v*dl:p.x;
+      const err=real-aim;const ok=Math.abs(err)<0.02;L.n2++;if(ok)L.hit++;
+      el('line',{x1:X0+aim*PX,y1:L.top+20,x2:X0+aim*PX,y2:L.top+78,stroke:'var(--warm)','stroke-width':3},L.g);
+      txt(ok?'✓':'✗ '+(err*100).toFixed(1)+'cm',{x:X0+aim*PX-10,y:L.top+96,class:ok?'good':'bad'},L.g)});return false}return true});
+  draw();return true}
+function draw(){lanes.forEach(L=>{L.box.setAttribute('x',X0+pos(t)*PX-12);$(L.id).textContent=L.hit+' / '+L.n2;
+  if(L.g.childNodes.length>12){L.g.removeChild(L.g.firstChild);L.g.removeChild(L.g.firstChild)}})}
+$('d').oninput=()=>{$('dv').textContent=$('d').value;ANIM.stop();reset()};
+setupPlayer({captureSeed:1,reset,next},30);
+</script></body></html>

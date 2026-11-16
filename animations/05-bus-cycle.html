@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>总线周期动画</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>第 5 章 · 总线周期：CAN 挨个点名，EtherCAT 一帧走全场</h1>
+<p class="sub">配套讲义：<a href="../lessons/05-electrical-compute.html">第 5 章 · 电气与计算架构：大脑、小脑、神经和血管</a>。CAN 1 Mbps、每帧 130 位、一问一答；EtherCAT 100 Mbps、每关节 24 字节 + 40 字节头、每从站 1 µs 转发延迟。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 400"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">CAN 一圈</div><div class="v" id="c1">—</div></div>
+<div class="stat"><div class="l">CAN 最高频率</div><div class="v" id="c2">—</div></div>
+<div class="stat"><div class="l">EtherCAT 一圈</div><div class="v" id="e1">—</div></div>
+<div class="stat"><div class="l">EtherCAT 最高频率</div><div class="v" id="e2">—</div></div>
+</div>
+<div class="row ctl"><label>关节数 <b id="nv">6</b></label><input id="n" type="range" min="2" max="12" value="6"></div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 重来</button></div>
+<p class="note">看点：两条线的动画各自按自己的一圈放慢播放，不是同一时间尺度。真实时间比例看底部两根条：灰框是 1 ms（1 kHz 控制周期），条超出灰框就跑不到 1 kHz。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');let n,f,nodesC,nodesE,dotC,dotE,lit=[];
+const lanes={can:{y:60,name:'CAN：主站 → 关节 i → 主站，挨个来'},ecat:{y:190,name:'EtherCAT：一帧穿过所有关节，就地读写，到头折返'}};
+const g=el('g',{},sv);
+function cyc(){const tc=n*2*130/1;const te=8*(n*24+40)/100+2*n*1;return[tc,te]}
+function build(){clear(g);n=+$('n').value;const X0=40,W=600,dx=(W-80)/n;
+  [lanes.can,lanes.ecat].forEach(L=>{txt(L.name,{x:X0,y:L.y-18},g);
+    el('rect',{x:X0,y:L.y,width:56,height:36,rx:6,fill:'var(--accent-bg)',stroke:'var(--accent)'},g);txt('主站',{x:X0+12,y:L.y+23},g);
+    L.nodes=[];for(let i=0;i<n;i++){const x=X0+80+i*dx;el('line',{x1:x-24+(i?0:0),y1:L.y+18,x2:x,y2:L.y+18,stroke:'var(--line)','stroke-width':2},g);
+      L.nodes.push({x:x+Math.min(30,dx-8)/2,r:el('rect',{x,y:L.y+4,width:Math.min(30,dx-8),height:28,rx:4,fill:'var(--card)',stroke:'var(--muted)'},g)});txt('J'+(i+1),{x:x+2,y:L.y+50,class:'m'},g)}
+    L.dot=el('circle',{r:7,cy:L.y+18,fill:'var(--warm)'},g)});
+  lanes.can.home=X0+28;lanes.ecat.home=X0+28;
+  const [tc,te]=cyc();const BX=60,BW=500,Y1=300,sc=BW/Math.max(1000,tc);
+  txt('真实时间比例（灰框 = 1 ms）',{x:BX,y:Y1-14,class:'m'},g);
+  el('rect',{x:BX,y:Y1,width:1000*sc,height:44,fill:'none',stroke:'var(--muted)','stroke-dasharray':'4 3'},g);
+  el('rect',{x:BX,y:Y1+4,width:tc*sc,height:16,fill:tc>1000?'var(--bad)':'var(--amber)'},g);txt('CAN '+(tc/1000).toFixed(2)+' ms',{x:BX+tc*sc+6,y:Y1+17,class:'m'},g);
+  el('rect',{x:BX,y:Y1+24,width:Math.max(2,te*sc),height:16,fill:'var(--good)'},g);txt('EtherCAT '+te.toFixed(0)+' µs',{x:BX+Math.max(2,te*sc)+6,y:Y1+37,class:'m'},g);
+  $('c1').textContent=(tc/1000).toFixed(2)+' ms';$('c2').textContent=Math.floor(1e6/tc)+' Hz';$('c2').className='v '+(tc>1000?'bad':'good');
+  $('e1').textContent=te.toFixed(0)+' µs';$('e2').textContent=(1e6/te/1000).toFixed(0)+' kHz';$('e2').className='v good'}
+const F=60;
+function place(){const p=(f%F)/F;
+  const C=lanes.can;const seg=p*2*n;const i=Math.min(n-1,Math.floor(seg/2));const s=seg-2*i;const xn=C.nodes[i].x;
+  const xc=s<1?C.home+(xn-C.home)*s:xn+(C.home-xn)*(s-1);C.dot.setAttribute('cx',xc);
+  C.nodes.forEach((d,j)=>d.r.setAttribute('fill',j<i||(j===i&&s>=1)?'var(--accent-bg)':'var(--card)'));
+  const E=lanes.ecat;const last=E.nodes[n-1].x;const xe=p<0.5?E.home+(last-E.home)*p*2:last+(E.home-last)*(p-0.5)*2;E.dot.setAttribute('cx',xe);
+  E.nodes.forEach(d=>d.r.setAttribute('fill',(p<0.5&&d.x<=xe)||p>=0.5?'var(--accent-bg)':'var(--card)'))}
+function reset(){f=0;build();place()}
+function next(){if(f>=2*F)return false;f++;place();return true}
+$('n').oninput=()=>{$('nv').textContent=$('n').value;ANIM.stop();reset()};
+setupPlayer({captureSeed:1,reset,next},50);
+</script></body></html>

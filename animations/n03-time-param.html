@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>时间参数化动画</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>规划细化 · 路径变轨迹：直线连点 vs 平滑样条</h1>
+<p class="sub">配套笔记：03-planning-deep-dive.md §4。同一个关节要依次经过 4 个路径点（0 → 1.0 → 0.4 → 1.2 rad），每段 1 秒。比较"直线连点"和"三次样条"两种轨迹的速度和加速度。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 470"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">时间</div><div class="v" id="st">0.00 s</div></div>
+<div class="stat"><div class="l">直线连点 最大 |加速度|</div><div class="v bad" id="a1">—</div></div>
+<div class="stat"><div class="l">三次样条 最大 |加速度|</div><div class="v good" id="a2">—</div></div>
+</div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 重来</button></div>
+<p class="note">看点：直线连点（红）位置是折线，速度在每个路径点突然跳变，加速度在那一瞬间是尖峰（理论上无穷大，图里按 10 ms 差分画）——电机做不到，机器人会"一顿"。三次样条（绿）速度连续、加速度有限。但样条的速度在开头和结尾超过了限值（虚线），所以真实系统还要再做时间参数化（TOPP-RA / Ruckig）：放慢超限的地方，让速度和加速度都在限值内。VLA 的 action chunk 接缝处也是同一个问题。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');const Y=[0,1.0,0.4,1.2],n=Y.length-1,DT=0.01,TM=3;
+// 自然三次样条：解二阶导 M
+const Mv=new Array(n+1).fill(0);{const a=[],b=[],c=[],d=[];for(let i=1;i<n;i++){a.push(1);b.push(4);c.push(1);d.push(6*(Y[i-1]-2*Y[i]+Y[i+1]))}
+  for(let i=1;i<b.length;i++){const m=a[i]/b[i-1];b[i]-=m*c[i-1];d[i]-=m*d[i-1]}const x=new Array(b.length);x[b.length-1]=d[b.length-1]/b[b.length-1];
+  for(let i=b.length-2;i>=0;i--)x[i]=(d[i]-c[i]*x[i+1])/b[i];x.forEach((v,i)=>Mv[i+1]=v)}
+function spl(t){const i=Math.min(n-1,Math.floor(t)),u=t-i;const A=1-u,B=u;
+  return A*Y[i]+B*Y[i+1]+((A*A*A-A)*Mv[i]+(B*B*B-B)*Mv[i+1])/6}
+function lin(t){const i=Math.min(n-1,Math.floor(t)),u=t-i;return Y[i]+(Y[i+1]-Y[i])*u}
+const NSTEP=Math.round(TM/DT);const series=[lin,spl].map(f=>{const q=[],v=[],a=[];for(let i=0;i<=NSTEP;i++)q.push(f(i*DT));
+  for(let i=0;i<=NSTEP;i++){const i0=Math.max(0,i-1),i1=Math.min(NSTEP,i+1);v.push((q[i1]-q[i0])/((i1-i0)*DT))}
+  for(let i=0;i<=NSTEP;i++){const i0=Math.max(0,i-1),i1=Math.min(NSTEP,i+1);a.push((v[i1]-v[i0])/((i1-i0)*DT))}return{q,v,a}});
+const X0=70,W=570;const plots=[{n:'位置 q (rad)',y:30,k:'q',lo:-0.2,hi:1.4},{n:'速度 (rad/s)',y:180,k:'v',lo:-1.5,hi:1.5,lim:1.2},{n:'加速度 (rad/s²)，红线尖峰被截断',y:330,k:'a',lo:-8,hi:8,lim:5}];
+const PH=110;const cols=['var(--bad)','var(--good)'];
+plots.forEach(P=>{txt(P.n,{x:X0,y:P.y-6,class:'m'},sv);el('rect',{x:X0,y:P.y,width:W,height:PH,fill:'var(--bg)',stroke:'var(--line)'},sv);
+  P.Y=v=>P.y+PH-(Math.max(P.lo,Math.min(P.hi,v))-P.lo)/(P.hi-P.lo)*PH;
+  el('line',{x1:X0,y1:P.Y(0),x2:X0+W,y2:P.Y(0),stroke:'var(--line)'},sv);
+  if(P.lim)[P.lim,-P.lim].forEach(l=>el('line',{x1:X0,y1:P.Y(l),x2:X0+W,y2:P.Y(l),stroke:'var(--amber)','stroke-dasharray':'5 4'},sv));
+  if(P.k==='q')Y.forEach((y,i)=>el('circle',{cx:X0+i/TM*W,cy:P.Y(y),r:5,fill:'var(--text)'},sv));
+  P.lines=cols.map(c=>el('polyline',{fill:'none',stroke:c,'stroke-width':2},sv));P.cur=el('line',{y1:P.y,y2:P.y+PH,stroke:'var(--text)','stroke-dasharray':'3 3'},sv)});
+txt('红 = 直线连点　绿 = 三次样条　黑点 = 路径点　黄虚线 = 速度 / 加速度限值',{x:X0,y:462,class:'m'},sv);
+let k;const FR=4;
+function reset(){k=0;draw()}
+function next(){if(k*FR>=NSTEP)return false;k++;draw();return true}
+function draw(){const m=Math.min(NSTEP,k*FR);plots.forEach(P=>{P.lines.forEach((L,si)=>{const arr=series[si][P.k];const pts=[];for(let i=0;i<=m;i++)pts.push([X0+i/NSTEP*W,P.Y(arr[i])]);L.setAttribute('points',pts.map(p=>p.join(',')).join(' '))});
+    const x=X0+m/NSTEP*W;P.cur.setAttribute('x1',x);P.cur.setAttribute('x2',x)});
+  const mx=si=>{let s=0;for(let i=1;i<m;i++)s=Math.max(s,Math.abs(series[si].a[i]));return s};
+  $('st').textContent=(m*DT).toFixed(2)+' s';$('a1').textContent=m>1?mx(0).toFixed(0)+' rad/s²':'—';$('a2').textContent=m>1?mx(1).toFixed(1)+' rad/s²':'—'}
+setupPlayer({captureSeed:1,reset,next},50);
+</script></body></html>

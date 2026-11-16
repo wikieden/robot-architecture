@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ROS 2 QoS 动画</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>第 7 章 · QoS：差网络下 RELIABLE 越积越旧，BEST_EFFORT 丢包但新鲜</h1>
+<p class="sub">配套讲义：<a href="../lessons/07-ros2-middleware.html">第 7 章 · 软件框架：ROS 2、中间件与实时系统</a>。相机每个时刻发 1 条；Wi-Fi 链路每时刻最多发 1.25 次，每次以丢包率 p 丢失。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 380"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">RELIABLE 队列长度</div><div class="v" id="q1">0</div></div>
+<div class="stat"><div class="l">RELIABLE 最新一帧多旧</div><div class="v" id="a1">—</div></div>
+<div class="stat"><div class="l">BEST_EFFORT 收到 / 发出</div><div class="v" id="r2">—</div></div>
+<div class="stat"><div class="l">BEST_EFFORT 最新一帧多旧</div><div class="v" id="a2">—</div></div>
+</div>
+<div class="row ctl"><label>丢包率 p = <b id="pv">35</b>%</label><input id="p" type="range" min="0" max="45" step="5" value="35"></div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 重来</button></div>
+<p class="note">看点：RELIABLE 每条平均要发 1/(1−p) 次，p = 35% 时是 1.54 次，超过了链路的 1.25 次——队列只会越来越长，订阅者看到的画面越来越旧。BEST_EFFORT 少收一些，但收到的都是刚拍的。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');const X0=40,W=600,CAP=1.25,N=120,LAT=2;
+const lanes=[{n:'RELIABLE：丢了重发，按顺序送达',top:30,rel:true},{n:'BEST_EFFORT：丢了就算了',top:170,rel:false}];
+lanes.forEach(L=>{txt(L.n,{x:X0,y:L.top},sv);
+  el('rect',{x:X0,y:L.top+14,width:70,height:40,rx:6,fill:'var(--accent-bg)',stroke:'var(--accent)'},sv);txt('相机节点',{x:X0+8,y:L.top+39},sv);
+  el('rect',{x:X0+W-90,y:L.top+14,width:90,height:40,rx:6,fill:'var(--card)',stroke:'var(--muted)'},sv);txt('订阅者',{x:X0+W-70,y:L.top+39},sv);
+  el('line',{x1:X0+70,y1:L.top+34,x2:X0+W-90,y2:L.top+34,stroke:'var(--line)','stroke-width':2,'stroke-dasharray':'6 4'},sv);
+  L.g=el('g',{},sv);L.qb=el('rect',{x:X0,y:L.top+60,height:10,fill:'var(--amber)'},sv);L.ql=txt('',{x:X0,y:L.top+86,class:'m'},sv)});
+const GY=300,GH=60;txt('最新一帧的"年龄"（时刻）',{x:X0,y:GY-6,class:'m'},sv);el('rect',{x:X0,y:GY,width:W,height:GH,fill:'var(--bg)',stroke:'var(--line)'},sv);
+const c1=el('polyline',{fill:'none',stroke:'var(--bad)','stroke-width':2},sv),c2=el('polyline',{fill:'none',stroke:'var(--good)','stroke-width':2},sv);
+txt('红 = RELIABLE　绿 = BEST_EFFORT',{x:X0+W-200,y:GY-6,class:'m'},sv);
+let k,p,credit,q,flight,lastR,lastB,sentB,gotB,pts1,pts2;
+function reset(){k=0;p=+$('p').value/100;credit=0;q=[];flight=[];lastR=null;lastB=null;sentB=0;gotB=0;pts1=[];pts2=[];lanes.forEach(L=>clear(L.g));draw()}
+function next(){if(k>=N)return false;k++;q.push(k);sentB++;
+  const L0=lanes[0],L1=lanes[1];
+  // BEST_EFFORT：每条只发一次
+  const lostB=rnd()<p;flight.push({lane:1,id:k,t:k,lost:lostB});
+  // RELIABLE：按容量发送队首，丢了留在队首下次重发
+  credit+=CAP;while(credit>=1&&q.length){credit-=1;const id=q[0];const lost=rnd()<p;flight.push({lane:0,id,t:k,lost});if(!lost)q.shift()}
+  if(!q.length)credit=Math.min(credit,1);
+  flight=flight.filter(m=>{if(k-m.t>=LAT){if(!m.lost){if(m.lane===0)lastR=Math.max(lastR||0,m.id);else{lastB=m.id;gotB++}}return false}return true});
+  pts1.push([X0+k/N*W,GY+GH-Math.min(GH,(lastR?k-lastR:0)*2.5)]);pts2.push([X0+k/N*W,GY+GH-Math.min(GH,(lastB?k-lastB:0)*2.5)]);
+  draw();return true}
+function draw(){lanes.forEach((L,li)=>{clear(L.g);flight.filter(m=>m.lane===li).forEach(m=>{const fr=(k-m.t+1)/(LAT+1);const x=X0+80+fr*(W-180);
+    if(m.lost)txt('✗',{x,y:L.top+40,class:'bad'},L.g);else el('circle',{cx:x,cy:L.top+34,r:6,fill:`hsl(${(m.id*37)%360},60%,55%)`},L.g)})});
+  lanes[0].qb.setAttribute('width',Math.min(600,q.length*6));lanes[0].ql.textContent='待发队列 '+q.length+' 条';
+  lanes[1].qb.setAttribute('width',0);lanes[1].ql.textContent='不排队';
+  $('q1').textContent=q.length;$('a1').textContent=lastR?(k-lastR)+' 时刻':'—';$('a1').className='v '+(lastR&&k-lastR>10?'bad':'');
+  $('r2').textContent=gotB+' / '+sentB;$('a2').textContent=lastB?(k-lastB)+' 时刻':'—';
+  c1.setAttribute('points',pts1.map(p=>p.join(',')).join(' '));c2.setAttribute('points',pts2.map(p=>p.join(',')).join(' '))}
+$('p').oninput=()=>{$('pv').textContent=$('p').value;ANIM.stop();seed(7);reset()};
+setupPlayer({captureSeed:7,reset:s=>{seed(s);reset()},next},90);
+</script></body></html>

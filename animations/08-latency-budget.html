@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>延迟预算动画</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>第 8 章 · 延迟预算：三种架构对突发事件的反应时间</h1>
+<p class="sub">配套讲义：<a href="../lessons/08-autonomy-stack.html">第 8 章 · 自主栈：从模块化流水线到端到端 VLA 与双系统</a>。第 0.30 s 杯子被碰走（红线）。数字是量级示意，不是某个产品的实测。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 400"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">时间</div><div class="v" id="st">0.00 s</div></div>
+<div class="stat"><div class="l">模块化 反应</div><div class="v" id="r0">—</div></div>
+<div class="stat"><div class="l">端到端 VLA 反应</div><div class="v" id="r1">—</div></div>
+<div class="stat"><div class="l">双系统 反应</div><div class="v" id="r2">—</div></div>
+</div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 重来</button></div>
+<p class="note">看点：每个彩色块是"在算"。一圈开始时拍照，用的是那一刻的画面；红线之后开始的那一圈才"看得到"杯子挪了，它结束（绿三角）才开始执行新动作。双系统的 S1 每 10 ms 一圈，几乎立刻反应；S2（紫色长块）慢慢更新意图。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');const X0=110,W=550,TMAX=1.0,EV=0.30;const PX=W/TMAX;
+const stages=[
+ {n:'模块化串行',y:40,segs:[['相机',.033,'var(--muted)'],['检测',.03,'var(--accent)'],['位姿',.04,'var(--teal)'],['规划',.2,'var(--amber)'],['下发',.005,'var(--warm)']],period:null,id:'r0'},
+ {n:'端到端 VLA',y:140,segs:[['编码',.02,'var(--accent)'],['VLM',.06,'var(--purple)'],['动作头',.04,'var(--warm)']],period:.2,id:'r1'},
+ {n:'双系统 S1',y:240,segs:[['S1',.008,'var(--good)']],period:.01,id:'r2'},
+ {n:'双系统 S2',y:285,segs:[['S2 VLM',.12,'var(--purple)']],period:.125,id:null}];
+stages.forEach(S=>{S.len=S.segs.reduce((a,s)=>a+s[1],0);S.per=S.period||S.len;txt(S.n,{x:8,y:S.y+18},sv);
+  el('rect',{x:X0,y:S.y,width:W,height:28,fill:'var(--bg)',stroke:'var(--line)'},sv);S.g=el('g',{},sv)});
+for(let i=0;i<=10;i++){const x=X0+i*0.1*PX;el('line',{x1:x,y1:330,x2:x,y2:336,stroke:'var(--muted)'},sv);txt((i/10).toFixed(1),{x:x-8,y:350,class:'m'},sv)}
+txt('时间 (s)',{x:X0+W-40,y:368,class:'m'},sv);
+el('line',{x1:X0+EV*PX,y1:24,x2:X0+EV*PX,y2:330,stroke:'var(--bad)','stroke-width':2},sv);txt('杯子被碰走',{x:X0+EV*PX+4,y:22,class:'bad'},sv);
+const cursor=el('line',{y1:30,y2:330,stroke:'var(--text)','stroke-width':1,'stroke-dasharray':'3 3'},sv);
+let t;const dt=0.01;
+function reset(){t=0;stages.forEach(S=>{clear(S.g);S.react=null;if(S.id)$(S.id).textContent='—'});draw()}
+function next(){if(t>=TMAX-1e-9)return false;t=+(t+dt).toFixed(3);draw();return true}
+function draw(){stages.forEach(S=>{clear(S.g);
+  for(let c=0;c*S.per<t;c++){let s0=c*S.per;let x=s0;S.segs.forEach(sg=>{const a=x,b=Math.min(x+sg[1],t);if(b>a){
+      el('rect',{x:X0+a*PX,y:S.y+3,width:Math.max(0.6,(b-a)*PX-0.4),height:22,fill:sg[2],opacity:.8},S.g);
+      if((b-a)*PX>34&&S.per>0.05)txt(sg[0],{x:X0+a*PX+3,y:S.y+18,class:'m'},S.g)}x+=sg[1]});
+    const end=s0+S.len;if(S.id&&s0>=EV&&S.react==null&&end<=t){S.react=end-EV;$(S.id).textContent=(S.react*1000).toFixed(0)+' ms'}}
+  if(S.react!=null){const x=X0+(EV+S.react)*PX;el('polygon',{points:`${x-7},${S.y+40} ${x+7},${S.y+40} ${x},${S.y+28}`,fill:'var(--good)'},S.g)}});
+  cursor.setAttribute('x1',X0+t*PX);cursor.setAttribute('x2',X0+t*PX);$('st').textContent=t.toFixed(2)+' s'}
+setupPlayer({captureSeed:1,reset,next},60);
+</script></body></html>

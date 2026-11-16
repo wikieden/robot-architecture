@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>减速比动画</title><link rel="stylesheet" href="anim.css"></head>
+<body><main>
+<h1>第 3 章 · 减速比的四个后果</h1>
+<p class="sub">配套讲义：<a href="../lessons/03-actuators.html">第 3 章 · 执行器：电机 + 减速器 = 一个关节</a>。电机：峰值 2 N·m、3000 rpm、转子惯量 J<sub>m</sub> = 5×10⁻⁵ kg·m²，效率按 0.85。</p>
+<div class="panel"><svg id="sv" viewBox="0 0 680 400"></svg></div>
+<div class="stats">
+<div class="stat"><div class="l">减速比 N</div><div class="v" id="sn">—</div></div>
+<div class="stat"><div class="l">输出峰值力矩</div><div class="v" id="st">—</div></div>
+<div class="stat"><div class="l">输出最高转速</div><div class="v" id="sw">—</div></div>
+<div class="stat"><div class="l">反射惯量 N²J<sub>m</sub></div><div class="v" id="sj">—</div></div>
+</div>
+<div class="row ctl"><label>N</label><input id="n" type="range" min="0" max="100" value="0"></div>
+<div class="row"><button id="play">▶ 播放</button><button id="step">→ 单步</button><button id="reset">↺ 重来</button></div>
+<p class="note">看点：四根柱子都按"最大可能值"归一化。力矩和反驱力矩随 N 线性涨，转速随 1/N 掉，反射惯量随 N² 涨——N 从 10 到 100，它涨 100 倍。</p>
+</main>
+<script src="anim.js"></script>
+<script>
+const sv=$('sv');const X0=60,W=580;const NMAX=160;
+const xs=n=>X0+Math.log(n)/Math.log(NMAX)*W;
+const bands=[{a:5,b:10,n:'QDD',c:'var(--teal)'},{a:20,b:100,n:'多级行星',c:'var(--amber)'},{a:50,b:160,n:'谐波',c:'var(--purple)'}];
+bands.forEach((B,i)=>{el('rect',{x:xs(B.a),y:24+i*16,width:xs(B.b)-xs(B.a),height:12,fill:B.c,opacity:.35,rx:3},sv);txt(B.n,{x:xs(B.a)+4,y:34+i*16,class:'m'},sv)});
+el('line',{x1:X0,y1:84,x2:X0+W,y2:84,stroke:'var(--line)'},sv);
+[1,3,10,30,100,160].forEach(n=>{el('line',{x1:xs(n),y1:80,x2:xs(n),y2:88,stroke:'var(--muted)'},sv);txt(String(n),{x:xs(n)-6,y:100,class:'m'},sv)});
+const mk=el('polygon',{fill:'var(--warm)'},sv);
+const bars=[{n:'输出力矩 ∝ N',c:'var(--accent)'},{n:'最高转速 ∝ 1/N',c:'var(--good)'},{n:'反射惯量 ∝ N²',c:'var(--bad)'},{n:'反驱力矩 ∝ N',c:'var(--amber)'}];
+const BY=130,BH=220,BW=90;
+bars.forEach((B,i)=>{const x=X0+30+i*140;el('rect',{x,y:BY,width:BW,height:BH,fill:'var(--bg)',stroke:'var(--line)'},sv);
+  B.r=el('rect',{x,width:BW,fill:B.c,opacity:.85},sv);txt(B.n,{x:x-10,y:BY+BH+22},sv);B.v=txt('',{x:x+4,y:BY-6,class:'m'},sv)});
+const Jm=5e-5,Jlink=0.05;let s;
+const Nof=s=>Math.exp(s/100*Math.log(NMAX));
+function upd(){const N=Nof(s);const tq=2*0.85*N,w=3000/N,J=N*N*Jm,bd=0.02*N;
+  const f=[tq/(2*0.85*NMAX),w/3000,J/(NMAX*NMAX*Jm),bd/(0.02*NMAX)];
+  bars.forEach((B,i)=>{const h=Math.max(1,f[i]*BH);B.r.setAttribute('y',BY+BH-h);B.r.setAttribute('height',h)});
+  bars[0].v.textContent=tq.toFixed(0)+' N·m';bars[1].v.textContent=w.toFixed(0)+' rpm';bars[2].v.textContent=J.toFixed(3)+' kg·m²';bars[3].v.textContent=bd.toFixed(2)+' N·m';
+  const x=xs(N);mk.setAttribute('points',`${x-7},70 ${x+7},70 ${x},82`);
+  $('sn').textContent=N.toFixed(N<10?1:0);$('st').textContent=tq.toFixed(0)+' N·m';$('sw').textContent=w.toFixed(0)+' rpm';
+  $('sj').textContent=(J/Jlink).toFixed(J/Jlink<1?2:0)+'× 连杆';$('n').value=s}
+function reset(){s=0;upd()}
+function next(){if(s>=100)return false;s+=2;upd();return true}
+$('n').oninput=()=>{ANIM.stop();s=+$('n').value;upd()};
+setupPlayer({captureSeed:1,reset,next},120);
+</script></body></html>
