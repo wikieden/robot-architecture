@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 5 章 · 电气与计算架构：大脑、小脑、神经和血管 · 机器人软硬件架构</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}}
+:root[data-theme="dark"]{--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:14px}
+header.top .brand{font-weight:600;color:var(--fg);text-decoration:none;margin-right:auto}
+header.top a{text-decoration:none}
+main{max-width:860px;margin:0 auto;padding:24px 16px 72px;overflow-wrap:anywhere}
+h1{font-size:28px;line-height:1.35;margin:8px 0 16px} h2{font-size:22px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)} h3{font-size:18px;margin:28px 0 8px}
+img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+blockquote{margin:16px 0;padding:10px 16px;background:var(--quote);border-left:3px solid var(--acc);border-radius:4px;color:var(--mute)}
+blockquote p{margin:4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto} pre code{padding:0;background:none}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:12px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--code)}
+details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px} summary{cursor:pointer;color:var(--acc);font-weight:500}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.btn{display:inline-block;margin:4px 8px 4px 0;padding:6px 14px;border:1px solid var(--acc);border-radius:999px;text-decoration:none;font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;color:inherit;text-decoration:none}
+.card:hover{border-color:var(--acc)} .card img{border:0;border-bottom:1px solid var(--line);border-radius:0;aspect-ratio:16/10;object-fit:contain;width:100%}
+.card .no{color:var(--mute);font-size:13px;padding:8px 12px 0} .card .t{padding:0 12px 12px;font-weight:500;line-height:1.5}
+.lead{font-size:17px;color:var(--mute)}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-size:13px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true,processEnvironments:true}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body>
+<header class="top"><div class="in">
+<a class="brand" href="../index.html">机器人软硬件架构</a>
+<a href="../lessons/index.html">讲义目录</a>
+<a href="../animations/index.html">动画</a>
+<a href="../review.html">复习卡片</a>
+<a href="../lessons/appendix-glossary.html">缩写表</a>
+</div></header>
+<main>
+<h1 id="5">第 5 章 · 电气与计算架构：大脑、小脑、神经和血管</h1><p><a class="btn" href="../animations/05-bus-cycle.html">▶ 打开本章可交互动画</a></p>
+<blockquote>
+<p>本章回答：机器人身上有几块"电脑"、各管什么？关节总线为什么多用 EtherCAT 或 CAN-FD？电源和急停回路怎么设计？<br />
+编写日期：2026-11-04 · 上一章：<a href="../lessons/04-sensors.html">第 4 章 传感器</a> · 下一章：<a href="../lessons/06-low-level-control.html">第 6 章 底层控制</a> · 总览：00-overview.md<br />
+对应原文：<code>materials/text/modern-robotics-lynch-park.txt</code>（Lynch &amp; Park，<em>Modern Robotics</em>，2017 预印本） §8.9 L14485–L14494（力矩指令约 1 kHz 更新，驱动器电压环快十倍以上）。总线、电源、急停原文没有，对照附录推荐的 EtherCAT 官方介绍和 ISO 11898-1（不在本地）<br />
+本章缩写：SoC = System on Chip（片上 / 系统）；INT8 = 8-bit integer（8 位整数）；TOPS = Tera Operations Per Second（每秒万亿次运算）；FP4 = 4-bit Floating Point（4 位浮点）；TFLOPS = Tera Floating-point Operations Per Second（每秒万亿次浮点运算）；PREEMPT_RT = preemptible real-time（可抢占 / 实时补丁）；FPGA = Field-Programmable Gate Array（现场 / 可编程 / 门阵列）；STM32 = 意法半导体（STMicroelectronics）的 32 位 MCU 系列；TI = Texas Instruments（德州仪器）；EtherCAT、CAN-FD（第 1 章）；DC = Distributed Clocks（分布式 / 时钟，EtherCAT 里）；Mbps / Gbps = megabits / gigabits per second（每秒兆位 / 吉位）；RS-485 = Recommended Standard 485（推荐 / 标准 485）；TSN = Time-Sensitive Networking（时间 / 敏感 / 网络）；GMSL = Gigabit Multimedia Serial Link（千兆 / 多媒体 / 串行链路）；MIPI = Mobile Industry Processor Interface（移动 / 产业 / 处理器 / 接口）；BMS = Battery Management System（电池 / 管理 / 系统）；SOC = State of Charge（荷电 / 状态，剩余电量）；DC-DC = Direct Current to Direct Current converter（直流转直流变换器）；E-stop = Emergency stop（急停）；PLC = Programmable Logic Controller（可编程 / 逻辑 / 控制器）；STO = Safe Torque Off（安全 / 力矩 / 关断）；SPI = Serial Peripheral Interface（串行 / 外设 / 接口）；OTA = Over-The-Air（空中升级）；Wh / Ah = watt-hour / ampere-hour（瓦时 / 安时）；SOEM = Simple Open EtherCAT Master（简单 / 开源 / EtherCAT 主站）；ISO = International Organization for Standardization（国际标准化组织）；CPU = Central Processing Unit（中央 / 处理 / 单元）；ARM = Advanced RISC Machines（RISC = Reduced Instruction Set Computer：精简 / 指令集 / 计算机；一种处理器架构）；PC = Personal Computer（个人 / 计算机；工业 PC 即工控机）；GB = gigabyte（吉字节）；AGX：NVIDIA Jetson 高端型号的产品名（官方没给全称）；ALOHA = A Low-cost Open-source HArdware system for bimanual teleoperation（低成本开源双臂遥操作硬件，第 9 章细讲）。全部缩写见 <a href="../lessons/appendix-glossary.html">附录 · 缩写与术语表</a></p>
+</blockquote>
+<h2 id="_1">讲解</h2>
+<h3 id="1">第 1 步：三种计算单元</h3>
+<p><strong>白话类比</strong>：公司里有总经理（想战略，不怕慢）、车间主任（盯节拍，必须准时）、流水线工人（手上动作，几乎是反射）。</p>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>硬件</th>
+<th>跑什么</th>
+<th>要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>主控（大脑）</strong></td>
+<td>NVIDIA Jetson AGX Orin / Thor、x86 工控机 + 独显、手机级 SoC（RK3588 等）</td>
+<td>感知、VLA / 规划、ROS 2 主体、日志</td>
+<td>算力和功耗比；不要求硬实时</td>
+</tr>
+<tr>
+<td><strong>实时控制器（小脑）</strong></td>
+<td>主控上的隔离实时核（PREEMPT_RT Linux）、独立 ARM Cortex-A/R 板、或工业 PC 跑 EtherCAT 主站</td>
+<td>WBC、阻抗控制、状态估计、总线主站</td>
+<td>硬实时：1 kHz 周期抖动 ≲ 几十 µs</td>
+</tr>
+<tr>
+<td><strong>关节驱动（脊髓）</strong></td>
+<td>每个关节一块 MCU（STM32 / TI C2000 等）或 FPGA</td>
+<td>FOC 电流环、编码器读取、过流过温保护</td>
+<td>10–40 kHz，确定性最高</td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么分开</strong>：GPU 推理和 Linux 调度会抖；只要控制环和它们共享一个 CPU 核、一把锁，就可能被拖慢。所以控制环要么放独立核（CPU 隔离 + 实时优先级），要么放独立板子。</p>
+<p><strong>算力参考</strong>（以 NVIDIA 公布的峰值为准，是稀疏 / 低精度下的理论数）：Jetson AGX Orin 约 275 INT8 TOPS；Jetson AGX Thor（2025 年发布，Blackwell 架构，128 GB 内存）约 2000 FP4 TFLOPS 量级，目标就是在机上跑 VLA / VLM。实际可用远低于峰值。</p>
+<h3 id="2">第 2 步：总线：控制周期内要把所有关节"点一遍名"</h3>
+<p>每个控制周期（例如 1 ms），主站要给每个关节发"目标"，再收回"状态"。总线够不够快，决定了关节数 × 频率的上限。</p>
+<table>
+<thead>
+<tr>
+<th>总线</th>
+<th>速率</th>
+<th>拓扑</th>
+<th>特点</th>
+<th>谁在用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>EtherCAT</strong></td>
+<td>100 Mbps（以太网物理层）</td>
+<td>线形 / 环形菊花链</td>
+<td>一帧报文"穿过"所有从站，每个从站在报文经过时就地读写（processing on the fly）；分布式时钟（DC）同步精度亚微秒</td>
+<td>工业臂、多数人形、高端四足</td>
+</tr>
+<tr>
+<td><strong>CAN / CAN-FD</strong></td>
+<td>CAN 1 Mbps；CAN-FD 数据段 2–8 Mbps</td>
+<td>总线</td>
+<td>便宜、抗干扰、成熟；一问一答，关节多时带宽紧，常分成多路</td>
+<td>消费级四足、低成本人形、底盘</td>
+</tr>
+<tr>
+<td><strong>RS-485 / 串口</strong></td>
+<td>1–10 Mbps</td>
+<td>总线</td>
+<td>最便宜，协议自定</td>
+<td>舵机（Dynamixel、Feetech）、ALOHA / SO-100</td>
+</tr>
+<tr>
+<td><strong>以太网 / TSN</strong></td>
+<td>1–10 Gbps</td>
+<td>交换机</td>
+<td>大带宽，TSN 加了时间调度</td>
+<td>相机、LiDAR、主控之间</td>
+</tr>
+<tr>
+<td><strong>USB3 / GMSL / MIPI</strong></td>
+<td>Gbps 级</td>
+<td>点对点</td>
+<td>相机专用；GMSL 走长线抗干扰</td>
+<td>相机</td>
+</tr>
+</tbody>
+</table>
+<p><strong>估算 CAN 的瓶颈</strong>（一问一答）：一帧标准 CAN 报文约 110–130 位，1 Mbps 下约 0.13 ms。每个关节"发 1 帧 + 回 1 帧"约 0.26 ms。6 个关节一路 CAN 就要约 1.6 ms，跑不到 1 kHz；所以人形常用 4–8 路 CAN 并行，或者换 EtherCAT。</p>
+<p><strong>EtherCAT</strong>：一帧几百字节的报文，100 Mbps 下传输只要十几微秒，每个从站只加不到 1 µs 的延迟，几十个关节也能轻松做到 1 kHz 甚至更高。</p>
+<h3 id="3">第 3 步：电源：峰值电流和回馈能量</h3>
+<table>
+<thead>
+<tr>
+<th>部件</th>
+<th>作用</th>
+<th>设计要点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>电池组</td>
+<td>主能源（人形常见 48 V 左右的锂电池）</td>
+<td>能量（Wh）定续航；<strong>峰值放电倍率</strong>定能不能起跳、举重</td>
+</tr>
+<tr>
+<td>BMS</td>
+<td>电池管理：均衡、过充过放保护、SOC 估计</td>
+<td>和主控通信，低电量提前回充</td>
+</tr>
+<tr>
+<td>母线电容</td>
+<td>吸收瞬时电流尖峰</td>
+<td>电机加速瞬间电流很大</td>
+</tr>
+<tr>
+<td>DC-DC</td>
+<td>把母线电压转成 24 / 12 / 5 V 给计算和传感器</td>
+<td>计算和电机分开供电，避免电机噪声干扰</td>
+</tr>
+<tr>
+<td>制动回馈 / 泄放电阻</td>
+<td>电机减速时变成发电机，把能量灌回母线</td>
+<td>电池满电时回馈能量没处去会抬高母线电压，要有泄放电阻或吸收电路</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4">第 4 步：安全回路必须是"硬"的</h3>
+<p>急停（E-stop）不能只是一个软件按钮：</p>
+<pre><code> 急停按钮 ──→ 安全继电器 / 安全 PLC ──→ 驱动器的 STO 输入（断开 PWM 驱动）
+     │                                   └→ 抱闸断电（自动锁死）
+     └→ 同时通知主控（软件层记录、进入安全状态）
+</code></pre>
+<ul>
+<li><strong>STO（Safe Torque Off）</strong>：硬件上切断驱动器给电机的功率输出，电机不再出力。不依赖任何软件。</li>
+<li><strong>双通道冗余</strong>：两路独立接线，一路断线也能检测出来。</li>
+<li><strong>看门狗</strong>：驱动板如果一段时间（例如几个控制周期）收不到主站报文，自己进入安全状态。</li>
+</ul>
+<p>第 10 章细讲安全分级和标准。</p>
+<h3 id="5_1">第 5 步：一台人形的典型拓扑</h3>
+<pre><code>               ┌──────────── 主控：Jetson Thor / Orin ─────────────┐
+ 相机 ×N ─GMSL─┤  感知 · VLA · ROS 2 · 日志                        │── Wi-Fi / 5G ── 云（大模型、遥操作、OTA）
+ LiDAR ─以太网─┤                                                  │
+ 麦克风 ─USB──┤                                                   │
+               └──────────────┬─────────────────────────────────┘
+                              │ 以太网 / 共享内存（目标轨迹、状态）
+               ┌──────────────▼────────────────┐
+ IMU ─SPI/串口─┤ 实时控制器（RT 核或独立板）       │
+               │ 状态估计 · WBC · EtherCAT 主站     │
+               └───┬───────────┬───────────┬──────┘
+                   │ EtherCAT  │ EtherCAT  │ EtherCAT（或多路 CAN-FD）
+              左腿 6 关节   右腿 6 关节   腰 + 双臂 + 手
+                   │
+              每个关节：驱动板（FOC）+ 电机 + 减速器 + 编码器 + 抱闸
+ 电池 48 V ── BMS ── 母线 ── 各关节驱动；DC-DC ── 计算与传感器
+ 急停 ── 安全继电器 ── 所有驱动器 STO
+</code></pre>
+<h3 id="_2">动画演示</h3>
+<p><img alt="总线周期：CAN 一问一答 vs EtherCAT 一帧穿过" src="../animations/05-bus-cycle.gif" /></p>
+<p>可交互版：<a href="../animations/05-bus-cycle.html">animations/05-bus-cycle.html</a>（可改关节数）。</p>
+<p><strong>怎么看</strong>：</p>
+<ol>
+<li>上面 CAN：主站给关节 1 发一帧、等它回一帧，再问关节 2……一圈问完的时间随关节数线性增长。</li>
+<li>下面 EtherCAT：一帧报文从主站出发，穿过所有关节（每个关节在报文经过时取走自己的目标、塞进自己的状态），到头折返回来。</li>
+<li>右边数字是"一圈要多久"和"最高能跑多少 Hz"。把关节数拖到 12，CAN 一路就跑不到 1 kHz 了。</li>
+<li>时间按比例放慢了，动画里的速度不是真实速度。</li>
+</ol>
+<h2 id="_3">公式</h2>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>式子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CAN 一圈时间（一问一答）</td>
+<td><span class="arithmatex">\(T_{CAN} \approx n \times 2 \times \dfrac{\text{bits/帧}}{\text{速率}}\)</span></td>
+</tr>
+<tr>
+<td>最高控制频率</td>
+<td><span class="arithmatex">\(f_{max} = 1/T_{cycle}\)</span></td>
+</tr>
+<tr>
+<td>EtherCAT 一圈</td>
+<td><span class="arithmatex">\(T_{ECAT} \approx \dfrac{8 \times \text{字节数}}{100\,\text{Mbps}} + n \times t_{从站}\)</span></td>
+</tr>
+<tr>
+<td>电池续航</td>
+<td><span class="arithmatex">\(t \approx \dfrac{E_{Wh}}{P_{平均}}\)</span></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">练习与作答记录</h2>
+<p><strong>题 1</strong>：一路 1 Mbps 的 CAN，每帧按 130 位算，一问一答。要让 12 个关节跑 500 Hz，至少要几路 CAN？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 2</strong>：为什么急停要接到驱动器的 STO 硬件输入上，而不是让主控收到急停信号后"发一条停止指令"？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 3</strong>：一台人形电池 1 kWh，站立时平均 300 W，走路时平均 600 W。各能撑多久？为什么峰值功率（比如跳跃时几 kW）对电池选型也很重要？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<h2 id="_5">口诀</h2>
+<blockquote>
+<p>大脑算得多但会抖，小脑算得少但准时，关节板只管电流不出错。<br />
+CAN 挨个点名，EtherCAT 一帧走全场；急停走硬线，不走软件。</p>
+</blockquote>
+<h2 id="_6">本章复习卡片</h2>
+<p>A13 三种计算单元为什么分开、A14 EtherCAT vs CAN、A15 STO 与硬件急停（见 <a href="../review.html">review.md</a>）</p>
+<h2 id="_7">附录 · 延伸阅读</h2>
+<blockquote>
+<p>留给以后深入学习用，不影响本章主线。★ 是建议先读的。</p>
+</blockquote>
+<h3 id="_8">推荐阅读</h3>
+<ul>
+<li>★ EtherCAT Technology Group，"EtherCAT – the Ethernet Fieldbus"技术介绍（ethercat.org 官方白皮书）：processing on the fly、分布式时钟。</li>
+<li>★ 开源 EtherCAT 主站：SOEM（Simple Open EtherCAT Master）、IgH EtherCAT Master；对照读一个 1 kHz 周期循环的例子。</li>
+<li>Bosch，CAN-FD 规范（ISO 11898-1:2015）：帧格式、仲裁、位速率切换。</li>
+<li>NVIDIA Jetson AGX Thor / Orin 开发者文档：算力、功耗模式、实时内核支持。</li>
+<li>Linux PREEMPT_RT：自 Linux 6.12（2024）起合入主线；<code>cyclictest</code> 测周期抖动。</li>
+<li>开源人形 / 四足的电气设计参考：MIT Mini Cheetah（CAN）、Berkeley Humanoid（2024，开源研究人形，论文介绍了执行器与系统设计）。</li>
+</ul>
+<h3 id="_9">数学原理</h3>
+<ul>
+<li>比特率与帧长换算；排队延迟直觉。</li>
+<li>功率 <span class="arithmatex">\(P = UI\)</span>、能量 <span class="arithmatex">\(E = Pt\)</span>、电池容量 Wh = V × Ah。</li>
+</ul>
+<h3 id="_10">公式清单</h3>
+<p>见正文"公式"一节的表。</p>
+<h3 id="_11">代码对照：把本章的数字用代码算一遍</h3>
+<blockquote>
+<p>用 Python + NumPy（Numerical Python：数值 / Python）把讲义里讲过的数算一遍，不算练习题。代码在仓库本地 <code>robot-system-architecture/solutions/chapter-code/ch05_electrical_compute.py</code>，配套测试 <code>tests/test_ch05.py</code>，notebook 在 <code>notebooks/ch05_electrical_compute.ipynb</code>。Mac 上直接能跑，不需要 GPU：</p>
+<p><code>bash  
+cd robot-system-architecture/solutions/chapter-code  
+uv run python ch05_electrical_compute.py   # 一步一步打印  
+uv run pytest tests/test_ch05.py</code></p>
+</blockquote>
+<p><strong>讲义 ↔ 代码</strong>（EtherCAT 300 字节、30 个从站、电池 48 V × 10 Ah 是编的）：</p>
+<table>
+<thead>
+<tr>
+<th>讲义</th>
+<th>公式</th>
+<th>写法</th>
+<th>跑出来</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 2 步 一帧 CAN</td>
+<td>位数 ÷ 速率</td>
+<td><code>frame_time_s(130, 1e6)</code></td>
+<td>0.13 ms（110 位是 0.11 ms）</td>
+</tr>
+<tr>
+<td>第 2 步 一问一答</td>
+<td>2 帧</td>
+<td><code>can_cycle_s(1)</code></td>
+<td>0.26 ms</td>
+</tr>
+<tr>
+<td>第 2 步 6 个关节一路 CAN</td>
+<td><span class="arithmatex">\(n \times 2 \times\)</span> 帧时间</td>
+<td><code>can_cycle_s(6)</code></td>
+<td>1.56 ms → 最高 641 Hz</td>
+</tr>
+<tr>
+<td>第 2 步 EtherCAT</td>
+<td><span class="arithmatex">\(8 \times\)</span> 字节 ÷ 100 Mbps + <span class="arithmatex">\(n \times t_{从站}\)</span></td>
+<td><code>ecat_cycle_s(300, 30)</code></td>
+<td>24 + 30 = 54 µs → 约 18.5 kHz</td>
+</tr>
+<tr>
+<td>数学原理 电池能量</td>
+<td>Wh = V × Ah</td>
+<td><code>battery_wh(48, 10)</code></td>
+<td>480 Wh</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键几行</strong>：</p>
+<pre><code class="language-python">def can_cycle_s(n_joints, bits_per_frame=130, rate_bps=1e6):
+    return n_joints * 2 * bits_per_frame / rate_bps          # 每个关节一来一回两帧，挨个点名
+
+def ecat_cycle_s(frame_bytes, n_slaves, t_slave_s=1e-6, rate_bps=100e6):
+    return 8 * frame_bytes / rate_bps + n_slaves * t_slave_s   # 一帧穿过全部从站，每站只加一点延迟
+</code></pre>
+<p><strong>代码里才看得到的 2 件事</strong>：</p>
+<ul>
+<li>单位最容易错：速率是"位每秒"，报文长度是"字节"，所以 EtherCAT 那里要乘 8。</li>
+<li>这是理想估算：真实 CAN 还有仲裁、位填充、帧间隔，EtherCAT 还有主站软件的处理时间，实际一圈更长。</li>
+</ul>
+<p><strong>自己改一改</strong>（不影响练习答案）：</p>
+<ul>
+<li>把 <code>bits_per_frame</code> 改成 110，看 6 个关节一圈变成多少、能不能到 1 kHz。</li>
+<li>把 EtherCAT 从站数加到 60，看一圈还剩多少余量。</li>
+</ul><nav class="pager"><a href="04-sensors.html">← 第 4 章 · 传感器：知道自己在哪，看见外面的世界</a><a href="06-low-level-control.html">第 6 章 · 底层控制：电流环 → 速度环 → 位置环，再到阻抗与全身控制 →</a></nav>
+</main>
+<footer>来自个人学习仓库的对话讲义，含练习作答记录。源码：<a href="https://github.com/wikieden/robot-architecture">github.com/wikieden/robot-architecture</a></footer>
+</body></html>

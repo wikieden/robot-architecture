@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>robot-system-architecture · 复习卡片 · 机器人软硬件架构</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}}
+:root[data-theme="dark"]{--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:14px}
+header.top .brand{font-weight:600;color:var(--fg);text-decoration:none;margin-right:auto}
+header.top a{text-decoration:none}
+main{max-width:860px;margin:0 auto;padding:24px 16px 72px;overflow-wrap:anywhere}
+h1{font-size:28px;line-height:1.35;margin:8px 0 16px} h2{font-size:22px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)} h3{font-size:18px;margin:28px 0 8px}
+img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+blockquote{margin:16px 0;padding:10px 16px;background:var(--quote);border-left:3px solid var(--acc);border-radius:4px;color:var(--mute)}
+blockquote p{margin:4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto} pre code{padding:0;background:none}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:12px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--code)}
+details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px} summary{cursor:pointer;color:var(--acc);font-weight:500}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.btn{display:inline-block;margin:4px 8px 4px 0;padding:6px 14px;border:1px solid var(--acc);border-radius:999px;text-decoration:none;font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;color:inherit;text-decoration:none}
+.card:hover{border-color:var(--acc)} .card img{border:0;border-bottom:1px solid var(--line);border-radius:0;aspect-ratio:16/10;object-fit:contain;width:100%}
+.card .no{color:var(--mute);font-size:13px;padding:8px 12px 0} .card .t{padding:0 12px 12px;font-weight:500;line-height:1.5}
+.lead{font-size:17px;color:var(--mute)}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-size:13px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true,processEnvironments:true}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body>
+<header class="top"><div class="in">
+<a class="brand" href="index.html">机器人软硬件架构</a>
+<a href="lessons/index.html">讲义目录</a>
+<a href="animations/index.html">动画</a>
+<a href="review.html">复习卡片</a>
+<a href="lessons/appendix-glossary.html">缩写表</a>
+</div></header>
+<main>
+<h1 id="robot-system-architecture">robot-system-architecture · 复习卡片</h1>
+<p>必须记住的概念和公式，以及之后讲解中卡住、追问、答错的地方，都追加到这里。每张卡片的"来源"链接到 <a href="lessons/index.html">lessons/</a> 里对应的章节，忘了就回去重读。</p>
+<h2 id="_1">怎么用</h2>
+<ol>
+<li>先只看<strong>问题</strong>，自己说出或写出答案；</li>
+<li>再点开"答案"核对；</li>
+<li>答对了，在"复习记录"里补一个日期；答错了就当天再看一遍。</li>
+</ol>
+<p><strong>复习间隔</strong>（按答对的次数）：第 1 次 → 隔 1 天 → 隔 3 天 → 隔 7 天 → 隔 14 天 → 隔 30 天。连续答对 5 次的卡片移到文末"已掌握"。</p>
+<p>想复习时说一声"复习"，我会挑到期的卡片来考你。</p>
+<blockquote>
+<p>本批 30 张是 2026-11-04 整理资料时先放进来的"必背点"；各章练习题还没作答，答案没有写进卡片。</p>
+</blockquote>
+<hr />
+<h2 id="_2">总图与分层</h2>
+<h3 id="a01">A01 · 机器人软件栈分哪五层？各自大约多快、跑在什么硬件上？</h3>
+<p>来源：<a href="lessons/01-layered-loops.html">第 1 章</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>频率</th>
+<th>硬件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L4 任务规划（LLM / 行为树）</td>
+<td>0.1–1 Hz</td>
+<td>主控 GPU 或云</td>
+</tr>
+<tr>
+<td>L3 感知（SLAM、检测）</td>
+<td>10–30 Hz</td>
+<td>主控 GPU</td>
+</tr>
+<tr>
+<td>L2 策略 / 运动生成（VLA、MoveIt）</td>
+<td>5–50 Hz</td>
+<td>主控 GPU</td>
+</tr>
+<tr>
+<td>L1 关节 / 全身控制（阻抗、WBC）</td>
+<td>200 Hz–1 kHz</td>
+<td>实时核 / 控制板</td>
+</tr>
+<tr>
+<td>L0 电机驱动（FOC 电流环）</td>
+<td>10–40 kHz</td>
+<td>每个关节的驱动板 MCU</td>
+</tr>
+</tbody>
+</table>
+<p>口诀：越往下越快、越简单、越不能迟到。</p>
+</details>
+<h3 id="a02">A02 · 为什么不能让一个大模型直接输出电机电流？</h3>
+<p>来源：<a href="lessons/01-layered-loops.html#第-2-步为什么不能一层到底">第 1 章 · 第 2 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ol>
+<li><strong>算不过来</strong>：电流环要 10–40 kHz，大模型一次推理几十到上百毫秒，差三个数量级。</li>
+<li><strong>不确定</strong>：GPU 推理时间会抖，电流环必须每次准时。</li>
+<li><strong>出错代价</strong>：底层出错直接撞坏或伤人，所以底层要简单、可验证。</li>
+</ol>
+<p>所以上层给"慢而粗"的目标，下层用"快而简单"的控制器去追。</p>
+</details>
+<h3 id="a03-10-hz-1-khz">A03 · 上层 10 Hz 给目标、下层 1 kHz 执行，中间的空档怎么办？</h3>
+<p>来源：<a href="lessons/01-layered-loops.html#第-4-步插补慢目标怎么变成快指令">第 1 章 · 第 4 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p><strong>插补</strong>：在两个目标之间用直线 / 三次样条 / 最小加加速度曲线补点，再交给跟踪控制器追。最简单的跟踪器：<span class="arithmatex">\(x_{k+1} = x_k + \alpha(x^*_k - x_k)\)</span>。VLA 里一次输出 action chunk，也是为了给下层足够的"未来目标"。</p>
+</details>
+<h2 id="_3">本体与运动学</h2>
+<h3 id="a04-6-7">A04 · 为什么空间中要 6 个自由度？7 自由度的"冗余"有什么用？</h3>
+<p>来源：<a href="lessons/02-kinematics.html#第-1-步自由度dof-能独立变化的数有几个">第 2 章 · 第 1 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>物体在空间里的位姿 = 位置 3 个数 + 朝向 3 个数，所以要 6 个独立关节才能到达任意位姿。第 7 个是冗余：手的位姿不变时还能调手肘，用来避障、避开奇异、避开关节极限。</p>
+</details>
+<h3 id="a05-j">A05 · 雅可比 J 的两个用途是什么？各写出公式。</h3>
+<p>来源：<a href="lessons/02-kinematics.html#第-5-步雅可比jacobian关节转一点点手动多少">第 2 章 · 第 5 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ol>
+<li><strong>速度</strong>：<span class="arithmatex">\(\dot x = J(\theta)\dot\theta\)</span>（关节速度 → 末端速度）；数值 IK 也靠它：<span class="arithmatex">\(\Delta\theta = J^\top(JJ^\top+\lambda^2 I)^{-1}e\)</span>。</li>
+<li><strong>力</strong>（静力学对偶）：<span class="arithmatex">\(\tau = J^\top F\)</span>（末端力 → 关节力矩），阻抗控制靠它把末端弹簧力换成关节力矩。</li>
+</ol>
+</details>
+<h3 id="a06">A06 · 什么是奇异？两连杆什么时候奇异？奇异附近会发生什么？</h3>
+<p>来源：<a href="lessons/02-kinematics.html#第-6-步奇异singularity">第 2 章 · 第 6 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>J 的列"挤到同一方向"，手在某个方向上动不了，<span class="arithmatex">\(\det J = 0\)</span>。两连杆 <span class="arithmatex">\(\det J = L_1L_2\sin\theta_2\)</span>，手臂完全伸直（<span class="arithmatex">\(\theta_2 = 0\)</span>）或完全折回（<span class="arithmatex">\(\pi\)</span>）时奇异。</p>
+<p>附近：沿那个方向走一点点，关节要转得极快（<span class="arithmatex">\(J^{-1}\)</span> 爆炸）；数值 IK 要加阻尼 <span class="arithmatex">\(\lambda\)</span> 防止步长发散。</p>
+</details>
+<h2 id="_4">执行器</h2>
+<h3 id="a07">A07 · 一个关节模组里从里到外有哪些部件？</h3>
+<p>来源：<a href="lessons/03-actuators.html#第-1-步一个关节模组里有什么">第 3 章 · 第 1 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>驱动板（MCU + MOSFET，跑 FOC）→ 无刷电机（BLDC / PMSM）→ 电机端编码器 → 抱闸 → 减速器 → 输出端编码器 →（可选）关节力矩传感器 → 输出法兰。电机力矩 <span class="arithmatex">\(\tau_m = K_t i\)</span>。</p>
+</details>
+<h3 id="a08-n">A08 · 减速比 N 对输出力矩、转速、反射惯量、反驱性各有什么影响？</h3>
+<p>来源：<a href="lessons/03-actuators.html#第-2-步减速比-n-的四个后果">第 3 章 · 第 2 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ul>
+<li>力矩 × N（乘效率 η）：<span class="arithmatex">\(\tau_{out} = \eta N\tau_m\)</span></li>
+<li>转速 ÷ N：<span class="arithmatex">\(\omega_{out} = \omega_m/N\)</span></li>
+<li><strong>反射惯量 × N²</strong>：<span class="arithmatex">\(J_{refl} = N^2 J_m\)</span></li>
+<li>反驱性变差（推关节需要的力随 N 增大），外力难以通过电流感知</li>
+</ul>
+<p>易错点：惯量是 N 的<strong>平方</strong>，不是 N。</p>
+</details>
+<h3 id="a09-qdd">A09 · 四足为什么偏爱准直驱（QDD），协作臂为什么用谐波，人形腿为什么有人用滚柱丝杠？</h3>
+<p>来源：<a href="lessons/03-actuators.html#第-3-步主流减速方案对比">第 3 章 · 第 3 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ul>
+<li><strong>QDD（N≈6–10）</strong>：腿每步撞地，低减速比反射惯量小、抗冲击、反驱好，电流就能反映地面反力（本体力感知）。</li>
+<li><strong>谐波（N≈50–160）</strong>：零背隙、体积小、单级大减速比，适合要精度的手臂；代价是柔性、怕冲击、反驱差。</li>
+<li><strong>滚柱丝杠</strong>：旋转变直线，推力大、刚度高，像肌肉一样配连杆驱动膝 / 踝 / 肘。</li>
+</ul>
+</details>
+<h2 id="_5">传感器</h2>
+<h3 id="a10">A10 · 本体感知和外部感知各包括哪些传感器？</h3>
+<p>来源：<a href="lessons/04-sensors.html#第-1-步两大类向内看和向外看">第 4 章 · 第 1 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ul>
+<li><strong>本体（向内看）</strong>：电机端 / 输出端编码器、电流传感、关节力矩传感器、六维力传感器、IMU。</li>
+<li><strong>外部（向外看）</strong>：RGB 相机、深度相机（结构光 / ToF / 双目）、LiDAR、触觉、麦克风。</li>
+</ul>
+</details>
+<h3 id="a11-t-v">A11 · 相机延迟 Δt、物体速度 v，抓取误差多大？怎么解决？</h3>
+<p>来源：<a href="lessons/04-sensors.html#第-3-步时间同步数据是什么时候的">第 4 章 · 第 3 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p><span class="arithmatex">\(e = v\cdot\Delta t\)</span>。解决：每帧打<strong>曝光时刻</strong>的硬件时间戳；所有设备统一时钟（PTP、硬件触发、EtherCAT 分布式时钟）；用运动模型补偿 <span class="arithmatex">\(\hat x = x_{obs} + v\Delta t\)</span>；多传感器按时间戳对齐后再融合。</p>
+</details>
+<h3 id="a12">A12 · 互补滤波怎么融合陀螺仪和加速度计？</h3>
+<p>来源：<a href="lessons/04-sensors.html#第-4-步传感器融合取长补短">第 4 章 · 第 4 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p><span class="arithmatex">\(\hat\theta_k = \alpha(\hat\theta_{k-1} + \omega_k\Delta t) + (1-\alpha)\theta^{acc}_k\)</span></p>
+<p>陀螺仪积分负责短期（高频准，但会漂），加速度计负责长期（不漂，但噪声大）。卡尔曼滤波相当于按不确定度自动调 α。</p>
+</details>
+<h2 id="_6">电气与计算</h2>
+<h3 id="a13">A13 · 机器人上的三种计算单元各管什么？为什么要分开？</h3>
+<p>来源：<a href="lessons/05-electrical-compute.html#第-1-步三种计算单元">第 5 章 · 第 1 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ul>
+<li>主控（Jetson Orin / Thor、x86 + GPU）：感知、VLA、ROS 2，不要求硬实时；</li>
+<li>实时控制器（RT 核 / 独立板）：WBC、阻抗、状态估计、总线主站，1 kHz 低抖动；</li>
+<li>关节驱动板（MCU / FPGA）：FOC 电流环与保护，10–40 kHz。</li>
+</ul>
+<p>分开是因为 GPU 推理和 Linux 调度会抖，控制环不能被拖慢。</p>
+</details>
+<h3 id="a14-ethercat-can">A14 · EtherCAT 和 CAN 在"一圈点名"上有什么本质区别？</h3>
+<p>来源：<a href="lessons/05-electrical-compute.html#第-2-步总线控制周期内要把所有关节点一遍名">第 5 章 · 第 2 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ul>
+<li><strong>CAN</strong>（1 Mbps，CAN-FD 数据段更快）：主站一问一答，挨个关节来，一圈时间随关节数线性增长；关节多时要分多路。</li>
+<li><strong>EtherCAT</strong>（100 Mbps）：一帧报文穿过所有从站，每个从站在报文经过时就地读写（processing on the fly），分布式时钟同步；几十个关节也能 1 kHz 以上。</li>
+</ul>
+</details>
+<h3 id="a15-sto">A15 · 什么是 STO？急停为什么要走硬件回路？</h3>
+<p>来源：<a href="lessons/05-electrical-compute.html#第-4-步安全回路必须是硬的">第 5 章 · 第 4 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>STO（Safe Torque Off）：硬件上切断驱动器给电机的功率输出。急停 → 安全继电器 / 安全 PLC → 驱动器 STO 输入 + 抱闸断电，双通道冗余。走硬件是因为软件可能卡死、崩溃或被错误指令覆盖，最后一道保险不能依赖软件。</p>
+</details>
+<h2 id="_7">底层控制</h2>
+<h3 id="a16-foc">A16 · 关节驱动里的三环级联是什么？FOC 里哪个电流分量产生力矩？</h3>
+<p>来源：<a href="lessons/06-low-level-control.html#第-2-步级联cascade一层套一层">第 6 章 · 第 2 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>位置环（~1 kHz）→ 速度环（5–10 kHz）→ 电流环（10–40 kHz），内环比外环快 5–10 倍。FOC 用 Clarke / Park 变换把三相电流变成 <span class="arithmatex">\(dq\)</span> 轴直流量：<strong><span class="arithmatex">\(i_q\)</span> 产生力矩</strong>（<span class="arithmatex">\(\tau = K_t i_q\)</span>），<span class="arithmatex">\(i_d\)</span> 通常控制为 0。</p>
+</details>
+<h3 id="a17">A17 · 阻抗控制的公式是什么？碰墙时接触力由什么决定？</h3>
+<p>来源：<a href="lessons/06-low-level-control.html#第-4-步阻抗控制让手变成一根可调的弹簧">第 6 章 · 第 4 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p><span class="arithmatex">\(\tau = J^\top[K(x^*-x) + D(\dot x^*-\dot x)] + g(q)\)</span></p>
+<p>稳态接触力 ≈ K × 目标陷进墙里的深度：可预测、有上限。刚碰上的冲击峰值则主要由速度和等效质量（反射惯量）决定。对偶的是导纳控制：测外力 → 算该怎么动。</p>
+</details>
+<h3 id="a18">A18 · 腿足机器人的底层控制有哪三条路线？</h3>
+<p>来源：<a href="lessons/06-low-level-control.html#第-5-步全身控制wbc和-mpc">第 6 章 · 第 5 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ol>
+<li><strong>WBC</strong>：每周期解一个 QP，满足动力学、摩擦锥、力矩限制，按权重 / 优先级跟踪多个任务；</li>
+<li><strong>MPC</strong>：用简化模型往前看一段、只执行第一步（和 receding horizon 同一思想），常与 WBC 组合；</li>
+<li><strong>RL</strong>：仿真里 PPO 训练，50 Hz 输出关节目标，驱动板 PD 高频追踪。</li>
+</ol>
+<p>三条路下面都还有 PD / FOC。</p>
+</details>
+<h2 id="_8">软件框架</h2>
+<h3 id="a19-ros-2">A19 · ROS 2 的话题、服务、动作各适合什么？</h3>
+<p>来源：<a href="lessons/07-ros2-middleware.html#第-2-步ros-2-的四种通信">第 7 章 · 第 2 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ul>
+<li>话题：发布 / 订阅流式数据（图像、关节状态、速度指令）；</li>
+<li>服务：短时请求 / 应答（重置、查询）；</li>
+<li>动作：长时间任务，带持续反馈、可取消（导航到某处、执行一段轨迹）。</li>
+</ul>
+<p>底层经 rmw 接 DDS 或 Zenoh。</p>
+</details>
+<h3 id="a20-reliable-best_effort">A20 · 差网络上传高频相机数据，RELIABLE 和 BEST_EFFORT 各会怎样？</h3>
+<p>来源：<a href="lessons/07-ros2-middleware.html#第-3-步qos每个话题要什么样的快递服务">第 7 章 · 第 3 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>RELIABLE 每条平均要发 <span class="arithmatex">\(1/(1-p)\)</span> 次，超过链路容量后队列越积越长，收到的画面越来越<strong>旧</strong>；BEST_EFFORT 会丢一些，但收到的都<strong>新鲜</strong>。对控制和可视化，新鲜比完整重要。另外，发布方和订阅方 QoS 不兼容会直接收不到。</p>
+</details>
+<h3 id="a21-ros2_control-ros-2">A21 · ros2_control 解决什么问题？ROS 2 的实时性要怎么保证？</h3>
+<p>来源：<a href="lessons/07-ros2-middleware.html#第-5-步ros2_control硬件抽象层">第 7 章 · 第 5、7 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>ros2_control：控制器插件和硬件插件（<code>read → update → write</code>）分开，换硬件 / 切仿真只换硬件插件。</p>
+<p>实时要自己保证：PREEMPT_RT 内核、CPU 隔离、SCHED_FIFO、锁内存；控制循环里不分配内存、不打日志、不等锁；实时与非实时线程用无锁缓冲交换；更硬的环下沉到独立控制板。</p>
+</details>
+<h2 id="_9">自主栈</h2>
+<h3 id="a22-vla">A22 · 模块化流水线、端到端 VLA、双系统各自的优缺点？</h3>
+<p>来源：<a href="lessons/08-autonomy-stack.html#第-1-步三种组织方式">第 8 章 · 第 1 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ul>
+<li>模块化：可解释、可单测；但串行延迟大，接口外的情况（透明、可变形物体）处理不了。</li>
+<li>端到端 VLA：不用手工设计中间表示，能学难描述的技能；但要大量数据、难调试、推理慢。</li>
+<li>双系统：慢 VLM（System 2）理解和规划 + 快策略（System 1）执行，兼顾泛化与反应速度；难点是两层对齐与联合训练。</li>
+</ul>
+<p>三种下面都还有底层控制和安全层。</p>
+</details>
+<h3 id="a23">A23 · 双系统为什么反应快？</h3>
+<p>来源：<a href="lessons/08-autonomy-stack.html#第-4-步双系统">第 8 章 · 第 4 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>System 1 不等 System 2：S2 异步更新"意图"（约 1–10 Hz），S1 用最新意图 + 最新画面高频出动作（约 50–200 Hz）。突发变化的反应时间由 S1 的周期和推理时间决定，与 S2 基本无关。</p>
+</details>
+<h3 id="a24">A24 · 串行流水线的反应时间怎么估？</h3>
+<p>来源：<a href="lessons/08-autonomy-stack.html#第-5-步延迟预算从发生到反应要多久">第 8 章 · 第 5 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>一圈 <span class="arithmatex">\(T_{cycle} = \sum_i t_i\)</span>；事件刚好错过本圈采样时，要等本圈跑完、下一圈从采样开始再跑完，最坏约 <span class="arithmatex">\(2T_{cycle}\)</span>。降低手段：异步推理、实时分块（RTC）、量化 / TensorRT、减少拷贝、降分辨率。</p>
+</details>
+<h2 id="_10">仿真、数据与部署</h2>
+<h3 id="a25-sim2real">A25 · sim2real 差距的五个来源？</h3>
+<p>来源：<a href="lessons/09-sim-data-deploy.html#第-3-步sim2real-差距从哪来">第 9 章 · 第 3 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ol>
+<li>动力学参数（质量、摩擦、阻尼）</li>
+<li>执行器（饱和、延迟、背隙、柔性）</li>
+<li>接触模型</li>
+<li>感知（渲染 vs 真实图像、深度噪声）</li>
+<li>时间（通信延迟、控制抖动）</li>
+</ol>
+<p>对策：系统辨识、域随机化、执行器网络、视觉随机化、注入延迟。</p>
+</details>
+<h3 id="a26">A26 · 域随机化的思想和代价？</h3>
+<p>来源：<a href="lessons/09-sim-data-deploy.html#第-3-步sim2real-差距从哪来">第 9 章 · 第 3 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>每回合随机抽一组物理参数训练，优化 <span class="arithmatex">\(\mathbb{E}_{\xi\sim p(\xi)}[J(\pi;\xi)]\)</span>，让真实世界只是参数范围里的"又一个样本"。代价：任何单一参数下都不是最优，策略偏保守，峰值性能略低。</p>
+</details>
+<h3 id="a27">A27 · 一条遥操作数据至少要记录哪些元信息才能长期可用？</h3>
+<p>来源：<a href="lessons/09-sim-data-deploy.html#第-5-步数据怎么存">第 9 章 · 第 5 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>统一时间戳、相机内外参、机器人型号与 URDF 版本、控制频率、动作的含义（关节角还是末端位姿、绝对还是增量）、任务描述。少了这些，换相机位置或换机器人后数据就没法用。</p>
+</details>
+<h2 id="_11">安全与整机</h2>
+<h3 id="a28-ai">A28 · 机器人安全有哪几层？AI 模型在哪一层？</h3>
+<p>来源：<a href="lessons/10-safety-and-cases.html#第-1-步安全是一层一层叠的">第 10 章 · 第 1 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>从下到上：本质安全（轻量、低减速比、限力矩）→ 硬件安全回路（急停、STO、抱闸）→ 认证安全控制器（安全限速 / 限位）→ 软件监控（看门狗、限幅、碰撞检测）→ 策略层（避障、请求人工）。AI 模型只在最上层，不能当最后一道保险。</p>
+</details>
+<h3 id="a29-stoss1ss2">A29 · STO、SS1、SS2 有什么区别？腿足机器人急停有什么特殊之处？</h3>
+<p>来源：<a href="lessons/10-safety-and-cases.html#第-2-步停机也分等级">第 10 章 · 第 2 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ul>
+<li>STO（类别 0）：立即切断出力，靠抱闸 / 惯性停；</li>
+<li>SS1（类别 1）：先受控减速，停下后再 STO；</li>
+<li>SS2（类别 2）：受控减速后保持出力停在原地。</li>
+</ul>
+<p>腿足直接 STO 会摔倒，所以常先受控蹲下 / 坐下再断电。</p>
+</details>
+<h3 id="a30">A30 · 从零设计一台机器人，九步决策顺序是什么？</h3>
+<p>来源：<a href="lessons/10-safety-and-cases.html#第-6-步选型清单从零设计时逐条过">第 10 章 · 第 6 步</a> · 加入 2026-11-04 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ol>
+<li>任务 → 构型 / DoF</li>
+<li>力矩、转速、接触 → 电机 + 减速器</li>
+<li>感知需求 → 传感器 + 标定 + 时间同步</li>
+<li>关节数 × 频率 → 总线；模型 × 推理频率 → 主控；功率 → 电池</li>
+<li>控制模式（位置 / 阻抗 / 力矩）与平衡</li>
+<li>软件框架与实时隔离</li>
+<li>自主架构（模块化 / 端到端 / 双系统）</li>
+<li>仿真模型、遥操作、数据格式、部署与 OTA</li>
+<li>安全回路、停机策略、适用标准</li>
+</ol>
+</details>
+<h2 id="_12">研发流程</h2>
+<h3 id="a31">A31 · 机器人软件研发主线的六个阶段是什么？外加哪个循环？</h3>
+<p>来源：01 · 研发流程 §2 · 加入 2026-11-05 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>① 需求与场景（任务、成功标准、运行环境边界、安全需求）→ ② 系统架构与接口（消息、频率、坐标系、时间戳、延迟预算）→ ③ 建模与仿真资产（URDF / MJCF / USD 一致）→ ④ 模块开发 → ⑤ 集成测试 → ⑥ 发布部署。</p>
+<p>外加 ⑦ 数据飞轮：真机日志 → 失败挖掘 → 定向采集 / 标注 → 再训练 → 回归评测 → OTA 灰度发布。</p>
+</details>
+<h3 id="a32">A32 · 机器人测试金字塔从下到上是哪几层？</h3>
+<p>来源：01 · 研发流程 §2 · 加入 2026-11-05 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>单元测试 / 录包回放 → SIL（软件在环，仿真里跑整套）→ HIL / 台架（真控制器或真硬件的一部分）→ 真机场景测试。越往下越多、越便宜、越快、越能复现；只靠真机测，问题难复现、成本高、容易伤机器。</p>
+</details>
+<h2 id="_13">运控与规划细化</h2>
+<h3 id="a33-pd-rl">A33 · "PD 目标"接口是什么？部署 RL 运控策略时哪些东西必须和仿真一致？</h3>
+<p>来源：02 · 运控细化 §2.3、§6.4 · 加入 2026-11-05 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>上层（约 50 Hz）只给目标关节角 <span class="arithmatex">\(q^*\)</span>，驱动板（≥1 kHz）自己算 <span class="arithmatex">\(\tau = K_p(q^*-q) - K_d\dot q\,(+\tau_{ff})\)</span>。</p>
+<p>必须一致：<span class="arithmatex">\(K_p\)</span> / <span class="arithmatex">\(K_d\)</span>、力矩饱和、控制频率与延迟、动作缩放、观测顺序 / 单位 / 归一化、关节零位与方向、IMU 坐标系。任何一项错，策略上机就乱动。</p>
+</details>
+<h3 id="a34">A34 · 动量观测器怎么检测碰撞？为什么好用？</h3>
+<p>来源：02 · 运控细化 §4.2 · 加入 2026-11-05 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>用广义动量 <span class="arithmatex">\(p = M(q)\dot q\)</span> 构造残差 <span class="arithmatex">\(r\)</span>，比较"模型算出应需的力矩"和"实际用的力矩"；<span class="arithmatex">\(r\)</span> 近似等于外力矩 <span class="arithmatex">\(J^\top F_{ext}\)</span>，超过阈值即判定碰撞。不需要关节加速度（加速度噪声大），也不需要额外力传感器。</p>
+</details>
+<h3 id="a35-mpc-wbc">A35 · 四足经典模型路线里，凸 MPC 和 WBC 各输出什么？为什么分两层？</h3>
+<p>来源：02 · 运控细化 §5.1、§5.4 · 加入 2026-11-05 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ul>
+<li>凸 MPC（30–100 Hz）：用单刚体简化模型往前看 0.3–0.5 s，输出每条支撑腿的<strong>期望地面反力</strong>；</li>
+<li>WBC（500 Hz–1 kHz）：解 QP，在全身动力学、摩擦锥、力矩限制下，把反力 + 躯干姿态 + 摆腿任务分配成<strong>每个关节的力矩</strong>。</li>
+</ul>
+<p>分两层是因为：往前看必须用简化模型才算得快；而真正执行要满足全身约束，只能在当前时刻用完整模型。</p>
+</details>
+<h3 id="a36-rl-teacherstudent">A36 · RL 运控里的 Teacher–Student 训练解决什么问题？</h3>
+<p>来源：02 · 运控细化 §6.2 · 加入 2026-11-05 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>仿真里能拿到真机拿不到的"特权信息"（真实摩擦、地形、外力）。先训练看得到特权信息的老师策略（好学），再让只看本体传感器历史的学生模仿老师，学生学会从历史里"推断"这些信息，就能部署到真机。类似思路：非对称 actor–critic、RMA 适应模块。</p>
+</details>
+<h3 id="a37">A37 · "路径"和"轨迹"有什么区别？时间参数化在做什么？</h3>
+<p>来源：03 · 规划细化 §4 · 加入 2026-11-05 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>路径是一串空间点（没有时间）；轨迹是每个时刻的位置、速度、加速度。时间参数化：给定路径 <span class="arithmatex">\(q(s)\)</span>，找 <span class="arithmatex">\(\dot s(t)\)</span>，让每个关节的速度 / 加速度（/ 加加速度）不超限且尽量快（TOPP-RA 时间最优、Ruckig 在线加加速度受限）。VLA 的 action chunk 下发前也要过这一层做平滑和限幅。</p>
+</details>
+<h3 id="a38">A38 · 运动规划四大家族各适合什么？</h3>
+<p>来源：03 · 规划细化 §3.6 · 加入 2026-11-05 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<ul>
+<li>搜索（A<em>、Hybrid A</em>）：低维，导航全局规划；</li>
+<li>采样（PRM、RRT-Connect、RRT*）：高维机械臂通用，概率完备，路径要后处理；</li>
+<li>优化（CHOMP、TrajOpt、cuRobo）：路径光滑、能加约束，但会陷局部最优；</li>
+<li>学习（扩散规划、VLA）：接触丰富操作，靠数据。</li>
+</ul>
+<p>常见组合：采样找可行路 → 优化精修。</p>
+</details>
+<h3 id="a39">A39 · 位控碰到硬表面为什么危险？阻抗控制怎么解决？</h3>
+<p>来源：02 · 运控细化 §4.4.1 · 加入 2026-11-05 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>位控时接触力 <span class="arithmatex">\(F \approx k_{env}\,e_{pos}\)</span>：刚性桌面 <span class="arithmatex">\(k_{env}\)</span> 可达 <span class="arithmatex">\(10^5\)</span>–<span class="arithmatex">\(10^6\)</span> N/m，1 mm 误差就是几百到上千牛。阻抗控制相当于串一根软弹簧 <span class="arithmatex">\(K\)</span>：<span class="arithmatex">\(F = \frac{K k_{env}}{K + k_{env}}\Delta \approx K\Delta\)</span>，力由自己设的 <span class="arithmatex">\(K\)</span> 决定，不再由环境硬度决定。</p>
+<p>另外：同一方向上不能同时指定位置和力，要么控位、要么控力（力位混合按方向分）。</p>
+</details>
+<h3 id="a40">A40 · 哪些情况必须用力控？举四类场景。</h3>
+<p>来源：02 · 运控细化 §4.4.4 · 加入 2026-11-05 · 复习记录：</p>
+<details>
+<summary>答案</summary>
+<p>判断规则（任一条）：① 任务要控接触力本身；② 位置不确定性 × 环境刚度会超过可承受的力；③ 轨迹由环境约束决定（门轴、导轨）；④ 和人物理接触要限力。</p>
+<p>场景：人机协作 / 拖动示教 / 康复；打磨抛光擦拭（恒力）；精密装配（插孔、插头、拧螺丝）；开门拉抽屉转阀门；双臂搬同一物体（闭链内力）；腿足行走；抓易碎物；医疗。</p>
+<p>位控就够：自由空间搬运、码垛、喷涂、弧焊、夹具定位精确的工位。</p>
+</details>
+<hr />
+<h2 id="_14">已掌握</h2>
+<p>（暂无）</p>
+</main>
+<footer>来自个人学习仓库的对话讲义，含练习作答记录。源码：<a href="https://github.com/wikieden/robot-architecture">github.com/wikieden/robot-architecture</a></footer>
+</body></html>

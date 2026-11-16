@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 4 章 · 传感器：知道自己在哪，看见外面的世界 · 机器人软硬件架构</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}}
+:root[data-theme="dark"]{--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:14px}
+header.top .brand{font-weight:600;color:var(--fg);text-decoration:none;margin-right:auto}
+header.top a{text-decoration:none}
+main{max-width:860px;margin:0 auto;padding:24px 16px 72px;overflow-wrap:anywhere}
+h1{font-size:28px;line-height:1.35;margin:8px 0 16px} h2{font-size:22px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)} h3{font-size:18px;margin:28px 0 8px}
+img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+blockquote{margin:16px 0;padding:10px 16px;background:var(--quote);border-left:3px solid var(--acc);border-radius:4px;color:var(--mute)}
+blockquote p{margin:4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto} pre code{padding:0;background:none}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:12px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--code)}
+details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px} summary{cursor:pointer;color:var(--acc);font-weight:500}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.btn{display:inline-block;margin:4px 8px 4px 0;padding:6px 14px;border:1px solid var(--acc);border-radius:999px;text-decoration:none;font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;color:inherit;text-decoration:none}
+.card:hover{border-color:var(--acc)} .card img{border:0;border-bottom:1px solid var(--line);border-radius:0;aspect-ratio:16/10;object-fit:contain;width:100%}
+.card .no{color:var(--mute);font-size:13px;padding:8px 12px 0} .card .t{padding:0 12px 12px;font-weight:500;line-height:1.5}
+.lead{font-size:17px;color:var(--mute)}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-size:13px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true,processEnvironments:true}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body>
+<header class="top"><div class="in">
+<a class="brand" href="../index.html">机器人软硬件架构</a>
+<a href="../lessons/index.html">讲义目录</a>
+<a href="../animations/index.html">动画</a>
+<a href="../review.html">复习卡片</a>
+<a href="../lessons/appendix-glossary.html">缩写表</a>
+</div></header>
+<main>
+<h1 id="4">第 4 章 · 传感器：知道自己在哪，看见外面的世界</h1><p><a class="btn" href="../animations/04-time-sync.html">▶ 打开本章可交互动画</a></p>
+<blockquote>
+<p>本章回答：机器人身上有哪些传感器？为什么"标定"和"时间同步"比传感器本身更容易出问题？多个传感器怎么融合？<br />
+编写日期：2026-11-04 · 上一章：<a href="../lessons/03-actuators.html">第 3 章 执行器</a> · 下一章：<a href="../lessons/05-electrical-compute.html">第 5 章 电气与计算</a> · 总览：00-overview.md<br />
+对应原文：<code>materials/text/modern-robotics-lynch-park.txt</code>（Lynch &amp; Park，<em>Modern Robotics</em>，2017 预印本） §11.1 L18864–L18868（关节编码器、力矩传感器、腕部六维力传感器）。外部传感器、标定、时间同步、融合原文没有，对照附录推荐的 <em>Probabilistic Robotics</em> 第 3 章和 Kalibr 文档（不在本地）<br />
+本章缩写：IMU（第 1 章）；F/T = Force/Torque（力 / 力矩，六维力传感器）；RGB = Red Green Blue（红 / 绿 / 蓝）；ToF = Time of Flight（飞行 / 时间）；LiDAR = Light Detection and Ranging（光 / 探测 / 与测距）；ChArUco = Chessboard + ArUco（棋盘格 + ArUco 标记）；PTP = Precision Time Protocol（精确 / 时间 / 协议，IEEE 1588）；IEEE = Institute of Electrical and Electronics Engineers（电气 / 电子 / 工程师协会）；USB = Universal Serial Bus（通用 / 串行 / 总线）；EKF = Extended Kalman Filter（扩展 / 卡尔曼 / 滤波）；VIO = Visual-Inertial Odometry（视觉 / 惯性 / 里程计）；VINS = Visual-Inertial Navigation System（视觉 / 惯性 / 导航 / 系统）；LIO = LiDAR-Inertial Odometry（激光雷达 / 惯性 / 里程计）；VLA（第 1 章）；<span class="arithmatex">\(\theta^{acc}\)</span>：acc = accelerometer（加速度计）；<span class="arithmatex">\(x_{obs}\)</span>：obs = observed（观测到的）；<span class="arithmatex">\(f_x\)</span> / <span class="arithmatex">\(c_x\)</span>：f = focal length（焦距），c = center（主点）；<span class="arithmatex">\(SE(3)\)</span> = Special Euclidean group in 3D（三维 / 特殊 / 欧几里得群：旋转 + 平移）；ETH = Eidgenössische Technische Hochschule（德语：联邦 / 理工学院，这里指苏黎世联邦理工）；ASL = Autonomous Systems Lab（自主 / 系统 / 实验室）。全部缩写见 <a href="../lessons/appendix-glossary.html">附录 · 缩写与术语表</a></p>
+</blockquote>
+<h2 id="_1">讲解</h2>
+<h3 id="1">第 1 步：两大类：向内看和向外看</h3>
+<p><strong>白话类比</strong>：闭上眼你也知道自己手臂弯成什么样（本体感觉，proprioception）；睁开眼才看到桌上有什么（外部感知，exteroception）。</p>
+<table>
+<thead>
+<tr>
+<th>类</th>
+<th>传感器</th>
+<th>测什么</th>
+<th>典型频率</th>
+<th>常见坑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>本体</strong></td>
+<td>电机端编码器（磁编 / 光编）</td>
+<td>转子角度 → FOC 换相、速度</td>
+<td>10–40 kHz</td>
+<td>安装偏心</td>
+</tr>
+<tr>
+<td></td>
+<td>输出端编码器</td>
+<td>关节真实角度（绕过减速器背隙 / 柔性）</td>
+<td>1 kHz</td>
+<td>双编码器对零</td>
+</tr>
+<tr>
+<td></td>
+<td>电流传感</td>
+<td>相电流 → 力矩估计</td>
+<td>和 FOC 同频</td>
+<td>温漂、齿槽力矩</td>
+</tr>
+<tr>
+<td></td>
+<td>关节力矩传感器</td>
+<td>关节真实力矩</td>
+<td>1 kHz</td>
+<td>温漂、串扰、贵</td>
+</tr>
+<tr>
+<td></td>
+<td>六维力 / 力矩传感器（F/T）</td>
+<td>腕部或脚底的 3 力 + 3 力矩</td>
+<td>1 kHz 以上</td>
+<td>重力补偿、零漂</td>
+</tr>
+<tr>
+<td></td>
+<td>IMU（加速度计 + 陀螺仪）</td>
+<td>姿态、角速度、加速度</td>
+<td>200 Hz–1 kHz</td>
+<td>陀螺零偏漂移、振动</td>
+</tr>
+<tr>
+<td><strong>外部</strong></td>
+<td>RGB 相机（全局 / 卷帘快门）</td>
+<td>颜色、纹理</td>
+<td>30–90 Hz</td>
+<td>运动模糊、卷帘畸变、曝光</td>
+</tr>
+<tr>
+<td></td>
+<td>深度相机（结构光、ToF、主动双目）</td>
+<td>每个像素的距离</td>
+<td>30–90 Hz</td>
+<td>透明 / 反光物体、近距离盲区</td>
+</tr>
+<tr>
+<td></td>
+<td>LiDAR（机械 / 固态）</td>
+<td>点云距离</td>
+<td>10–20 Hz</td>
+<td>稀疏、运动畸变</td>
+</tr>
+<tr>
+<td></td>
+<td>触觉（GelSight 类视触觉、电子皮肤）</td>
+<td>接触位置、压力分布、滑动</td>
+<td>30 Hz–1 kHz</td>
+<td>寿命、标定、布线</td>
+</tr>
+<tr>
+<td></td>
+<td>麦克风阵列</td>
+<td>语音、声源方向</td>
+<td>16–48 kHz</td>
+<td>电机噪声</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-calibration">第 2 步：标定（calibration）：传感器在哪、朝哪</h3>
+<p>传感器的读数要变成"机器人坐标系里的东西"才能用，所以必须知道：</p>
+<table>
+<thead>
+<tr>
+<th>标定</th>
+<th>求什么</th>
+<th>常用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>相机内参</td>
+<td>焦距、主点、畸变系数</td>
+<td>棋盘格 / ChArUco 板，张正友标定法</td>
+</tr>
+<tr>
+<td>相机外参（固定相机）</td>
+<td>相机相对机器人底座的位姿</td>
+<td>末端拿标定板走多个位姿</td>
+</tr>
+<tr>
+<td><strong>手眼标定</strong>（腕部相机）</td>
+<td>相机相对末端法兰的位姿 <span class="arithmatex">\(X\)</span></td>
+<td>解 <span class="arithmatex">\(AX = XB\)</span>（Tsai–Lenz 等）</td>
+</tr>
+<tr>
+<td>相机–LiDAR / 相机–IMU</td>
+<td>两传感器之间的相对位姿和时间偏移</td>
+<td>Kalibr 等工具</td>
+</tr>
+<tr>
+<td>运动学标定</td>
+<td>连杆真实长度、关节零位</td>
+<td>激光跟踪仪 / 视觉测量后最小二乘拟合</td>
+</tr>
+<tr>
+<td>力传感器</td>
+<td>零点、工具重力和质心</td>
+<td>不同姿态静止采样拟合</td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么重要</strong>：外参错 5 mm，抓取就偏 5 mm。端到端策略（VLA）看似"不需要标定"，但它学到的是<strong>某个特定相机位置</strong>下的映射；部署时相机挪了，性能就掉——这是真机迁移最常见的坑之一。</p>
+<h3 id="3">第 3 步：时间同步：数据是"什么时候"的</h3>
+<p><strong>白话类比</strong>：你看到的星光是几年前发出的。相机给你的画面也不是"现在"，而是曝光那一刻——中间隔着曝光、读出、USB 传输、解码、排队，加起来几十毫秒很常见。</p>
+<p>物体以速度 <span class="arithmatex">\(v\)</span> 移动，画面延迟 <span class="arithmatex">\(\Delta t\)</span>，那么机器人以为物体在的位置和真实位置差：</p>
+<div class="arithmatex">\[e = v\cdot\Delta t\]</div>
+<p>传送带 0.5 m/s、延迟 60 ms → 差 3 cm，足够夹空。</p>
+<p><strong>做法</strong>：</p>
+<ol>
+<li><strong>每帧打硬件时间戳</strong>：用曝光时刻而不是"收到的时刻"。</li>
+<li><strong>统一时钟</strong>：所有设备对齐到同一个时钟——PTP（IEEE 1588，以太网设备）、硬件触发线（多相机同时曝光）、EtherCAT 分布式时钟。</li>
+<li><strong>延迟补偿</strong>：知道了 <span class="arithmatex">\(\Delta t\)</span>，就用运动模型往前预测 <span class="arithmatex">\(\hat{x} = x_{\text{观测}} + v\,\Delta t\)</span>。</li>
+<li><strong>对齐再融合</strong>：多个传感器的数据按时间戳插值到同一时刻再用（ROS 2 里 <code>message_filters</code> 的近似时间同步）。</li>
+</ol>
+<h3 id="4_1">第 4 步：传感器融合：取长补短</h3>
+<p>每种传感器都有短板，融合就是让它们互补：</p>
+<table>
+<thead>
+<tr>
+<th>组合</th>
+<th>A 的短板</th>
+<th>B 的短板</th>
+<th>融合后</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>陀螺仪 + 加速度计</td>
+<td>陀螺积分会漂</td>
+<td>加速度计噪声大、受运动加速度干扰</td>
+<td>姿态稳定（互补滤波、Mahony / Madgwick）</td>
+</tr>
+<tr>
+<td>IMU + 腿部运动学</td>
+<td>IMU 积分位置会漂</td>
+<td>腿打滑时运动学会错</td>
+<td>四足 / 人形的躯干速度估计（EKF）</td>
+</tr>
+<tr>
+<td>视觉 + IMU</td>
+<td>相机慢、怕模糊</td>
+<td>IMU 漂</td>
+<td>VIO（视觉惯性里程计，如 VINS、OpenVINS）</td>
+</tr>
+<tr>
+<td>LiDAR + IMU</td>
+<td>点云运动畸变</td>
+<td>IMU 漂</td>
+<td>LIO（如 FAST-LIO）</td>
+</tr>
+</tbody>
+</table>
+<p>最简单的互补滤波（一维姿态角）：</p>
+<div class="arithmatex">\[\hat\theta_{k} = \alpha\,(\hat\theta_{k-1} + \omega_k\,\Delta t) + (1-\alpha)\,\theta^{\text{acc}}_k\]</div>
+<p>陀螺仪负责"短期准"（高频），加速度计负责"长期不漂"（低频）。卡尔曼滤波是它的"自动调 <span class="arithmatex">\(\alpha\)</span>"版本：按两边的不确定度加权。</p>
+<h3 id="_2">动画演示</h3>
+<p><img alt="时间同步：延迟 Δt 让抓取差 v·Δt" src="../animations/04-time-sync.gif" /></p>
+<p>可交互版：<a href="../animations/04-time-sync.html">animations/04-time-sync.html</a>（拖动延迟滑块）。</p>
+<p><strong>怎么看</strong>：</p>
+<ol>
+<li>两条传送带上的方块以同样速度往右走。相机每隔一段时间拍一张，但图片要晚 <span class="arithmatex">\(\Delta t\)</span> 才到机器人手里。</li>
+<li>上面一条"不补偿"：夹爪去"图里看到的位置"，结果总是落在方块后面 <span class="arithmatex">\(v\Delta t\)</span>。</li>
+<li>下面一条"按时间戳补偿"：用 <span class="arithmatex">\(x + v\Delta t\)</span> 预测，夹爪正好落在方块上。</li>
+<li>把延迟拖到 0，两条就一样了；拖到 150 ms，没补偿的那条几乎每次都夹空。</li>
+</ol>
+<h2 id="_3">公式</h2>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>式子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>延迟误差</td>
+<td><span class="arithmatex">\(e = v\,\Delta t\)</span></td>
+</tr>
+<tr>
+<td>延迟补偿</td>
+<td><span class="arithmatex">\(\hat x = x_{obs} + v\,\Delta t\)</span></td>
+</tr>
+<tr>
+<td>手眼标定</td>
+<td><span class="arithmatex">\(AX = XB\)</span></td>
+</tr>
+<tr>
+<td>互补滤波</td>
+<td><span class="arithmatex">\(\hat\theta_k = \alpha(\hat\theta_{k-1}+\omega_k\Delta t) + (1-\alpha)\theta^{acc}_k\)</span></td>
+</tr>
+<tr>
+<td>针孔相机投影</td>
+<td><span class="arithmatex">\(u = f_x X/Z + c_x,\ v = f_y Y/Z + c_y\)</span></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">练习与作答记录</h2>
+<p><strong>题 1</strong>：机械臂末端以 0.3 m/s 移动，腕部相机图像从曝光到进入策略总共 80 ms。如果策略用的是"收到图片时"的关节角去配这张图，图和关节角之间差了多少距离？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 2</strong>：为什么陀螺仪"短期准长期漂"、加速度计"长期准短期噪"？互补滤波里 <span class="arithmatex">\(\alpha\)</span> 取 0.98 意味着更相信哪一个？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 3</strong>：一个 VLA 在实验室训练得很好，搬到另一个房间同型号机器人上成功率大跌。从本章的角度列出两个可能原因。</p>
+<p><strong>作答</strong>：（待作答）</p>
+<h2 id="_5">口诀</h2>
+<blockquote>
+<p>向内看编码器、IMU、力；向外看相机、雷达、触觉。<br />
+传感器不怕不准，怕不知道在哪、不知道是什么时候：先标定，再对时。</p>
+</blockquote>
+<h2 id="_6">本章复习卡片</h2>
+<p>A10 本体 vs 外部感知、A11 时间同步与 <span class="arithmatex">\(e = v\Delta t\)</span>、A12 互补滤波（见 <a href="../review.html">review.md</a>）</p>
+<h2 id="_7">附录 · 延伸阅读</h2>
+<blockquote>
+<p>留给以后深入学习用，不影响本章主线。★ 是建议先读的。</p>
+</blockquote>
+<h3 id="_8">推荐阅读</h3>
+<ul>
+<li>★ Thrun, Burgard, Fox，<em>Probabilistic Robotics</em>（2005）：第 3 章 Gaussian Filters（卡尔曼、EKF）、第 6 章 Robot Perception（传感器模型）。</li>
+<li>★ Kalibr（ETH ASL 开源工具）文档：多相机、相机–IMU 的时空联合标定；Furgale et al.，"Unified Temporal and Spatial Calibration for Multi-Sensor Systems"，IROS 2013。</li>
+<li>Zhang，"A Flexible New Technique for Camera Calibration"，IEEE TPAMI 2000：张正友标定法。</li>
+<li>Tsai &amp; Lenz，"A New Technique for Fully Autonomous and Efficient 3D Robotics Hand/Eye Calibration"，IEEE T-RA 1989：<span class="arithmatex">\(AX=XB\)</span>。</li>
+<li>Madgwick，"An efficient orientation filter for inertial and inertial/magnetic sensor arrays"（2010 报告）：轻量姿态融合。</li>
+<li>Yuan et al.，"GelSight: High-Resolution Robot Tactile Sensors for Estimating Geometry and Force"，Sensors 2017：视触觉原理。</li>
+<li>工具：OpenCV <code>calibrateCamera</code> / <code>calibrateHandEye</code>、ROS 2 <code>message_filters</code>、linuxptp。</li>
+</ul>
+<h3 id="_9">数学原理</h3>
+<ul>
+<li>针孔模型与齐次坐标；刚体变换 <span class="arithmatex">\(SE(3)\)</span>。</li>
+<li>高斯分布、协方差、贝叶斯更新（卡尔曼滤波的基础）。</li>
+<li>一阶低通 / 高通滤波的频域直觉。</li>
+</ul>
+<h3 id="_10">公式清单</h3>
+<p>见正文"公式"一节的表。</p>
+<h3 id="_11">代码对照：把本章的数字用代码算一遍</h3>
+<blockquote>
+<p>用 Python + NumPy（Numerical Python：数值 / Python）把讲义里讲过的数算一遍，不算练习题。代码在仓库本地 <code>robot-system-architecture/solutions/chapter-code/ch04_sensors.py</code>，配套测试 <code>tests/test_ch04.py</code>，notebook 在 <code>notebooks/ch04_sensors.ipynb</code>。Mac 上直接能跑，不需要 GPU：</p>
+<p><code>bash  
+cd robot-system-architecture/solutions/chapter-code  
+uv run python ch04_sensors.py   # 一步一步打印  
+uv run pytest tests/test_ch04.py</code></p>
+</blockquote>
+<p><strong>讲义 ↔ 代码</strong>（互补滤波的信号和相机参数是编的）：</p>
+<table>
+<thead>
+<tr>
+<th>讲义</th>
+<th>公式</th>
+<th>写法</th>
+<th>跑出来</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 3 步 延迟误差</td>
+<td><span class="arithmatex">\(e = v\Delta t\)</span></td>
+<td><code>delay_error(0.5, 0.060)</code></td>
+<td>3.0 cm</td>
+</tr>
+<tr>
+<td>第 3 步 补偿</td>
+<td><span class="arithmatex">\(\hat x = x_{obs} + v\Delta t\)</span></td>
+<td><code>compensate</code></td>
+<td>0.200 m → 0.230 m</td>
+</tr>
+<tr>
+<td>第 4 步 只用陀螺</td>
+<td>积分 <span class="arithmatex">\(\omega\)</span></td>
+<td><code>np.cumsum(gyro) * dt</code></td>
+<td>10 秒漂 0.200 rad</td>
+</tr>
+<tr>
+<td>第 4 步 只用加速度计</td>
+<td><span class="arithmatex">\(\theta^{acc}\)</span></td>
+<td><code>acc</code></td>
+<td>均方根误差 0.050 rad</td>
+</tr>
+<tr>
+<td>第 4 步 互补滤波</td>
+<td><span class="arithmatex">\(\alpha(\hat\theta+\omega\Delta t) + (1-\alpha)\theta^{acc}\)</span></td>
+<td><code>complementary(..., alpha=0.95)</code></td>
+<td>均方根误差 0.008 rad</td>
+</tr>
+<tr>
+<td>公式表 针孔投影</td>
+<td><span class="arithmatex">\(u = f_xX/Z + c_x\)</span></td>
+<td><code>project</code></td>
+<td>(0.1, −0.05, 1) m → (380, 210) 像素</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键几行</strong>：</p>
+<pre><code class="language-python">for k in range(1, len(gyro)):
+    est[k] = alpha * (est[k - 1] + gyro[k] * dt) + (1 - alpha) * acc_angle[k]   # 陀螺往前推一步，再拿加速度计拉一下
+</code></pre>
+<p><strong>代码里才看得到的 2 件事</strong>：</p>
+<ul>
+<li>陀螺的零偏 0.02 rad/s 看起来很小，积 10 秒就是 0.2 rad（约 11°）。只积分的误差是一直往上涨的。</li>
+<li>编数据时用了 <code>np.random.default_rng(0)</code> 固定随机种子，所以每次跑出来的噪声一样，测试才能核对。</li>
+</ul>
+<p><strong>自己改一改</strong>（不影响练习答案）：</p>
+<ul>
+<li>把 <code>fake_imu</code> 里的零偏 0.02 改成 0，看"只积分陀螺"还漂不漂。</li>
+<li>把传送带速度改成 1 m/s、延迟改成 150 ms，算一下差多少，对照动画里"几乎每次夹空"。</li>
+</ul><nav class="pager"><a href="03-actuators.html">← 第 3 章 · 执行器：电机 + 减速器 = 一个关节</a><a href="05-electrical-compute.html">第 5 章 · 电气与计算架构：大脑、小脑、神经和血管 →</a></nav>
+</main>
+<footer>来自个人学习仓库的对话讲义，含练习作答记录。源码：<a href="https://github.com/wikieden/robot-architecture">github.com/wikieden/robot-architecture</a></footer>
+</body></html>

@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 2 章 · 本体与运动学：关节角怎么变成手的位置 · 机器人软硬件架构</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}}
+:root[data-theme="dark"]{--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:14px}
+header.top .brand{font-weight:600;color:var(--fg);text-decoration:none;margin-right:auto}
+header.top a{text-decoration:none}
+main{max-width:860px;margin:0 auto;padding:24px 16px 72px;overflow-wrap:anywhere}
+h1{font-size:28px;line-height:1.35;margin:8px 0 16px} h2{font-size:22px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)} h3{font-size:18px;margin:28px 0 8px}
+img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+blockquote{margin:16px 0;padding:10px 16px;background:var(--quote);border-left:3px solid var(--acc);border-radius:4px;color:var(--mute)}
+blockquote p{margin:4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto} pre code{padding:0;background:none}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:12px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--code)}
+details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px} summary{cursor:pointer;color:var(--acc);font-weight:500}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.btn{display:inline-block;margin:4px 8px 4px 0;padding:6px 14px;border:1px solid var(--acc);border-radius:999px;text-decoration:none;font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;color:inherit;text-decoration:none}
+.card:hover{border-color:var(--acc)} .card img{border:0;border-bottom:1px solid var(--line);border-radius:0;aspect-ratio:16/10;object-fit:contain;width:100%}
+.card .no{color:var(--mute);font-size:13px;padding:8px 12px 0} .card .t{padding:0 12px 12px;font-weight:500;line-height:1.5}
+.lead{font-size:17px;color:var(--mute)}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-size:13px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true,processEnvironments:true}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body>
+<header class="top"><div class="in">
+<a class="brand" href="../index.html">机器人软硬件架构</a>
+<a href="../lessons/index.html">讲义目录</a>
+<a href="../animations/index.html">动画</a>
+<a href="../review.html">复习卡片</a>
+<a href="../lessons/appendix-glossary.html">缩写表</a>
+</div></header>
+<main>
+<h1 id="2">第 2 章 · 本体与运动学：关节角怎么变成手的位置</h1><p><a class="btn" href="../animations/02-two-link-ik.html">▶ 打开本章可交互动画</a></p>
+<blockquote>
+<p>本章回答：机器人的"骨架"有哪几类？自由度是什么？给定关节角怎么算手在哪（正运动学），反过来怎么算（逆运动学）？什么是奇异？<br />
+编写日期：2026-11-04 · 上一章：<a href="../lessons/01-layered-loops.html">第 1 章 总图</a> · 下一章：<a href="../lessons/03-actuators.html">第 3 章 执行器</a> · 总览：00-overview.md<br />
+对应原文：<code>materials/text/modern-robotics-lynch-park.txt</code>（Lynch &amp; Park，<em>Modern Robotics</em>，2017 预印本） §2.1 L1112 起（自由度）、§2.2.2 L1323（Grübler 公式）；§4.1 L6917（PoE 正运动学）；§5.1 L8410–L8418（两连杆 FK 与雅可比的图和式子）；§5.2 L9241–L9258（<span class="arithmatex">\(\tau = J^\top F\)</span>，式 5.26）；§5.3 L9300–L9305（奇异 = 雅可比不满秩）；§5.4 L9550（可操作度）；§6.1 L10789（elbow-up / elbow-down 两组解）；§6.2 L10867（数值 IK）<br />
+本章缩写：DoF = Degrees of Freedom（自由 / 度）；FK = Forward Kinematics（正 / 运动学）；IK = Inverse Kinematics（逆 / 运动学）；SCARA = Selective Compliance Assembly Robot Arm（选择性 / 柔顺 / 装配 / 机械臂）；UR5e = Universal Robots 5 kg 负载 e 系列；KUKA iiwa = intelligent industrial work assistant（智能 / 工业 / 工作 / 助手）；DH = Denavit–Hartenberg（两位提出者的姓）；PoE = Product of Exponentials（指数 / 积）；URDF = Unified Robot Description Format（统一 / 机器人 / 描述 / 格式）；MuJoCo = Multi-Joint dynamics with Contact（多关节 / 带接触的动力学）；MJCF = MuJoCo Format（MuJoCo 的 XML 模型格式）；USD = Universal Scene Description（通用 / 场景 / 描述）；KDL = Kinematics and Dynamics Library（运动学 / 与动力学 / 库）；det = determinant（行列式）；<span class="arithmatex">\(SO(3)\)</span> = Special Orthogonal group in 3D（三维 / 特殊 / 正交群，所有旋转矩阵）；<span class="arithmatex">\(c_{12}\)</span> / <span class="arithmatex">\(s_{12}\)</span> = <span class="arithmatex">\(\cos(\theta_1+\theta_2)\)</span> / <span class="arithmatex">\(\sin(\theta_1+\theta_2)\)</span> 的简写。全部缩写见 <a href="../lessons/appendix-glossary.html">附录 · 缩写与术语表</a></p>
+</blockquote>
+<h2 id="_1">讲解</h2>
+<h3 id="1-dof">第 1 步：自由度（DoF）= 能独立变化的数有几个</h3>
+<p><strong>白话类比</strong>：你的手臂从肩到腕大约有 7 个能独立转的方向（肩 3、肘 1、腕 3）。所以你可以保持手里杯子的位置和朝向不变，同时把手肘抬高或放低——这就是"多出来的那 1 个自由度"（冗余）。</p>
+<p>在三维空间里，要把一个物体放到任意位置 + 任意朝向，需要 <strong>6 个数</strong>（x, y, z + 三个转角）。所以：</p>
+<table>
+<thead>
+<tr>
+<th>关节数</th>
+<th>能做到什么</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lt; 6</td>
+<td>只能到达部分位置 / 朝向</td>
+<td>SCARA 4 轴（平面搬运）、桌面 5 轴臂</td>
+</tr>
+<tr>
+<td>= 6</td>
+<td>一般能到达工作空间内任意位姿，但解是有限几组</td>
+<td>UR5e、大多数工业臂</td>
+</tr>
+<tr>
+<td>= 7</td>
+<td>多 1 个冗余，可以绕开障碍、避开奇异、调肘位</td>
+<td>Franka、KUKA iiwa、人形手臂</td>
+</tr>
+</tbody>
+</table>
+<p>整机的 DoF 是所有关节加起来：四足 12，人形 20–40（加灵巧手可上 50），移动操作 = 底盘 2–3 + 每条臂 6–7。</p>
+<h3 id="2_1">第 2 步：常见构型</h3>
+<table>
+<thead>
+<tr>
+<th>构型</th>
+<th>关节</th>
+<th>好处</th>
+<th>难点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>串联臂</strong></td>
+<td>一串旋转关节</td>
+<td>工作空间大、建模简单</td>
+<td>末端误差层层累积、刚度低</td>
+</tr>
+<tr>
+<td><strong>并联机构</strong>（Delta、Stewart）</td>
+<td>几条链共同撑一个平台</td>
+<td>刚度高、快</td>
+<td>工作空间小、逆解易正解难</td>
+</tr>
+<tr>
+<td><strong>轮式底盘</strong>（差速、全向麦轮、舵轮）</td>
+<td>2–4 个驱动轮</td>
+<td>简单、高效、续航长</td>
+<td>不能爬楼梯，差速底盘不能横移（非完整约束）</td>
+</tr>
+<tr>
+<td><strong>四足</strong></td>
+<td>每腿 3 个（髋外展、髋前摆、膝）</td>
+<td>地形适应强</td>
+<td>需要动态平衡控制</td>
+</tr>
+<tr>
+<td><strong>人形</strong></td>
+<td>腿 6×2 + 腰 1–3 + 臂 7×2 + 头 + 手</td>
+<td>适配人类环境、能用人类数据</td>
+<td>平衡、散热、成本、可靠性</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-fk">第 3 步：正运动学（FK）：已知角度求手的位置</h3>
+<p><strong>平面两连杆</strong>（肩 <span class="arithmatex">\(\theta_1\)</span>，肘 <span class="arithmatex">\(\theta_2\)</span>，连杆长 <span class="arithmatex">\(L_1, L_2\)</span>）：</p>
+<div class="arithmatex">\[x = L_1\cos\theta_1 + L_2\cos(\theta_1+\theta_2),\qquad y = L_1\sin\theta_1 + L_2\sin(\theta_1+\theta_2)\]</div>
+<p>一层一层"把前面的转角加起来"，就是 FK。三维里用 4×4 齐次变换矩阵连乘：</p>
+<div class="arithmatex">\[T_{\text{末端}} = T_1(\theta_1)\,T_2(\theta_2)\cdots T_n(\theta_n)\]</div>
+<p>每个 <span class="arithmatex">\(T_i\)</span> 描述"第 i 个关节转了 <span class="arithmatex">\(\theta_i\)</span> 之后，坐标系怎么变"。描述方式有 DH 参数和 Modern Robotics 用的指数积（Product of Exponentials，PoE）两种。FK 永远有唯一解，算起来很便宜。</p>
+<p><strong>软件里</strong>：机器人的连杆长度、关节轴方向、质量、惯量、碰撞外形都写在模型文件里——ROS 用 <strong>URDF</strong>，MuJoCo 用 <strong>MJCF</strong>，Isaac 用 <strong>USD</strong>。FK 由库自动算（KDL、Pinocchio、MuJoCo 内置）。</p>
+<h3 id="4-ik">第 4 步：逆运动学（IK）：想让手到这，角度该是多少</h3>
+<p>IK 难得多：</p>
+<ul>
+<li><strong>可能无解</strong>：目标在工作空间外（够不着）。</li>
+<li><strong>可能多解</strong>：同一个点，肘朝上和肘朝下都能到（两连杆有 2 组解，6 轴工业臂最多 8 组）。</li>
+<li><strong>冗余臂有无穷多解</strong>：7 DoF 臂可以在解空间里"滑动"。</li>
+</ul>
+<p>两种做法：</p>
+<ol>
+<li><strong>解析解</strong>：某些构型（腕部三轴交于一点的 6 轴臂）能推出闭式公式，快且稳定，工具如 IKFast。</li>
+<li><strong>数值迭代</strong>：用雅可比矩阵一步步修正。</li>
+</ol>
+<h3 id="5-jacobian">第 5 步：雅可比（Jacobian）：关节转一点点，手动多少</h3>
+<div class="arithmatex">\[\dot{x} = J(\theta)\,\dot\theta\]</div>
+<p><span class="arithmatex">\(J\)</span> 是一个矩阵：第 j 列表示"只转第 j 个关节，手会往哪个方向动、动多快"。</p>
+<p><strong>数值 IK</strong>（阻尼最小二乘，damped least squares）：</p>
+<div class="arithmatex">\[\Delta\theta = J^\top (J J^\top + \lambda^2 I)^{-1}\, e,\qquad e = x_{\text{目标}} - x_{\text{当前}}\]</div>
+<p>每次把关节往"减小误差"的方向挪一点，重复直到误差足够小。<span class="arithmatex">\(\lambda\)</span> 是阻尼：不加的话，靠近奇异点时步长会爆炸。</p>
+<p><strong>同一个 J 还管力</strong>（静力学对偶）：手上受到外力 <span class="arithmatex">\(F\)</span>，各关节要出的力矩是</p>
+<div class="arithmatex">\[\tau = J^\top F\]</div>
+<p>所以 J 同时决定了"速度怎么传"和"力怎么传"，第 6 章的阻抗控制会再用到它。</p>
+<h3 id="6-singularity">第 6 步：奇异（singularity）</h3>
+<p>当 <span class="arithmatex">\(J\)</span> 的某些列"挤到同一个方向"上，手在某个方向上就<strong>动不了</strong>了。两连杆的例子：手臂完全伸直（<span class="arithmatex">\(\theta_2=0\)</span>）时，手只能沿圆周方向动，没法再往外伸。</p>
+<p>奇异附近的表现：</p>
+<ul>
+<li>想让手沿那个方向动一点点，关节要转得极快（<span class="arithmatex">\(\dot\theta = J^{-1}\dot x\)</span> 里 <span class="arithmatex">\(J^{-1}\)</span> 爆炸）。</li>
+<li>那个方向上，很小的关节力矩就能扛住很大的外力（反过来，外力传不进关节，力控变差）。</li>
+</ul>
+<p>判断：两连杆 <span class="arithmatex">\(\det J = L_1 L_2 \sin\theta_2\)</span>，<span class="arithmatex">\(\theta_2 \to 0\)</span> 或 <span class="arithmatex">\(\pi\)</span> 时为 0。一般用可操作度 <span class="arithmatex">\(w = \sqrt{\det(JJ^\top)}\)</span> 衡量离奇异有多远。</p>
+<h3 id="_2">动画演示</h3>
+<p><img alt="两连杆机械臂：正逆运动学、工作空间与奇异" src="../animations/02-two-link-ik.gif" /></p>
+<p>可交互版：<a href="../animations/02-two-link-ik.html">animations/02-two-link-ik.html</a>。</p>
+<p><strong>怎么看</strong>：</p>
+<ol>
+<li>灰色圆环是工作空间：内圈半径 <span class="arithmatex">\(|L_1-L_2|\)</span>，外圈 <span class="arithmatex">\(L_1+L_2\)</span>。</li>
+<li>青色点是目标，它沿一条会跑出圆环的路径走。每帧用阻尼最小二乘迭代几步，手（橙点）去追。</li>
+<li>目标跑出外圈时，手臂伸直、贴着外圈走（够不着，只能尽量近）；同时 <span class="arithmatex">\(\det J\)</span> 变红趋近 0——这就是奇异。</li>
+<li>勾选"肘朝下"可以看到同一个目标的另一组解。</li>
+</ol>
+<h2 id="_3">公式</h2>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>式子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>两连杆 FK</td>
+<td><span class="arithmatex">\(x = L_1 c_1 + L_2 c_{12},\ y = L_1 s_1 + L_2 s_{12}\)</span></td>
+</tr>
+<tr>
+<td>一般 FK</td>
+<td><span class="arithmatex">\(T = T_1(\theta_1)\cdots T_n(\theta_n)\)</span></td>
+</tr>
+<tr>
+<td>速度雅可比</td>
+<td><span class="arithmatex">\(\dot x = J(\theta)\dot\theta\)</span></td>
+</tr>
+<tr>
+<td>静力学对偶</td>
+<td><span class="arithmatex">\(\tau = J^\top F\)</span></td>
+</tr>
+<tr>
+<td>阻尼最小二乘 IK</td>
+<td><span class="arithmatex">\(\Delta\theta = J^\top(JJ^\top+\lambda^2I)^{-1}e\)</span></td>
+</tr>
+<tr>
+<td>两连杆奇异</td>
+<td><span class="arithmatex">\(\det J = L_1L_2\sin\theta_2\)</span></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">练习与作答记录</h2>
+<p><strong>题 1</strong>：两连杆 <span class="arithmatex">\(L_1 = 1\)</span>，<span class="arithmatex">\(L_2 = 0.8\)</span>，<span class="arithmatex">\(\theta_1 = 90°\)</span>，<span class="arithmatex">\(\theta_2 = -90°\)</span>。手在哪？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 2</strong>：一台 6 DoF 臂和一台 7 DoF 臂都要把杯子放到同一个位置和朝向。哪台还能"顺便"让手肘避开旁边的柜子？为什么？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 3</strong>：为什么在奇异点附近，让手"沿伸直方向再走 1 mm"会让控制器要求关节转得极快？用 <span class="arithmatex">\(\dot\theta = J^{-1}\dot x\)</span> 解释。</p>
+<p><strong>作答</strong>：（待作答）</p>
+<h2 id="_5">口诀</h2>
+<blockquote>
+<p>正解一路加角度，逆解要猜要迭代；雅可比管速度也管力。<br />
+手臂伸直就奇异：往外一毫米，关节转疯掉。</p>
+</blockquote>
+<h2 id="_6">本章复习卡片</h2>
+<p>A04 自由度与冗余、A05 雅可比的两个用途、A06 奇异（见 <a href="../review.html">review.md</a>）</p>
+<h2 id="_7">附录 · 延伸阅读</h2>
+<blockquote>
+<p>留给以后深入学习用，不影响本章主线。★ 是建议先读的。</p>
+</blockquote>
+<h3 id="_8">推荐阅读</h3>
+<ul>
+<li>★ Lynch &amp; Park，<em>Modern Robotics</em>：第 2 章 Configuration Space（DoF 计数、Grübler 公式）、第 4 章 Forward Kinematics（PoE）、第 5 章 Velocity Kinematics and Statics（雅可比、<span class="arithmatex">\(\tau=J^\top F\)</span>、可操作度椭球）、第 6 章 Inverse Kinematics（数值 IK）。</li>
+<li>Craig，<em>Introduction to Robotics: Mechanics and Control</em>：DH 参数的经典讲法。</li>
+<li>Buss，"Introduction to Inverse Kinematics with Jacobian Transpose, Pseudoinverse and Damped Least Squares methods"（2004 讲义）：三种数值 IK 对比，篇幅短。</li>
+<li>工具：Pinocchio（C++/Python 刚体运动学与动力学库）、MuJoCo（MJCF 模型 + 内置 FK/雅可比）、<code>urdf_parser</code>、<code>ikpy</code>。</li>
+</ul>
+<h3 id="_9">数学原理</h3>
+<ul>
+<li>齐次变换矩阵 <span class="arithmatex">\(T = \begin{bmatrix}R &amp; p\\0 &amp; 1\end{bmatrix}\)</span>，旋转矩阵 <span class="arithmatex">\(R\in SO(3)\)</span>。</li>
+<li>偏导数与雅可比矩阵、矩阵求逆、伪逆 <span class="arithmatex">\(J^+ = J^\top(JJ^\top)^{-1}\)</span>。</li>
+<li>虚功原理推出 <span class="arithmatex">\(\tau = J^\top F\)</span>。</li>
+</ul>
+<h3 id="_10">公式清单</h3>
+<p>见正文"公式"一节的表。</p>
+<h3 id="_11">代码对照：把本章的数字用代码算一遍</h3>
+<blockquote>
+<p>用 Python + NumPy（Numerical Python：数值 / Python）把讲义里讲过的数算一遍，不算练习题。代码在仓库本地 <code>robot-system-architecture/solutions/chapter-code/ch02_kinematics.py</code>，配套测试 <code>tests/test_ch02.py</code>，notebook 在 <code>notebooks/ch02_kinematics.ipynb</code>。Mac 上直接能跑，不需要 GPU：</p>
+<p><code>bash  
+cd robot-system-architecture/solutions/chapter-code  
+uv run python ch02_kinematics.py   # 一步一步打印  
+uv run pytest tests/test_ch02.py</code></p>
+</blockquote>
+<p><strong>讲义 ↔ 代码</strong>（连杆长度 L1 = 0.5 m、L2 = 0.4 m 和角度都是编的）：</p>
+<table>
+<thead>
+<tr>
+<th>讲义</th>
+<th>公式</th>
+<th>写法</th>
+<th>跑出来</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 3 步 FK</td>
+<td><span class="arithmatex">\(x = L_1c_1 + L_2c_{12}\)</span>，<span class="arithmatex">\(y = L_1s_1 + L_2s_{12}\)</span></td>
+<td><code>fk(theta)</code></td>
+<td>θ = (30°, 60°) → (0.4330, 0.6500) m</td>
+</tr>
+<tr>
+<td>工作空间</td>
+<td>内圈 <span class="arithmatex">\(\lvert L_1-L_2\rvert\)</span>、外圈 <span class="arithmatex">\(L_1+L_2\)</span></td>
+<td>—</td>
+<td>0.1 m、0.9 m</td>
+</tr>
+<tr>
+<td>第 4 步 IK 两组解</td>
+<td>阻尼最小二乘</td>
+<td><code>dls_ik(target, theta0)</code></td>
+<td>(30°, 60°) 和 (82.66°, −60°) 都到同一点</td>
+</tr>
+<tr>
+<td>第 5 步 雅可比</td>
+<td><span class="arithmatex">\(\dot x = J\dot\theta\)</span></td>
+<td><code>jacobian</code> vs <code>numeric_jacobian</code></td>
+<td>解析式和差分一致</td>
+</tr>
+<tr>
+<td>第 5 步 静力学</td>
+<td><span class="arithmatex">\(\tau = J^\top F\)</span></td>
+<td><code>jacobian(theta).T @ F</code></td>
+<td>挂 10 N → τ = (−4.33, 0) N·m</td>
+</tr>
+<tr>
+<td>第 6 步 奇异</td>
+<td><span class="arithmatex">\(\det J = L_1L_2\sin\theta_2\)</span></td>
+<td><code>np.linalg.det</code>、<code>manipulability</code></td>
+<td>θ2 = 60° → 0.1732；θ2 = 0 → 0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键几行</strong>：</p>
+<pre><code class="language-python">e = target - fk(theta)                                       # 误差 e = x目标 − x当前
+J = jacobian(theta)
+theta = theta + J.T @ np.linalg.solve(J @ J.T + lam**2 * np.eye(2), e)   # Δθ = Jᵀ(JJᵀ + λ²I)⁻¹ e
+</code></pre>
+<p><strong>代码里才看得到的 4 件事</strong>：</p>
+<ul>
+<li>代码里角度一律是弧度：<code>np.radians([30, 60])</code> 先换算，打印时再 <code>np.degrees</code> 换回来。</li>
+<li>两组解用哪一组，取决于初始猜测 <code>theta0</code>：从肘朝上的猜测出发就收敛到肘朝上那组。数值 IK 自己不会"挑解"。</li>
+<li>不用 <code>np.linalg.inv</code> 求逆，而是 <code>np.linalg.solve(A, e)</code> 直接解方程，更稳也更快。</li>
+<li>第二列第二行是 0：θ = (30°, 60°) 时第二节连杆正好竖直，只转肘，手只会横着动。</li>
+</ul>
+<p><strong>自己改一改</strong>（不影响练习答案）：</p>
+<ul>
+<li>把 <code>lam</code> 改成 0（不加阻尼），再让目标落在外圈 0.9 m 之外，看迭代会不会乱跳。</li>
+<li>把 θ2 从 5° 一路改到 −5°，看 det J 怎么经过 0 变号（肘从一侧翻到另一侧）。</li>
+</ul><nav class="pager"><a href="01-layered-loops.html">← 第 1 章 · 总图：一台机器人 = 一组快慢嵌套的闭环</a><a href="03-actuators.html">第 3 章 · 执行器：电机 + 减速器 = 一个关节 →</a></nav>
+</main>
+<footer>来自个人学习仓库的对话讲义，含练习作答记录。源码：<a href="https://github.com/wikieden/robot-architecture">github.com/wikieden/robot-architecture</a></footer>
+</body></html>

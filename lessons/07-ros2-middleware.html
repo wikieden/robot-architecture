@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 7 章 · 软件框架：ROS 2、中间件与实时系统 · 机器人软硬件架构</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}}
+:root[data-theme="dark"]{--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:14px}
+header.top .brand{font-weight:600;color:var(--fg);text-decoration:none;margin-right:auto}
+header.top a{text-decoration:none}
+main{max-width:860px;margin:0 auto;padding:24px 16px 72px;overflow-wrap:anywhere}
+h1{font-size:28px;line-height:1.35;margin:8px 0 16px} h2{font-size:22px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)} h3{font-size:18px;margin:28px 0 8px}
+img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+blockquote{margin:16px 0;padding:10px 16px;background:var(--quote);border-left:3px solid var(--acc);border-radius:4px;color:var(--mute)}
+blockquote p{margin:4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto} pre code{padding:0;background:none}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:12px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--code)}
+details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px} summary{cursor:pointer;color:var(--acc);font-weight:500}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.btn{display:inline-block;margin:4px 8px 4px 0;padding:6px 14px;border:1px solid var(--acc);border-radius:999px;text-decoration:none;font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;color:inherit;text-decoration:none}
+.card:hover{border-color:var(--acc)} .card img{border:0;border-bottom:1px solid var(--line);border-radius:0;aspect-ratio:16/10;object-fit:contain;width:100%}
+.card .no{color:var(--mute);font-size:13px;padding:8px 12px 0} .card .t{padding:0 12px 12px;font-weight:500;line-height:1.5}
+.lead{font-size:17px;color:var(--mute)}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-size:13px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true,processEnvironments:true}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body>
+<header class="top"><div class="in">
+<a class="brand" href="../index.html">机器人软硬件架构</a>
+<a href="../lessons/index.html">讲义目录</a>
+<a href="../animations/index.html">动画</a>
+<a href="../review.html">复习卡片</a>
+<a href="../lessons/appendix-glossary.html">缩写表</a>
+</div></header>
+<main>
+<h1 id="7-ros-2">第 7 章 · 软件框架：ROS 2、中间件与实时系统</h1><p><a class="btn" href="../animations/07-ros2-qos.html">▶ 打开本章可交互动画</a></p>
+<blockquote>
+<p>本章回答：机器人软件为什么要拆成很多进程？ROS 2 的节点、话题、服务、动作、QoS、tf、ros2_control 各是什么？实时部分怎么和非实时部分共存？<br />
+编写日期：2026-11-04 · 上一章：<a href="../lessons/06-low-level-control.html">第 6 章 底层控制</a> · 下一章：<a href="../lessons/08-autonomy-stack.html">第 8 章 自主栈</a> · 总览：00-overview.md<br />
+对应原文：本地 ROS 2 官方文档：<code>ros2/materials/ros2_documentation/source/ROS-Framework/interfaces/topics/About-Quality-of-Service-Settings.rst</code> L60–L61（best effort / reliable）、L112（默认 keep last 10 + reliable）；<code>ros2/materials/ros2_documentation/source/ROS-Framework/interfaces/About-Tf2/About-Tf2.rst</code> L31–L32（tf2 按时间缓存坐标树）；<code>ros2/materials/design/articles/qos.md</code>（QoS 设计文章）<br />
+本章缩写：ROS 2（第 1 章）；QoS = Quality of Service（服务 / 质量）；rmw = ROS middleware（ROS 中间件接口）；DDS = Data Distribution Service（数据 / 分发 / 服务）；SHM = shared memory（共享内存）；NAT = Network Address Translation（网络 / 地址 / 转换）；tf2 = transform library 第 2 版（坐标变换库）；REP = ROS Enhancement Proposal（ROS 改进提案）；AMCL = Adaptive Monte Carlo Localization（自适应 / 蒙特卡洛 / 定位）；OMPL = Open Motion Planning Library（开源 / 运动规划 / 库）；Nav2 = Navigation 2（ROS 2 导航栈）；RViz = ROS Visualization（ROS 可视化）；LTS = Long-Term Support（长期 / 支持）；SCHED_FIFO = scheduling first-in first-out（先进先出实时调度）；<code>isolcpus</code> = isolate CPUs（隔离 CPU 核）；<code>mlockall</code> = memory lock all（锁住全部内存不换出）；CPU（第 5 章）；LCM = Lightweight Communications and Marshalling（轻量 / 通信 / 与编组）；dora-rs = Dataflow-Oriented Robotic Architecture（面向数据流的机器人架构，Rust 写）；SDK = Software Development Kit（软件 / 开发 / 工具包）；MCAP：rosbag2 默认的录包文件格式名（官方文档没给全称）；AI = Artificial Intelligence（人工 / 智能）。全部缩写见 <a href="../lessons/appendix-glossary.html">附录 · 缩写与术语表</a></p>
+</blockquote>
+<h2 id="_1">讲解</h2>
+<h3 id="1">第 1 步：为什么要中间件</h3>
+<p><strong>白话类比：广播电台</strong>。相机节点像电台，只管往"/camera/image"频道播；谁想听就调到这个频道，电台不用知道有几个听众。新加一个检测模块，不用改相机的代码。</p>
+<p>机器人软件拆成很多独立进程（节点），好处：</p>
+<ul>
+<li>一个模块崩了不拖垮全部；</li>
+<li>不同语言（C++ 控制、Python 模型）可以混用；</li>
+<li>能录下所有消息回放调试（rosbag2 / MCAP）；</li>
+<li>社区现成模块（导航、规划、驱动）直接拿来用。</li>
+</ul>
+<h3 id="2-ros-2">第 2 步：ROS 2 的四种通信</h3>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>模式</th>
+<th>例子</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>话题 Topic</strong></td>
+<td>发布 / 订阅，多对多</td>
+<td><code>/camera/image</code>、<code>/joint_states</code>、<code>/cmd_vel</code></td>
+<td>流式数据，最常用</td>
+</tr>
+<tr>
+<td><strong>服务 Service</strong></td>
+<td>请求 / 应答</td>
+<td>"重置里程计"、"查询地图"</td>
+<td>短时调用，会阻塞等待</td>
+</tr>
+<tr>
+<td><strong>动作 Action</strong></td>
+<td>目标 + 持续反馈 + 结果，可取消</td>
+<td>"导航到厨房"、"执行这段轨迹"</td>
+<td>长时间任务</td>
+</tr>
+<tr>
+<td><strong>参数 Parameter</strong></td>
+<td>每个节点的配置</td>
+<td>控制增益、话题名</td>
+<td>可运行时修改</td>
+</tr>
+</tbody>
+</table>
+<p>底层传输：ROS 2 通过 <code>rmw</code> 抽象层接 <strong>DDS</strong>（Fast DDS、Cyclone DDS 等）；<strong>Zenoh</strong>（rmw_zenoh）是近两年的新选择，跨网络、穿 NAT 更方便。同机大数据（图像、点云）可用共享内存 / 零拷贝（如 iceoryx、Fast DDS SHM）。</p>
+<h3 id="3-qos">第 3 步：QoS：每个话题要什么样的"快递服务"</h3>
+<table>
+<thead>
+<tr>
+<th>QoS 项</th>
+<th>选项</th>
+<th>用在哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reliability</td>
+<td><code>RELIABLE</code>（丢了重发）/ <code>BEST_EFFORT</code>（丢了就丢）</td>
+<td>指令、地图用 RELIABLE；相机、点云、高频状态用 BEST_EFFORT</td>
+</tr>
+<tr>
+<td>History / Depth</td>
+<td>保留最近 N 条</td>
+<td>控制类只要最新 1 条</td>
+</tr>
+<tr>
+<td>Durability</td>
+<td><code>VOLATILE</code> / <code>TRANSIENT_LOCAL</code>（后加入的订阅者也能收到最后一条）</td>
+<td>静态地图、机器人描述 <code>/robot_description</code></td>
+</tr>
+<tr>
+<td>Deadline / Liveliness</td>
+<td>多久没消息算异常</td>
+<td>安全监控</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键直觉</strong>：在差网络（Wi-Fi）上传高频数据时，<code>RELIABLE</code> 会不停重发，消息排队越来越长，你收到的是越来越<strong>旧</strong>的数据；<code>BEST_EFFORT</code> 会丢一些，但收到的都是<strong>新鲜</strong>的。对控制来说，"新鲜"比"完整"重要。发布方和订阅方 QoS 不兼容时会直接收不到——新手最常见的"怎么没数据"。</p>
+<h3 id="4-tf2">第 4 步：tf2：所有东西"在谁的坐标系里"</h3>
+<p>机器人里有几十个坐标系：<code>map</code>、<code>odom</code>、<code>base_link</code>、各连杆、<code>camera_link</code>、<code>gripper</code>……tf2 维护一棵<strong>随时间变化的坐标树</strong>，你可以问："0.2 秒前，相机坐标系里的这个点，在 <code>base_link</code> 里是哪？"</p>
+<ul>
+<li>静态变换（相机装在哪）来自 URDF 或标定结果（第 4 章）；</li>
+<li>动态变换（关节角）由 <code>robot_state_publisher</code> 根据 <code>/joint_states</code> 和 URDF 做 FK（第 2 章）实时发布；</li>
+<li><code>map → odom → base_link</code> 是导航的标准约定（REP-105）。</li>
+</ul>
+<h3 id="5-ros2_control">第 5 步：ros2_control：硬件抽象层</h3>
+<pre><code> 上层（MoveIt 2 / Nav2 / 你的 VLA 节点）
+        │  action / topic：轨迹、速度指令
+ ┌──────▼──────────────── controller_manager（实时循环）──────┐
+ │  控制器插件：joint_trajectory_controller、diff_drive_controller、 │
+ │              admittance_controller、自定义控制器              │
+ │        │ command interfaces（position / velocity / effort）   │
+ │        │ state interfaces（position / velocity / effort）     │
+ │  硬件插件 hardware_interface：read() → update() → write()     │
+ └──────┬───────────────────────────────────────────────────┘
+        │  厂商 SDK / EtherCAT / CAN
+      真实硬件，或仿真（Gazebo / MuJoCo / Isaac 的 ros2_control 插件）
+</code></pre>
+<p>好处：同一套控制器和上层代码，换硬件只换 <code>hardware_interface</code> 插件；仿真和真机切换也只改一行配置。</p>
+<h3 id="6-ros-2">第 6 步：ROS 2 生态里的大模块</h3>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>做什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MoveIt 2</strong></td>
+<td>机械臂运动规划（OMPL 采样规划、碰撞检测、IK、轨迹时间参数化），MoveIt Servo 做实时遥操作</td>
+</tr>
+<tr>
+<td><strong>Nav2</strong></td>
+<td>移动机器人导航：定位（AMCL）、代价地图、全局 / 局部规划、行为树调度</td>
+</tr>
+<tr>
+<td><strong>slam_toolbox / Cartographer</strong></td>
+<td>2D / 3D 建图</td>
+</tr>
+<tr>
+<td><strong>rosbag2（MCAP 格式）</strong></td>
+<td>录制回放；Foxglove 可视化</td>
+</tr>
+<tr>
+<td><strong>RViz2</strong></td>
+<td>3D 可视化</td>
+</tr>
+</tbody>
+</table>
+<p>发行版：Humble（2022，LTS）、Jazzy（2024，LTS）、Kilted（2025）、Lyrical（2026，LTS）。新项目一般选最新 LTS。</p>
+<h3 id="7-ros-2_1">第 7 步：实时：ROS 2 本身不保证，要自己保证</h3>
+<p>ROS 2 的 DDS、Python、动态内存分配都可能带来毫秒级抖动。工程上的做法：</p>
+<ol>
+<li><strong>操作系统</strong>：PREEMPT_RT 内核（Linux 6.12 起已入主线）、CPU 隔离（<code>isolcpus</code>）、把控制线程设成 <code>SCHED_FIFO</code> 高优先级、锁内存（<code>mlockall</code>）。</li>
+<li><strong>控制循环里不做</strong>：动态分配内存、打日志、加锁等慢线程、走网络。</li>
+<li><strong>数据交换</strong>：实时线程和非实时线程之间用无锁队列 / 双缓冲（ros2_control 的 <code>RealtimeBuffer</code>）。</li>
+<li><strong>更硬的部分下沉</strong>：1 kHz 以上的环交给独立控制板（第 5 章）。</li>
+</ol>
+<p><strong>替代方案</strong>：LCM（MIT，轻量，Cheetah 系常用）、dora-rs（Rust 数据流框架，面向 AI 机器人，零拷贝）、各公司自研共享内存框架。很多人形公司"上层用 ROS 2、底层自研实时框架"。</p>
+<h3 id="_2">动画演示</h3>
+<p><img alt="QoS：差网络下 RELIABLE 越积越旧，BEST_EFFORT 丢包但新鲜" src="../animations/07-ros2-qos.gif" /></p>
+<p>可交互版：<a href="../animations/07-ros2-qos.html">animations/07-ros2-qos.html</a>（拖动丢包率）。</p>
+<p><strong>怎么看</strong>：</p>
+<ol>
+<li>相机节点每个时刻发一条消息（彩色点），经过一条丢包率 35% 的 Wi-Fi 送到订阅者。链路每个时刻最多发 1.25 次。</li>
+<li>上面 RELIABLE：丢了就重发，所有消息都会到，但队列越积越长，"收到的最新一帧有多旧"一直往上涨。</li>
+<li>下面 BEST_EFFORT：丢了就算了（红叉），收到的帧数少一些，但每一帧都是几乎刚拍的。</li>
+<li>把丢包率拖到 5%，两者差不多；拖到 40%，RELIABLE 的延迟会失控。</li>
+</ol>
+<h2 id="_3">公式</h2>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>式子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>可靠传输需要的发送次数</td>
+<td>每条平均 <span class="arithmatex">\(1/(1-p)\)</span> 次（丢包率 <span class="arithmatex">\(p\)</span>）</td>
+</tr>
+<tr>
+<td>队列不爆的条件</td>
+<td>发布速率 <span class="arithmatex">\(\times \dfrac{1}{1-p}\)</span> &lt; 链路容量</td>
+</tr>
+<tr>
+<td>坐标变换链</td>
+<td><span class="arithmatex">\({}^{A}T_{C} = {}^{A}T_{B}\,{}^{B}T_{C}\)</span></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">练习与作答记录</h2>
+<p><strong>题 1</strong>：一个 30 Hz 的相机话题通过 Wi-Fi 传给笔记本上的可视化工具，画面越来越卡、延迟越来越大。你会先改哪个 QoS 设置？为什么？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 2</strong>：tf2 里查询"0.1 秒前相机坐标系的点在 <code>base_link</code> 里在哪"，为什么必须带时间戳？如果直接用"当前"的变换会怎样？（联系第 4 章）</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 3</strong>：ros2_control 把控制器和硬件分开成插件，对"先在仿真里调好、再上真机"有什么帮助？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<h2 id="_5">口诀</h2>
+<blockquote>
+<p>节点像电台，话题像频道；服务一问一答，动作有进度能取消。<br />
+差网络里控制要新鲜不要完整；ROS 2 不保证实时，实时要自己隔出来。</p>
+</blockquote>
+<h2 id="_6">本章复习卡片</h2>
+<p>A19 话题 / 服务 / 动作、A20 QoS RELIABLE vs BEST_EFFORT、A21 ros2_control 与实时隔离（见 <a href="../review.html">review.md</a>）</p>
+<h2 id="_7">附录 · 延伸阅读</h2>
+<blockquote>
+<p>留给以后深入学习用，不影响本章主线。★ 是建议先读的。</p>
+</blockquote>
+<h3 id="_8">推荐阅读</h3>
+<ul>
+<li>★ Macenski, Foote, Gerkey, Lalancette, Woodall，"Robot Operating System 2: Design, Architecture, and Uses in the Wild"，Science Robotics 2022：ROS 2 设计总览。</li>
+<li>★ ROS 2 官方文档（docs.ros.org）：Concepts（Nodes / Topics / Services / Actions / QoS）、ros2_control 文档（control.ros.org）。</li>
+<li>Macenski et al.，"The Marathon 2: A Navigation System"，IROS 2020：Nav2 架构。</li>
+<li>Coleman et al.，"Reducing the Barrier to Entry of Complex Robotic Software: a MoveIt! Case Study"（2014）：MoveIt 架构。</li>
+<li>Foote，"tf: The transform library"（2013）；REP-105（坐标系约定）、REP-103（单位与方向约定）。</li>
+<li>Huang, Olson, Moore，"LCM: Lightweight Communications and Marshalling"，IROS 2010。</li>
+<li>dora-rs 项目文档；Eclipse Zenoh / rmw_zenoh 文档。</li>
+<li>本仓库：ros2 专题（官方文档已归档，按阶段 A–I 动手）。</li>
+</ul>
+<h3 id="_9">数学原理</h3>
+<ul>
+<li>排队论直觉：到达速率 &gt; 服务速率时队列无界增长。</li>
+<li>几何级数：重传次数期望 <span class="arithmatex">\(\sum_k k(1-p)p^{k-1} = 1/(1-p)\)</span>。</li>
+<li>坐标变换的复合与求逆。</li>
+</ul>
+<h3 id="_10">公式清单</h3>
+<p>见正文"公式"一节的表。</p>
+<h3 id="_11">代码对照：把本章的数字用代码算一遍</h3>
+<blockquote>
+<p>用 Python + NumPy（Numerical Python：数值 / Python）把讲义里讲过的数算一遍，不算练习题。代码在仓库本地 <code>robot-system-architecture/solutions/chapter-code/ch07_ros2_middleware.py</code>，配套测试 <code>tests/test_ch07.py</code>，notebook 在 <code>notebooks/ch07_ros2_middleware.ipynb</code>。Mac 上直接能跑，不需要 GPU：</p>
+<p><code>bash  
+cd robot-system-architecture/solutions/chapter-code  
+uv run python ch07_ros2_middleware.py   # 一步一步打印  
+uv run pytest tests/test_ch07.py</code></p>
+</blockquote>
+<p><strong>讲义 ↔ 代码</strong>（QoS 的数字照动画：每时刻发 1 条、链路 1.25 次/时刻；坐标变换的位姿是编的）：</p>
+<table>
+<thead>
+<tr>
+<th>讲义</th>
+<th>公式</th>
+<th>写法</th>
+<th>跑出来</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>公式表 重发次数</td>
+<td><span class="arithmatex">\(1/(1-p)\)</span></td>
+<td><code>expected_sends</code>、<code>monte_carlo_sends</code></td>
+<td>p = 0.35：公式 1.538，模拟 1.536</td>
+</tr>
+<tr>
+<td>公式表 队列不爆</td>
+<td>速率 × <span class="arithmatex">\(1/(1-p)\)</span> &lt; 容量</td>
+<td><code>queue_ok(1.0, p, 1.25)</code></td>
+<td>p = 0.05 能跟上；0.35 跟不上；临界 0.20</td>
+</tr>
+<tr>
+<td>第 3 步 / 动画</td>
+<td>RELIABLE vs BEST_EFFORT</td>
+<td><code>simulate_qos(p)</code></td>
+<td>p = 0.35：RELIABLE 旧 31 个时刻，BEST_EFFORT 旧 1 个、收到 60%</td>
+</tr>
+<tr>
+<td>第 4 步 tf 变换链</td>
+<td><span class="arithmatex">\({}^AT_C = {}^AT_B\,{}^BT_C\)</span></td>
+<td><code>se2(...) @ p</code></td>
+<td>相机系 (1, 0) → base_link 系 (0.2, 1.0)，逆变换变回去</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键几行</strong>：</p>
+<pre><code class="language-python">while credit &gt;= 1.0:                  # 这个时刻链路还能发一次
+    credit -= 1.0
+    if queue and rng.random() &gt; p:    # 没丢：队头那条送达；丢了：下次重发同一条
+        rel_last = queue.pop(0)
+if rng.random() &gt; p:                  # BEST_EFFORT：只发这一刻最新的，丢了就算了
+    be_last = t
+</code></pre>
+<p><strong>代码里才看得到的 2 件事</strong>：</p>
+<ul>
+<li><code>rng.geometric(1 − p)</code> 正好是"一直重发直到成功，一共发了几次"的分布，平均值就是 <span class="arithmatex">\(1/(1-p)\)</span>。</li>
+<li>平面坐标变换用 3×3 齐次矩阵，点要写成 (x, y, 1)；最后那个 1 让平移也能写成矩阵乘法。三维 tf2 里是 4×4，道理一样。</li>
+</ul>
+<p><strong>自己改一改</strong>（不影响练习答案）：</p>
+<ul>
+<li>把丢包率改成 0.20（临界值）和 0.25，跑长一点（<code>ticks=2000</code>），看 RELIABLE 的延迟怎么变。</li>
+<li>再串一个变换（夹爪在相机前方），用两次矩阵乘法把夹爪上的点变到 base_link 系。</li>
+</ul><nav class="pager"><a href="06-low-level-control.html">← 第 6 章 · 底层控制：电流环 → 速度环 → 位置环，再到阻抗与全身控制</a><a href="08-autonomy-stack.html">第 8 章 · 自主栈：从模块化流水线到端到端 VLA 与双系统 →</a></nav>
+</main>
+<footer>来自个人学习仓库的对话讲义，含练习作答记录。源码：<a href="https://github.com/wikieden/robot-architecture">github.com/wikieden/robot-architecture</a></footer>
+</body></html>

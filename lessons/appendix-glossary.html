@@ -1,0 +1,1133 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>附录 · 缩写与术语表 · 机器人软硬件架构</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}}
+:root[data-theme="dark"]{--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:14px}
+header.top .brand{font-weight:600;color:var(--fg);text-decoration:none;margin-right:auto}
+header.top a{text-decoration:none}
+main{max-width:860px;margin:0 auto;padding:24px 16px 72px;overflow-wrap:anywhere}
+h1{font-size:28px;line-height:1.35;margin:8px 0 16px} h2{font-size:22px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)} h3{font-size:18px;margin:28px 0 8px}
+img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+blockquote{margin:16px 0;padding:10px 16px;background:var(--quote);border-left:3px solid var(--acc);border-radius:4px;color:var(--mute)}
+blockquote p{margin:4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto} pre code{padding:0;background:none}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:12px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--code)}
+details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px} summary{cursor:pointer;color:var(--acc);font-weight:500}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.btn{display:inline-block;margin:4px 8px 4px 0;padding:6px 14px;border:1px solid var(--acc);border-radius:999px;text-decoration:none;font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;color:inherit;text-decoration:none}
+.card:hover{border-color:var(--acc)} .card img{border:0;border-bottom:1px solid var(--line);border-radius:0;aspect-ratio:16/10;object-fit:contain;width:100%}
+.card .no{color:var(--mute);font-size:13px;padding:8px 12px 0} .card .t{padding:0 12px 12px;font-weight:500;line-height:1.5}
+.lead{font-size:17px;color:var(--mute)}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-size:13px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true,processEnvironments:true}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body>
+<header class="top"><div class="in">
+<a class="brand" href="../index.html">机器人软硬件架构</a>
+<a href="../lessons/index.html">讲义目录</a>
+<a href="../animations/index.html">动画</a>
+<a href="../review.html">复习卡片</a>
+<a href="../lessons/appendix-glossary.html">缩写表</a>
+</div></header>
+<main>
+<h1 id="_1">附录 · 缩写与术语表</h1>
+<blockquote>
+<p>用途：讲义里遇到缩写，先查这一页。每章开头的"本章缩写"只列这一章用到的。整理日期：2026-11-14，2026-11-15 逐条核对过"第一次出现"。<br />
+写法：缩写 = 英文全称（逐词拆开的中文意思）；"第一次出现"指本书 10 章讲义里第一次出现的那一章。</p>
+</blockquote>
+<h2 id="_2">分层与整机</h2>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>意思</th>
+<th>第一次出现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L0–L4</td>
+<td>Layer 0–4</td>
+<td>本书的五层编号：L0 电机驱动、L1 关节 / 全身控制、L2 策略、L3 感知、L4 任务规划</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>DoF</td>
+<td>Degrees of Freedom</td>
+<td>自由度：能独立变化的数有几个</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td>SCARA</td>
+<td>Selective Compliance Assembly Robot Arm</td>
+<td>选择性柔顺装配机械臂：平面 4 轴搬运臂</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td>UR5e</td>
+<td>Universal Robots 5（kg 负载）e-Series</td>
+<td>优傲协作臂的一个型号</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td>KUKA iiwa</td>
+<td>intelligent industrial work assistant</td>
+<td>库卡 7 轴力控协作臂</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td>AMR / AGV</td>
+<td>Autonomous Mobile Robot / Automated Guided Vehicle</td>
+<td>自主移动机器人 / 自动导引车</td>
+<td><a href="../lessons/10-safety-and-cases.html">第 10 章</a></td>
+</tr>
+<tr>
+<td>MIT</td>
+<td>Massachusetts Institute of Technology</td>
+<td>麻省理工学院（Cheetah 四足、QDD 路线的出处）</td>
+<td><a href="../lessons/03-actuators.html">第 3 章</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">运动学与动力学</h2>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>意思</th>
+<th>第一次出现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FK / IK</td>
+<td>Forward / Inverse Kinematics</td>
+<td>正运动学（角度 → 手在哪）/ 逆运动学（手要到哪 → 角度）</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td>DH</td>
+<td>Denavit–Hartenberg</td>
+<td>用 4 个参数描述相邻连杆关系的经典方法（两位提出者的姓）</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td>PoE</td>
+<td>Product of Exponentials</td>
+<td>指数积：Modern Robotics 用的 FK 写法</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(J\)</span></td>
+<td>Jacobian</td>
+<td>雅可比矩阵：关节速度 → 手的速度；转置后管力 <span class="arithmatex">\(\tau = J^\top F\)</span></td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td>det</td>
+<td>determinant</td>
+<td>行列式；两连杆 <span class="arithmatex">\(\det J = L_1L_2\sin\theta_2\)</span>，为 0 就是奇异</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(SO(3)\)</span> / <span class="arithmatex">\(SE(3)\)</span></td>
+<td>Special Orthogonal / Special Euclidean group in 3D</td>
+<td>三维旋转矩阵的全体 / 旋转 + 平移（刚体位姿）的全体</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a>（<span class="arithmatex">\(SE(3)\)</span> 在 <a href="../lessons/04-sensors.html">第 4 章</a>）</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(c_{12}\)</span> / <span class="arithmatex">\(s_{12}\)</span></td>
+<td><span class="arithmatex">\(\cos(\theta_1+\theta_2)\)</span> / <span class="arithmatex">\(\sin(\theta_1+\theta_2)\)</span></td>
+<td>运动学里的简写</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(J_{refl}\)</span></td>
+<td>reflected inertia</td>
+<td>反射惯量：从关节外面看电机转子的等效惯量 <span class="arithmatex">\(N^2J_m\)</span>（MR 叫 apparent inertia）</td>
+<td><a href="../lessons/03-actuators.html">第 3 章</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">执行器与电气</h2>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>意思</th>
+<th>第一次出现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BLDC</td>
+<td>Brushless Direct Current motor</td>
+<td>无刷直流电机</td>
+<td><a href="../lessons/03-actuators.html">第 3 章</a></td>
+</tr>
+<tr>
+<td>PMSM</td>
+<td>Permanent Magnet Synchronous Motor</td>
+<td>永磁同步电机</td>
+<td><a href="../lessons/03-actuators.html">第 3 章</a></td>
+</tr>
+<tr>
+<td>MOSFET</td>
+<td>Metal-Oxide-Semiconductor Field-Effect Transistor</td>
+<td>金属氧化物半导体场效应晶体管：驱动板上的功率开关</td>
+<td><a href="../lessons/03-actuators.html">第 3 章</a></td>
+</tr>
+<tr>
+<td>QDD</td>
+<td>Quasi-Direct Drive</td>
+<td>准直驱：大扭矩电机 + 低减速比（约 6–10）</td>
+<td><a href="../lessons/03-actuators.html">第 3 章</a></td>
+</tr>
+<tr>
+<td>RV</td>
+<td>Rotate Vector reducer</td>
+<td>旋转矢量减速器：一种摆线减速器，重载工业臂底座用</td>
+<td><a href="../lessons/03-actuators.html">第 3 章</a></td>
+</tr>
+<tr>
+<td>SEA</td>
+<td>Series Elastic Actuator</td>
+<td>串联弹性执行器：减速器和负载之间串一根已知刚度的弹簧</td>
+<td><a href="../lessons/03-actuators.html">第 3 章</a></td>
+</tr>
+<tr>
+<td>rpm</td>
+<td>revolutions per minute</td>
+<td>每分钟转数</td>
+<td><a href="../lessons/03-actuators.html">第 3 章</a></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(K_t\)</span></td>
+<td>torque constant</td>
+<td>力矩常数：<span class="arithmatex">\(\tau = K_t i\)</span></td>
+<td><a href="../lessons/03-actuators.html">第 3 章</a></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\eta\)</span></td>
+<td>eta</td>
+<td>减速器效率（≤ 1）</td>
+<td><a href="../lessons/03-actuators.html">第 3 章</a></td>
+</tr>
+<tr>
+<td>PWM</td>
+<td>Pulse-Width Modulation</td>
+<td>脉冲宽度调制：用开关占空比控制平均电压</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>BMS</td>
+<td>Battery Management System</td>
+<td>电池管理系统</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>SOC</td>
+<td>State of Charge</td>
+<td>荷电状态：剩余电量百分比</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>DC-DC</td>
+<td>Direct Current to Direct Current converter</td>
+<td>直流变换器：48 V 转 24 / 12 / 5 V</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>Wh / Ah</td>
+<td>watt-hour / ampere-hour</td>
+<td>瓦时 / 安时；Wh = V × Ah</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>E-stop</td>
+<td>Emergency stop</td>
+<td>急停按钮</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">计算与总线</h2>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>意思</th>
+<th>第一次出现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ARM</td>
+<td>Advanced RISC Machines（RISC = Reduced Instruction Set Computer）</td>
+<td>精简指令集处理器架构：Jetson、树莓派、手机芯片都是</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>PC</td>
+<td>Personal Computer</td>
+<td>个人计算机；工业 PC = 工控机</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>AGX</td>
+<td>（产品名，官方没给全称）</td>
+<td>NVIDIA Jetson 的高端型号（AGX Orin / Thor）</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>GB</td>
+<td>gigabyte</td>
+<td>吉字节（注意是字节 B，不是位 b）</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>CPU / GPU</td>
+<td>Central / Graphics Processing Unit</td>
+<td>中央处理器 / 图形处理器</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a>（CPU 在 <a href="../lessons/05-electrical-compute.html">第 5 章</a>）</td>
+</tr>
+<tr>
+<td>MCU</td>
+<td>Microcontroller Unit</td>
+<td>微控制器：每个关节驱动板上的小芯片</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>RT / RTOS</td>
+<td>Real-Time / Real-Time Operating System</td>
+<td>实时 / 实时操作系统</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>PREEMPT_RT</td>
+<td>preemptible real-time</td>
+<td>Linux 可抢占实时补丁，6.12 起入主线</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>SoC</td>
+<td>System on Chip</td>
+<td>片上系统：CPU + GPU + 外设做在一颗芯片上</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>FPGA</td>
+<td>Field-Programmable Gate Array</td>
+<td>现场可编程门阵列</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>STM32</td>
+<td>STMicroelectronics 32-bit MCU</td>
+<td>意法半导体的 32 位 MCU 系列</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>TI</td>
+<td>Texas Instruments</td>
+<td>德州仪器（C2000 电机控制芯片）</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>TOPS / TFLOPS</td>
+<td>Tera Operations / Floating-point Operations Per Second</td>
+<td>每秒万亿次运算 / 浮点运算</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>INT8 / FP16 / FP4</td>
+<td>8-bit integer / 16-bit / 4-bit Floating Point</td>
+<td>8 位整数 / 16 位、4 位浮点：量化后的数字格式</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a>（FP16 在 <a href="../lessons/09-sim-data-deploy.html">第 9 章</a>）</td>
+</tr>
+<tr>
+<td>EtherCAT</td>
+<td>Ethernet for Control Automation Technology</td>
+<td>用于控制自动化的以太网：一帧穿过所有从站，就地读写</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>DC</td>
+<td>Distributed Clocks</td>
+<td>EtherCAT 的分布式时钟，同步精度亚微秒</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>CAN / CAN-FD</td>
+<td>Controller Area Network / with Flexible Data-rate</td>
+<td>控制器局域网 / 数据段速率可变的 CAN</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>RS-485</td>
+<td>Recommended Standard 485</td>
+<td>一种差分串口总线，舵机常用</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>TSN</td>
+<td>Time-Sensitive Networking</td>
+<td>时间敏感网络：带时间调度的以太网</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>GMSL</td>
+<td>Gigabit Multimedia Serial Link</td>
+<td>千兆多媒体串行链路：相机长线</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>MIPI</td>
+<td>Mobile Industry Processor Interface</td>
+<td>移动产业处理器接口：相机排线</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>TTL</td>
+<td>Transistor-Transistor Logic</td>
+<td>晶体管–晶体管逻辑：舵机常用的单线串口电平</td>
+<td><a href="../lessons/10-safety-and-cases.html">第 10 章</a></td>
+</tr>
+<tr>
+<td>SPI</td>
+<td>Serial Peripheral Interface</td>
+<td>串行外设接口：IMU 常用</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>USB</td>
+<td>Universal Serial Bus</td>
+<td>通用串行总线</td>
+<td><a href="../lessons/04-sensors.html">第 4 章</a></td>
+</tr>
+<tr>
+<td>Mbps / Gbps</td>
+<td>megabits / gigabits per second</td>
+<td>每秒兆位 / 吉位（注意是位，不是字节）</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>SOEM</td>
+<td>Simple Open EtherCAT Master</td>
+<td>开源 EtherCAT 主站</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>OTA</td>
+<td>Over-The-Air</td>
+<td>空中升级：远程推送软件 / 模型</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>Hz / kHz / µs</td>
+<td>hertz / kilohertz / microsecond</td>
+<td>赫兹（每秒几次）/ 千赫兹 / 微秒</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_6">传感器</h2>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>意思</th>
+<th>第一次出现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IMU</td>
+<td>Inertial Measurement Unit</td>
+<td>惯性测量单元：加速度计 + 陀螺仪</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>F/T</td>
+<td>Force/Torque</td>
+<td>六维力 / 力矩传感器：3 个力 + 3 个力矩</td>
+<td><a href="../lessons/04-sensors.html">第 4 章</a></td>
+</tr>
+<tr>
+<td>RGB</td>
+<td>Red Green Blue</td>
+<td>彩色相机</td>
+<td><a href="../lessons/04-sensors.html">第 4 章</a></td>
+</tr>
+<tr>
+<td>ToF</td>
+<td>Time of Flight</td>
+<td>飞行时间：测光往返时间得到深度</td>
+<td><a href="../lessons/04-sensors.html">第 4 章</a></td>
+</tr>
+<tr>
+<td>LiDAR</td>
+<td>Light Detection and Ranging</td>
+<td>激光雷达</td>
+<td><a href="../lessons/04-sensors.html">第 4 章</a></td>
+</tr>
+<tr>
+<td>ChArUco</td>
+<td>Chessboard + ArUco</td>
+<td>棋盘格和 ArUco 标记合在一起的标定板</td>
+<td><a href="../lessons/04-sensors.html">第 4 章</a></td>
+</tr>
+<tr>
+<td>PTP</td>
+<td>Precision Time Protocol</td>
+<td>精确时间协议（IEEE 1588）：以太网设备对时</td>
+<td><a href="../lessons/04-sensors.html">第 4 章</a></td>
+</tr>
+<tr>
+<td>EKF</td>
+<td>Extended Kalman Filter</td>
+<td>扩展卡尔曼滤波：非线性版的卡尔曼滤波</td>
+<td><a href="../lessons/04-sensors.html">第 4 章</a></td>
+</tr>
+<tr>
+<td>VIO / VINS</td>
+<td>Visual-Inertial Odometry / Navigation System</td>
+<td>视觉惯性里程计 / 导航系统</td>
+<td><a href="../lessons/04-sensors.html">第 4 章</a></td>
+</tr>
+<tr>
+<td>LIO</td>
+<td>LiDAR-Inertial Odometry</td>
+<td>激光雷达惯性里程计</td>
+<td><a href="../lessons/04-sensors.html">第 4 章</a></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(f_x\)</span> / <span class="arithmatex">\(c_x\)</span></td>
+<td>focal length / center</td>
+<td>相机内参：焦距 / 主点（像素）</td>
+<td><a href="../lessons/04-sensors.html">第 4 章</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_7">控制</h2>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>意思</th>
+<th>第一次出现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kp / Kd</td>
+<td>proportional / derivative gain</td>
+<td>比例 / 微分增益；接口里也当"刚度 / 阻尼"用</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>PID / PD / PI</td>
+<td>Proportional–Integral–Derivative</td>
+<td>比例–积分–微分控制及其去掉某项的版本</td>
+<td><a href="../lessons/06-low-level-control.html">第 6 章</a></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\tau_{ff}\)</span></td>
+<td>feedforward torque</td>
+<td>前馈力矩：事先算好的那部分（如重力补偿）</td>
+<td><a href="../lessons/06-low-level-control.html">第 6 章</a></td>
+</tr>
+<tr>
+<td>FOC</td>
+<td>Field-Oriented Control</td>
+<td>磁场定向控制：Clarke + Park 变换后分别控 <span class="arithmatex">\(i_d\)</span>、<span class="arithmatex">\(i_q\)</span></td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>αβ / dq</td>
+<td>alpha–beta / direct–quadrature axes</td>
+<td>Clarke 后的静止两轴 / Park 后跟着转子转的直轴、交轴</td>
+<td><a href="../lessons/06-low-level-control.html">第 6 章</a></td>
+</tr>
+<tr>
+<td>WBC</td>
+<td>Whole-Body Control</td>
+<td>全身控制：每个周期解一个 QP 分配所有关节力矩</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>QP</td>
+<td>Quadratic Programming</td>
+<td>二次规划：二次目标 + 线性约束</td>
+<td><a href="../lessons/06-low-level-control.html">第 6 章</a></td>
+</tr>
+<tr>
+<td>MPC</td>
+<td>Model Predictive Control</td>
+<td>模型预测控制：往前看一段、只执行第一步</td>
+<td><a href="../lessons/06-low-level-control.html">第 6 章</a></td>
+</tr>
+<tr>
+<td>OSQP / ProxQP</td>
+<td>Operator Splitting QP / Proximal QP（算子分裂 / 近端）</td>
+<td>两个常用 QP 求解器</td>
+<td><a href="../lessons/06-low-level-control.html">第 6 章</a></td>
+</tr>
+<tr>
+<td>OCS2</td>
+<td>Optimal Control for Switched Systems</td>
+<td>切换系统最优控制库，四足 MPC 常用</td>
+<td><a href="../lessons/06-low-level-control.html">第 6 章</a></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\omega_n\)</span> / <span class="arithmatex">\(\zeta\)</span></td>
+<td>natural frequency / damping ratio</td>
+<td>二阶系统的自然频率 / 阻尼比</td>
+<td><a href="../lessons/06-low-level-control.html">第 6 章</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_8">软件与中间件</h2>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>意思</th>
+<th>第一次出现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ROS 2</td>
+<td>Robot Operating System 2</td>
+<td>机器人操作系统第 2 版（其实是中间件 + 工具生态）</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>rmw</td>
+<td>ROS middleware</td>
+<td>ROS 2 接底层通信的抽象层</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>DDS</td>
+<td>Data Distribution Service</td>
+<td>数据分发服务：ROS 2 默认的底层通信标准</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>QoS</td>
+<td>Quality of Service</td>
+<td>服务质量：可靠 / 尽力、保留几条、迟到者能否收到</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>SHM</td>
+<td>shared memory</td>
+<td>共享内存：同机零拷贝</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>NAT</td>
+<td>Network Address Translation</td>
+<td>网络地址转换（路由器后面的设备不好直连）</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>tf2</td>
+<td>transform library 2</td>
+<td>ROS 2 的坐标变换库：按时间缓存的坐标树</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>REP</td>
+<td>ROS Enhancement Proposal</td>
+<td>ROS 改进提案（REP-103 单位、REP-105 坐标系）</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>URDF</td>
+<td>Unified Robot Description Format</td>
+<td>统一机器人描述格式（ROS）</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td>MuJoCo / MJCF</td>
+<td>Multi-Joint dynamics with Contact / MuJoCo Format</td>
+<td>带接触的多关节动力学仿真器 / 它的 XML 模型格式</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td>USD</td>
+<td>Universal Scene Description</td>
+<td>通用场景描述（Isaac 用）</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td>KDL</td>
+<td>Kinematics and Dynamics Library</td>
+<td>运动学与动力学库（Orocos）</td>
+<td><a href="../lessons/02-kinematics.html">第 2 章</a></td>
+</tr>
+<tr>
+<td>AMCL</td>
+<td>Adaptive Monte Carlo Localization</td>
+<td>自适应蒙特卡洛定位（Nav2）</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>OMPL</td>
+<td>Open Motion Planning Library</td>
+<td>开源运动规划库（MoveIt 2 用）</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>Nav2</td>
+<td>Navigation 2</td>
+<td>ROS 2 导航栈</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>RViz</td>
+<td>ROS Visualization</td>
+<td>ROS 三维可视化工具</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>LTS</td>
+<td>Long-Term Support</td>
+<td>长期支持版本</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>SCHED_FIFO</td>
+<td>scheduling first-in first-out</td>
+<td>Linux 的先进先出实时调度策略</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td><code>isolcpus</code> / <code>mlockall</code></td>
+<td>isolate CPUs / memory lock all</td>
+<td>隔离 CPU 核给实时线程 / 锁住内存不换出</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>MCAP</td>
+<td>（格式名，官方文档没给全称）</td>
+<td>rosbag2 默认的录包文件格式</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>LCM</td>
+<td>Lightweight Communications and Marshalling</td>
+<td>轻量通信与编组库（MIT）</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>dora-rs</td>
+<td>Dataflow-Oriented Robotic Architecture</td>
+<td>面向数据流的机器人框架（Rust）</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_9">自主栈与模型</h2>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>意思</th>
+<th>第一次出现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AI</td>
+<td>Artificial Intelligence</td>
+<td>人工智能</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>LLM</td>
+<td>Large Language Model</td>
+<td>大语言模型</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>VLM</td>
+<td>Vision-Language Model</td>
+<td>视觉语言模型：看图 + 读文字</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>VLA</td>
+<td>Vision-Language-Action model</td>
+<td>视觉语言动作模型：看图读指令，直接出动作</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>SLAM</td>
+<td>Simultaneous Localization and Mapping</td>
+<td>同时定位与建图</td>
+<td><a href="../lessons/01-layered-loops.html">第 1 章</a></td>
+</tr>
+<tr>
+<td>S1 / S2</td>
+<td>System 1 / System 2</td>
+<td>双系统：快的执行策略 / 慢的推理大模型</td>
+<td><a href="../lessons/08-autonomy-stack.html">第 8 章</a></td>
+</tr>
+<tr>
+<td>SAM 2</td>
+<td>Segment Anything Model 2</td>
+<td>分割一切模型第 2 版</td>
+<td><a href="../lessons/08-autonomy-stack.html">第 8 章</a></td>
+</tr>
+<tr>
+<td>6D</td>
+<td>six-dimensional</td>
+<td>六维位姿：3 个位置 + 3 个转角</td>
+<td><a href="../lessons/08-autonomy-stack.html">第 8 章</a></td>
+</tr>
+<tr>
+<td>ORB</td>
+<td>Oriented FAST and Rotated BRIEF</td>
+<td>一种图像特征点（ORB-SLAM3 用）</td>
+<td><a href="../lessons/08-autonomy-stack.html">第 8 章</a></td>
+</tr>
+<tr>
+<td>PDDL</td>
+<td>Planning Domain Definition Language</td>
+<td>规划领域定义语言：经典符号任务规划</td>
+<td><a href="../lessons/08-autonomy-stack.html">第 8 章</a></td>
+</tr>
+<tr>
+<td>RT-2</td>
+<td>Robotics Transformer 2</td>
+<td>谷歌的早期 VLA</td>
+<td><a href="../lessons/08-autonomy-stack.html">第 8 章</a></td>
+</tr>
+<tr>
+<td>GR00T</td>
+<td>Generalist Robot 00 Technology</td>
+<td>NVIDIA 的通用人形机器人模型（N1 分 System 1 / 2）</td>
+<td><a href="../lessons/08-autonomy-stack.html">第 8 章</a></td>
+</tr>
+<tr>
+<td>RTC</td>
+<td>Real-Time Chunking</td>
+<td>实时分块：执行旧 chunk 的同时算新 chunk</td>
+<td><a href="../lessons/08-autonomy-stack.html">第 8 章</a></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(T_a\)</span> / <span class="arithmatex">\(t_{react}\)</span></td>
+<td>action horizon / reaction time</td>
+<td>一段 chunk 执行多久 / 反应时间</td>
+<td><a href="../lessons/08-autonomy-stack.html">第 8 章</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_10">仿真、数据与部署</h2>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>意思</th>
+<th>第一次出现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sim2real</td>
+<td>simulation to reality</td>
+<td>仿真到真机的迁移</td>
+<td><a href="../lessons/06-low-level-control.html">第 6 章</a></td>
+</tr>
+<tr>
+<td>BC</td>
+<td>Behavior Cloning</td>
+<td>行为克隆：照着示范学</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+<tr>
+<td>RL</td>
+<td>Reinforcement Learning</td>
+<td>强化学习</td>
+<td><a href="../lessons/06-low-level-control.html">第 6 章</a></td>
+</tr>
+<tr>
+<td>PPO</td>
+<td>Proximal Policy Optimization</td>
+<td>近端策略优化：运控 RL 最常用的算法</td>
+<td><a href="../lessons/06-low-level-control.html">第 6 章</a></td>
+</tr>
+<tr>
+<td>MJX / XLA</td>
+<td>MuJoCo XLA / Accelerated Linear Algebra</td>
+<td>MuJoCo 的 JAX / GPU 版 / 谷歌的线性代数编译器</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+<tr>
+<td>SAPIEN</td>
+<td>SimulAted Part-based Interactive ENvironment</td>
+<td>基于部件的交互仿真环境（ManiSkill 用）</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+<tr>
+<td>CAD</td>
+<td>Computer-Aided Design</td>
+<td>计算机辅助设计：URDF / MJCF / USD 都该从同一份 CAD 导出</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+<tr>
+<td>VR</td>
+<td>Virtual Reality</td>
+<td>虚拟现实</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+<tr>
+<td>ALOHA</td>
+<td>A Low-cost Open-source HArdware system for bimanual teleoperation</td>
+<td>低成本开源双臂遥操作平台</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>GELLO</td>
+<td>（项目名，论文标题 <em>GELLO: A General, Low-Cost, and Intuitive Teleoperation Framework</em>）</td>
+<td>低成本主从臂遥操作框架（Wu et al. 2023）</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+<tr>
+<td>UMI</td>
+<td>Universal Manipulation Interface</td>
+<td>通用操作接口：手持带相机的夹爪采数据</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+<tr>
+<td>LAPA</td>
+<td>Latent Action Pretraining from Videos</td>
+<td>从人类视频学隐动作的预训练</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+<tr>
+<td>ACT</td>
+<td>Action Chunking with Transformers</td>
+<td>用 Transformer 做动作分块（ALOHA 的策略）</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+<tr>
+<td>RLDS / TFDS</td>
+<td>Reinforcement Learning Datasets / TensorFlow Datasets</td>
+<td>强化学习数据集格式 / 它所在的 TensorFlow 数据集库</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+<tr>
+<td>HDF5</td>
+<td>Hierarchical Data Format 5</td>
+<td>层级数据格式第 5 版</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+<tr>
+<td>ONNX</td>
+<td>Open Neural Network Exchange</td>
+<td>开放神经网络交换格式，再转 TensorRT</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+<tr>
+<td>KV cache</td>
+<td>Key–Value cache</td>
+<td>键值缓存：Transformer 推理时复用算过的前缀</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\xi\)</span> / <span class="arithmatex">\(J(\pi;\xi)\)</span></td>
+<td>xi / return</td>
+<td>物理参数（摩擦、质量……）/ 策略 π 在这组参数下的回报</td>
+<td><a href="../lessons/09-sim-data-deploy.html">第 9 章</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_11">安全与标准</h2>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>意思</th>
+<th>第一次出现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STO</td>
+<td>Safe Torque Off</td>
+<td>安全力矩关断：硬件切断电机出力（停止类别 0）</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>SS1 / SS2</td>
+<td>Safe Stop 1 / 2</td>
+<td>先受控减速再 STO / 减速后保持出力停在原地</td>
+<td><a href="../lessons/10-safety-and-cases.html">第 10 章</a></td>
+</tr>
+<tr>
+<td>SLS / SLP</td>
+<td>Safely-Limited Speed / Position</td>
+<td>安全限速 / 安全限位</td>
+<td><a href="../lessons/10-safety-and-cases.html">第 10 章</a></td>
+</tr>
+<tr>
+<td>PLC</td>
+<td>Programmable Logic Controller</td>
+<td>可编程逻辑控制器（安全 PLC 是认证过的版本）</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>ISO</td>
+<td>International Organization for Standardization</td>
+<td>国际标准化组织</td>
+<td><a href="../lessons/05-electrical-compute.html">第 5 章</a></td>
+</tr>
+<tr>
+<td>ISO/TS</td>
+<td>Technical Specification</td>
+<td>技术规范（如 ISO/TS 15066 协作机器人）</td>
+<td><a href="../lessons/10-safety-and-cases.html">第 10 章</a></td>
+</tr>
+<tr>
+<td>IEC</td>
+<td>International Electrotechnical Commission</td>
+<td>国际电工委员会（IEC 61508、61800-5-2）</td>
+<td><a href="../lessons/10-safety-and-cases.html">第 10 章</a></td>
+</tr>
+<tr>
+<td>PL</td>
+<td>Performance Level</td>
+<td>性能等级 a–e（ISO 13849-1）</td>
+<td><a href="../lessons/10-safety-and-cases.html">第 10 章</a></td>
+</tr>
+<tr>
+<td>SIL</td>
+<td>Safety Integrity Level</td>
+<td>安全完整性等级 1–4（IEC 61508）</td>
+<td><a href="../lessons/10-safety-and-cases.html">第 10 章</a></td>
+</tr>
+<tr>
+<td>SSM</td>
+<td>Speed and Separation Monitoring</td>
+<td>速度与距离监控：人越近机器人越慢</td>
+<td><a href="../lessons/10-safety-and-cases.html">第 10 章</a></td>
+</tr>
+<tr>
+<td>PFL</td>
+<td>Power and Force Limiting</td>
+<td>功率与力限制：碰到人时力不超过阈值</td>
+<td><a href="../lessons/10-safety-and-cases.html">第 10 章</a></td>
+</tr>
+<tr>
+<td>FCI</td>
+<td>Franka Control Interface</td>
+<td>Franka 的 1 kHz 实时控制接口</td>
+<td><a href="../lessons/10-safety-and-cases.html">第 10 章</a></td>
+</tr>
+<tr>
+<td>SDK</td>
+<td>Software Development Kit</td>
+<td>软件开发工具包</td>
+<td><a href="../lessons/07-ros2-middleware.html">第 7 章</a></td>
+</tr>
+<tr>
+<td>ABS</td>
+<td>Anti-lock Braking System</td>
+<td>汽车防抱死制动系统（第 10 章拿汽车安全分层打比方）</td>
+<td><a href="../lessons/10-safety-and-cases.html">第 10 章</a></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\tau_{th}\)</span></td>
+<td>threshold torque</td>
+<td>碰撞检测的力矩阈值</td>
+<td><a href="../lessons/10-safety-and-cases.html">第 10 章</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_12">论文出处里的期刊与会议</h2>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IEEE</td>
+<td>Institute of Electrical and Electronics Engineers（电气电子工程师协会）</td>
+</tr>
+<tr>
+<td>T-RO / T-RA</td>
+<td>IEEE Transactions on Robotics / on Robotics and Automation（机器人汇刊 / 机器人与自动化汇刊）</td>
+</tr>
+<tr>
+<td>J-RA</td>
+<td>IEEE Journal of Robotics and Automation（机器人与自动化期刊）</td>
+</tr>
+<tr>
+<td>T-Mech</td>
+<td>IEEE/ASME Transactions on Mechatronics（机电一体化汇刊；ASME = American Society of Mechanical Engineers，美国机械工程师协会）</td>
+</tr>
+<tr>
+<td>TPAMI</td>
+<td>IEEE Transactions on Pattern Analysis and Machine Intelligence（模式分析与机器智能汇刊）</td>
+</tr>
+<tr>
+<td>IJRR</td>
+<td>International Journal of Robotics Research（机器人研究国际期刊）</td>
+</tr>
+<tr>
+<td>ICRA</td>
+<td>International Conference on Robotics and Automation（机器人与自动化国际会议）</td>
+</tr>
+<tr>
+<td>IROS</td>
+<td>International Conference on Intelligent Robots and Systems（智能机器人与系统国际会议）</td>
+</tr>
+<tr>
+<td>CoRL</td>
+<td>Conference on Robot Learning（机器人学习会议）</td>
+</tr>
+<tr>
+<td>ETH / ASL</td>
+<td>Eidgenössische Technische Hochschule（苏黎世联邦理工学院，德语）/ Autonomous Systems Lab（自主系统实验室，Kalibr 的出处）</td>
+</tr>
+<tr>
+<td>PDF</td>
+<td>Portable Document Format（便携文档格式）</td>
+</tr>
+</tbody>
+</table>
+</main>
+<footer>来自个人学习仓库的对话讲义，含练习作答记录。源码：<a href="https://github.com/wikieden/robot-architecture">github.com/wikieden/robot-architecture</a></footer>
+</body></html>

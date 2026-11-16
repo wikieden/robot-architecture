@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>机器人软硬件架构 · 讲义目录 · 机器人软硬件架构</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}}
+:root[data-theme="dark"]{--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:14px}
+header.top .brand{font-weight:600;color:var(--fg);text-decoration:none;margin-right:auto}
+header.top a{text-decoration:none}
+main{max-width:860px;margin:0 auto;padding:24px 16px 72px;overflow-wrap:anywhere}
+h1{font-size:28px;line-height:1.35;margin:8px 0 16px} h2{font-size:22px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)} h3{font-size:18px;margin:28px 0 8px}
+img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+blockquote{margin:16px 0;padding:10px 16px;background:var(--quote);border-left:3px solid var(--acc);border-radius:4px;color:var(--mute)}
+blockquote p{margin:4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto} pre code{padding:0;background:none}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:12px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--code)}
+details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px} summary{cursor:pointer;color:var(--acc);font-weight:500}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.btn{display:inline-block;margin:4px 8px 4px 0;padding:6px 14px;border:1px solid var(--acc);border-radius:999px;text-decoration:none;font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;color:inherit;text-decoration:none}
+.card:hover{border-color:var(--acc)} .card img{border:0;border-bottom:1px solid var(--line);border-radius:0;aspect-ratio:16/10;object-fit:contain;width:100%}
+.card .no{color:var(--mute);font-size:13px;padding:8px 12px 0} .card .t{padding:0 12px 12px;font-weight:500;line-height:1.5}
+.lead{font-size:17px;color:var(--mute)}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-size:13px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true,processEnvironments:true}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body>
+<header class="top"><div class="in">
+<a class="brand" href="../index.html">机器人软硬件架构</a>
+<a href="../lessons/index.html">讲义目录</a>
+<a href="../animations/index.html">动画</a>
+<a href="../review.html">复习卡片</a>
+<a href="../lessons/appendix-glossary.html">缩写表</a>
+</div></header>
+<main>
+<h1 id="_1">机器人软硬件架构 · 讲义目录</h1>
+<blockquote>
+<p>10 章 · 10 个动画（GIF + 可交互页面）· 40 张复习卡片（A01–A40，本书 10 章对应 A01–A30）· 覆盖 Lynch &amp; Park《Modern Robotics》第 2、4–6 章与 §8.9、第 11 章里和整机架构有关的部分，其余（传感器、总线、ROS 2、自主栈、数据、安全）为自编</p>
+</blockquote>
+<h2 id="_2">这本书讲什么</h2>
+<p>从"一台机器人 = 一组快慢嵌套的闭环"这张总图讲起，按"骨肉 → 神经 → 反射 → 思考 → 机器之外"的顺序，一层层拆开：关节角怎么变成手的位置、电机和减速器怎么选、传感器怎么标定和对时、几块电脑和几条总线怎么接、关节怎么"听话"、ROS 2 怎么把模块串起来、VLA 和双系统放在哪一层、仿真和数据怎么转成飞轮，最后讲安全分层，并拆五类整机。</p>
+<ul>
+<li><strong>适合谁</strong>：学过一点 AI（比如 VLA、强化学习），想知道"模型下面那台机器到底长什么样"的人。需要的数学（三角函数、矩阵、雅可比、二阶系统、期望）在用到的那一章现场补。</li>
+<li><strong>读完能做什么</strong>：拿到一台机器人（或一份方案），能画出它的分层闭环图，说出每层多快、跑在哪块硬件上、层间传什么；能用第 10 章的九步清单从零做一遍选型；接着去读 VLA 讲义 和 ROS 2 专题时知道每个模块坐在哪。</li>
+<li><strong>怎么读</strong>：按章顺序读。每章先看讲解和动画，再自己做练习，最后用复习卡片隔几天考自己。</li>
+</ul>
+<h2 id="_3">讲解的特点</h2>
+<ul>
+<li><strong>一次一小步</strong>：每个概念按"白话类比 → 公式（每个符号说清楚怎么读）→ 小数字亲手算一遍"讲：端水走路讲分层、自行车变速讲减速比、星光讲相机延迟、开门讲阻抗控制。</li>
+<li><strong>每章一个动画</strong>：关键原理做成可交互页面，▶ 播放、→ 单步、↺ 从头开始，有滑块的可以拖动参数看结果怎么变（减速比、延迟、刚度、丢包率、随机化范围）；GIF 版直接嵌在正文里。</li>
+<li><strong>对照原文</strong>：每章开头的"对应原文"标了本地文本的行号（Modern Robotics 的 <code>materials/text/</code>、ROS 2 官方文档、VLA 论文文本），原文没讲的部分写明去哪查。</li>
+<li><strong>保留真实的学习过程</strong>：练习与作答记录会记下学习时的原话、对错和点评；答错、卡住的地方变成复习卡片。（目前 30 道练习还没作答。）</li>
+<li><strong>术语不设门槛</strong>：缩写第一次出现就给英文全称并逐词解释（如 QDD = Quasi-Direct Drive：准 / 直驱），全书缩写见 <a href="../lessons/appendix-glossary.html">缩写与术语表</a>。</li>
+<li><strong>每章都有代码对照</strong>：附录最后一节用 Python + NumPy 把本章的数算一遍（减速比、CAN 一圈多久、阻抗撞墙的力、QoS 队列、反应时间、停止距离……），配测试核对和讲义一致，顺带讲代码里才看得到的坑（角度要换弧度、位和字节差 8 倍、浮点误差让 <code>ceil</code> 多算一圈……）；只算讲过的例子，不提前给练习答案。每章还配了一个 Jupyter notebook（<code>solutions/chapter-code/notebooks/</code>），讲解和代码放在一起，一格一格边读边跑。</li>
+<li><strong>每章收尾有口诀</strong>：几句话记住一章，全部口诀汇总在本页末尾。</li>
+</ul>
+<h2 id="_4">示例动画</h2>
+<table>
+<tr>
+<td width="33%" valign="top"><img src="../animations/01-layered-loops.gif" width="100%" alt="第 1 章 · 分层闭环"><br><b>第 1 章 · 分层闭环</b><br>慢层给目标、快层追目标，拖滑块看策略频率变低会怎样<br><a href="../lessons/01-layered-loops.html">讲义</a> · <a href="../animations/01-layered-loops.html">▶ 交互</a></td>
+<td width="33%" valign="top"><img src="../animations/02-two-link-ik.gif" width="100%" alt="第 2 章 · 两连杆 IK"><br><b>第 2 章 · 两连杆 IK</b><br>手追目标，跑出工作空间时手臂伸直、det J 趋近 0<br><a href="../lessons/02-kinematics.html">讲义</a> · <a href="../animations/02-two-link-ik.html">▶ 交互</a></td>
+<td width="33%" valign="top"><img src="../animations/03-gear-ratio.gif" width="100%" alt="第 3 章 · 减速比"><br><b>第 3 章 · 减速比</b><br>力矩乘 N、速度除 N，反射惯量乘 N²<br><a href="../lessons/03-actuators.html">讲义</a> · <a href="../animations/03-gear-ratio.html">▶ 交互</a></td>
+</tr>
+<tr>
+<td width="33%" valign="top"><img src="../animations/05-bus-cycle.gif" width="100%" alt="第 5 章 · 总线周期"><br><b>第 5 章 · 总线周期</b><br>CAN 挨个点名，EtherCAT 一帧走全场<br><a href="../lessons/05-electrical-compute.html">讲义</a> · <a href="../animations/05-bus-cycle.html">▶ 交互</a></td>
+<td width="33%" valign="top"><img src="../animations/06-impedance.gif" width="100%" alt="第 6 章 · 阻抗控制"><br><b>第 6 章 · 阻抗控制</b><br>硬弹簧和软弹簧撞墙，稳态力 ≈ K × 陷入深度<br><a href="../lessons/06-low-level-control.html">讲义</a> · <a href="../animations/06-impedance.html">▶ 交互</a></td>
+<td width="33%" valign="top"><img src="../animations/10-safety-states.gif" width="100%" alt="第 10 章 · 安全降级"><br><b>第 10 章 · 安全降级</b><br>正常 → 降速 → SS1 → STO，一层层兜底<br><a href="../lessons/10-safety-and-cases.html">讲义</a> · <a href="../animations/10-safety-states.html">▶ 交互</a></td>
+</tr>
+</table>
+
+<p>全部动画见 <a href="../animations/index.html">动画目录</a>（另有运控、规划细化笔记的 4 个动画）。</p>
+<h2 id="_5">其他入口</h2>
+<ul>
+<li>一页总图：../00-overview.md（分层闭环、硬件栈表、软件栈表、五类整机对照）</li>
+<li>复习卡片：<a href="../review.html">../review.md</a>（编号以 A 开头，按间隔规则复习）</li>
+<li>细化笔记：研发流程 · 运控细化 · 规划细化</li>
+<li>学习计划：../study-plan.md</li>
+<li>代码对照：../../solutions/chapter-code/</li>
+<li>缩写与术语表：<a href="../lessons/appendix-glossary.html">appendix-glossary.md</a></li>
+</ul>
+<h2 id="_6">全流程总览</h2>
+<p>目标：机器人听到"把杯子递给我"，从一句话一路变成电机里的电流，再把手稳稳伸出去。</p>
+<pre><code>&quot;把杯子递给我&quot;
+   │  L4 任务规划：LLM / VLM 拆子任务（0.1–1 Hz）              第 1、8 章
+   ▼
+[找杯子, 抓杯子, 转身, 递出]
+   │  L3 感知：相机看到杯子在哪（30 Hz）；先标定、再对时       第 4 章
+   │  L2 策略：VLA / 双系统出一段 action chunk（5–50 Hz）      第 8 章
+   ▼
+未来 N 步的关节角 / 末端位姿
+   │  ROS 2 话题、QoS、tf2 送到实时控制器                       第 7 章
+   │  插补：慢目标补成每毫秒一个点                              第 1 章
+   ▼
+L1 关节 / 全身控制：阻抗、WBC、PD（200 Hz–1 kHz）              第 6 章
+   │  用雅可比把手的力换成关节力矩 τ = Jᵀ F                     第 2、6 章
+   │  EtherCAT / CAN-FD 每周期一帧，发给每个关节               第 5 章
+   ▼
+L0 电机驱动：FOC 电流环（10–40 kHz）→ 电机 → 减速器 → 连杆      第 3、6 章
+   │
+   └── 旁边一直开着：看门狗、限幅、碰撞检测、急停 → STO          第 5、10 章
+机器之外：仿真训练、遥操作采集、日志回流、OTA 升级（数据飞轮）    第 9 章
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>做什么</th>
+<th>为什么这样做</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>分层</td>
+<td>上层慢而粗、下层快而简单，频率每层约快 10 倍</td>
+<td>大模型算不过来也不准时；越往下出错代价越大</td>
+</tr>
+<tr>
+<td>运动学</td>
+<td>FK 算手在哪，IK 反推角度，雅可比同时管速度和力</td>
+<td>上层说的是"手去哪"，下层只认关节</td>
+</tr>
+<tr>
+<td>执行器</td>
+<td>电机 + 减速器，按减速比在力矩、速度、惯量间取舍</td>
+<td>电机天生快而弱，关节要慢而强</td>
+</tr>
+<tr>
+<td>传感器</td>
+<td>本体 + 外部，标定位置、统一时间戳</td>
+<td>不知道在哪、什么时候的数据等于错的数据</td>
+</tr>
+<tr>
+<td>电气计算</td>
+<td>主控 / 实时 / 驱动三块板，EtherCAT 点名，急停走硬线</td>
+<td>各自的实时要求差几个数量级</td>
+</tr>
+<tr>
+<td>底层控制</td>
+<td>级联 PID、FOC、阻抗、WBC / MPC / RL</td>
+<td>让关节准、让接触安全、让整机不倒</td>
+</tr>
+<tr>
+<td>中间件</td>
+<td>ROS 2 节点 + QoS + tf2 + ros2_control</td>
+<td>模块可替换、可录制回放，仿真真机一键切换</td>
+</tr>
+<tr>
+<td>自主栈</td>
+<td>模块化 / 端到端 VLA / 双系统</td>
+<td>在可解释、泛化和反应速度之间取舍</td>
+</tr>
+<tr>
+<td>机器之外</td>
+<td>仿真、域随机化、遥操作、数据格式、部署</td>
+<td>数据飞轮让机器人越用越好</td>
+</tr>
+<tr>
+<td>安全</td>
+<td>本质安全 → 硬件回路 → 安全控制器 → 软件监控 → 策略</td>
+<td>AI 只能在最上层，永远不是最后一道保险</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_7">目录</h2>
+<p>每章都配一个动画：<strong>GIF</strong> 在讲义正文里直接播放，<strong>▶ 交互</strong>是可以点按钮、拖滑块的页面（本地看需要起服务，见 <a href="../animations/index.html">动画目录</a>）。每章附录最后有代码对照，代码和测试在 <code>solutions/chapter-code/</code>。</p>
+<table>
+<thead>
+<tr>
+<th>章</th>
+<th>主题</th>
+<th>一句话精要</th>
+<th>动画</th>
+<th>卡片</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../lessons/01-layered-loops.html">1</a></td>
+<td>总图：一台机器人 = 一组快慢嵌套的闭环</td>
+<td>大脑给目标、脊髓追目标；每层软件坐在一块硬件上</td>
+<td><a href="../animations/01-layered-loops.gif">GIF</a> · <a href="../animations/01-layered-loops.html">▶ 交互</a></td>
+<td>A01–A03</td>
+<td>已写，待讲</td>
+</tr>
+<tr>
+<td><a href="../lessons/02-kinematics.html">2</a></td>
+<td>本体与运动学：FK / IK / 雅可比 / 奇异</td>
+<td>正解一路加角度，逆解要迭代；雅可比管速度也管力</td>
+<td><a href="../animations/02-two-link-ik.gif">GIF</a> · <a href="../animations/02-two-link-ik.html">▶ 交互</a></td>
+<td>A04–A06</td>
+<td>已写，待讲</td>
+</tr>
+<tr>
+<td><a href="../lessons/03-actuators.html">3</a></td>
+<td>执行器：电机 + 减速器，减速比的四个后果</td>
+<td>力矩乘 N、速度除 N、惯量乘 N²</td>
+<td><a href="../animations/03-gear-ratio.gif">GIF</a> · <a href="../animations/03-gear-ratio.html">▶ 交互</a></td>
+<td>A07–A09</td>
+<td>已写，待讲</td>
+</tr>
+<tr>
+<td><a href="../lessons/04-sensors.html">4</a></td>
+<td>传感器：本体 / 外部、标定、时间同步、融合</td>
+<td>先标定、再对时；延迟误差 = v · Δt</td>
+<td><a href="../animations/04-time-sync.gif">GIF</a> · <a href="../animations/04-time-sync.html">▶ 交互</a></td>
+<td>A10–A12</td>
+<td>已写，待讲</td>
+</tr>
+<tr>
+<td><a href="../lessons/05-electrical-compute.html">5</a></td>
+<td>电气与计算：主控 / 实时 / 驱动、EtherCAT vs CAN、电源、急停</td>
+<td>CAN 挨个点名，EtherCAT 一帧走全场；急停走硬线</td>
+<td><a href="../animations/05-bus-cycle.gif">GIF</a> · <a href="../animations/05-bus-cycle.html">▶ 交互</a></td>
+<td>A13–A15</td>
+<td>已写，待讲</td>
+</tr>
+<tr>
+<td><a href="../lessons/06-low-level-control.html">6</a></td>
+<td>底层控制：级联 PID、FOC、阻抗、WBC / MPC / RL</td>
+<td>内环快外环慢，电流即力矩；阻抗让手像弹簧</td>
+<td><a href="../animations/06-impedance.gif">GIF</a> · <a href="../animations/06-impedance.html">▶ 交互</a></td>
+<td>A16–A18</td>
+<td>已写，待讲</td>
+</tr>
+<tr>
+<td><a href="../lessons/07-ros2-middleware.html">7</a></td>
+<td>软件框架：ROS 2、QoS、tf2、ros2_control、实时</td>
+<td>差网络里要新鲜不要完整；实时要自己隔出来</td>
+<td><a href="../animations/07-ros2-qos.gif">GIF</a> · <a href="../animations/07-ros2-qos.html">▶ 交互</a></td>
+<td>A19–A21</td>
+<td>已写，待讲</td>
+</tr>
+<tr>
+<td><a href="../lessons/08-autonomy-stack.html">8</a></td>
+<td>自主栈：模块化 vs 端到端 VLA vs 双系统</td>
+<td>反应快慢看最快那条闭环</td>
+<td><a href="../animations/08-latency-budget.gif">GIF</a> · <a href="../animations/08-latency-budget.html">▶ 交互</a></td>
+<td>A22–A24</td>
+<td>已写，待讲</td>
+</tr>
+<tr>
+<td><a href="../lessons/09-sim-data-deploy.html">9</a></td>
+<td>仿真、数据与部署闭环：sim2real、遥操作、数据格式、OTA</td>
+<td>仿真不准就让它随机地不准；数据要记相机在哪、什么时候</td>
+<td><a href="../animations/09-domain-randomization.gif">GIF</a> · <a href="../animations/09-domain-randomization.html">▶ 交互</a></td>
+<td>A25–A27</td>
+<td>已写，待讲</td>
+</tr>
+<tr>
+<td><a href="../lessons/10-safety-and-cases.html">10</a></td>
+<td>安全、可靠性与五类整机案例</td>
+<td>越往下越不靠软件；能减速就别断电</td>
+<td><a href="../animations/10-safety-states.gif">GIF</a> · <a href="../animations/10-safety-states.html">▶ 交互</a></td>
+<td>A28–A30</td>
+<td>已写，待讲</td>
+</tr>
+<tr>
+<td><a href="../lessons/appendix-glossary.html">附录</a></td>
+<td>缩写与术语表</td>
+<td>全书缩写按领域分表</td>
+<td>—</td>
+<td>—</td>
+<td>完成</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_8">后续大纲</h2>
+<p>10 章已经覆盖整机的每一层。下一步不是加章，而是：</p>
+<table>
+<thead>
+<tr>
+<th>做什么</th>
+<th>去哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>做完 30 道练习，补作答记录、点评和卡片</td>
+<td>本讲义</td>
+</tr>
+<tr>
+<td>动手里程碑 A-M1–A-M5（7 DoF 臂的 IK、IMU 融合、MuJoCo 阻抗推墙、ROS 2、仿真与数据）</td>
+<td>study-plan</td>
+</tr>
+<tr>
+<td>运控、规划往深里走</td>
+<td>运控细化、规划细化</td>
+</tr>
+<tr>
+<td>第 7 章动手</td>
+<td>ros2 专题</td>
+</tr>
+<tr>
+<td>第 8 章的 VLA 细节</td>
+<td>vla-deep-dive</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_9">口诀汇总</h2>
+<ul>
+<li><strong>第 1 章</strong>：大脑给目标，脊髓追目标；越往下越快、越简单、越不能迟到。每一层软件都坐在一块硬件上，层和层之间是一条总线加一种消息。</li>
+<li><strong>第 2 章</strong>：正解一路加角度，逆解要猜要迭代；雅可比管速度也管力。手臂伸直就奇异：往外一毫米，关节转疯掉。</li>
+<li><strong>第 3 章</strong>：电机快而弱，减速器换成慢而强；力矩乘 N，速度除 N，惯量乘 N 平方。撞地多的腿选低减速比，要精度的臂选谐波，要大推力的选丝杠。</li>
+<li><strong>第 4 章</strong>：向内看编码器、IMU、力；向外看相机、雷达、触觉。传感器不怕不准，怕不知道在哪、不知道是什么时候：先标定，再对时。</li>
+<li><strong>第 5 章</strong>：大脑算得多但会抖，小脑算得少但准时，关节板只管电流不出错。CAN 挨个点名，EtherCAT 一帧走全场；急停走硬线，不走软件。</li>
+<li><strong>第 6 章</strong>：内环快、外环慢，一层追一层；电流就是力矩。位置控制硬顶，阻抗控制像弹簧；全身控制是每毫秒解一道带约束的题。</li>
+<li><strong>第 7 章</strong>：节点像电台，话题像频道；服务一问一答，动作有进度能取消。差网络里控制要新鲜不要完整；ROS 2 不保证实时，实时要自己隔出来。</li>
+<li><strong>第 8 章</strong>：流水线可解释但串行慢，端到端省接口但要数据，双系统一个想一个做。反应快慢看最快那条闭环；VLA 底下照样有控制和安全。</li>
+<li><strong>第 9 章</strong>：仿真练、遥操作教、日志复盘、OTA 升级，转起来就是数据飞轮。仿真不准就让它"随机地不准"；数据不记相机在哪、什么时候，就等于白采。</li>
+<li><strong>第 10 章</strong>：安全一层叠一层，越往下越简单、越不靠软件；AI 只在最上面。能减速就别断电（SS1），真危险立刻断（STO）；腿足机器人先蹲下再断。</li>
+</ul>
+</main>
+<footer>来自个人学习仓库的对话讲义，含练习作答记录。源码：<a href="https://github.com/wikieden/robot-architecture">github.com/wikieden/robot-architecture</a></footer>
+</body></html>

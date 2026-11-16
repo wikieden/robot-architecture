@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 3 章 · 执行器：电机 + 减速器 = 一个关节 · 机器人软硬件架构</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}}
+:root[data-theme="dark"]{--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:14px}
+header.top .brand{font-weight:600;color:var(--fg);text-decoration:none;margin-right:auto}
+header.top a{text-decoration:none}
+main{max-width:860px;margin:0 auto;padding:24px 16px 72px;overflow-wrap:anywhere}
+h1{font-size:28px;line-height:1.35;margin:8px 0 16px} h2{font-size:22px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)} h3{font-size:18px;margin:28px 0 8px}
+img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+blockquote{margin:16px 0;padding:10px 16px;background:var(--quote);border-left:3px solid var(--acc);border-radius:4px;color:var(--mute)}
+blockquote p{margin:4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto} pre code{padding:0;background:none}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:12px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--code)}
+details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px} summary{cursor:pointer;color:var(--acc);font-weight:500}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.btn{display:inline-block;margin:4px 8px 4px 0;padding:6px 14px;border:1px solid var(--acc);border-radius:999px;text-decoration:none;font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;color:inherit;text-decoration:none}
+.card:hover{border-color:var(--acc)} .card img{border:0;border-bottom:1px solid var(--line);border-radius:0;aspect-ratio:16/10;object-fit:contain;width:100%}
+.card .no{color:var(--mute);font-size:13px;padding:8px 12px 0} .card .t{padding:0 12px 12px;font-weight:500;line-height:1.5}
+.lead{font-size:17px;color:var(--mute)}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-size:13px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true,processEnvironments:true}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body>
+<header class="top"><div class="in">
+<a class="brand" href="../index.html">机器人软硬件架构</a>
+<a href="../lessons/index.html">讲义目录</a>
+<a href="../animations/index.html">动画</a>
+<a href="../review.html">复习卡片</a>
+<a href="../lessons/appendix-glossary.html">缩写表</a>
+</div></header>
+<main>
+<h1 id="3">第 3 章 · 执行器：电机 + 减速器 = 一个关节</h1><p><a class="btn" href="../animations/03-gear-ratio.html">▶ 打开本章可交互动画</a></p>
+<blockquote>
+<p>本章回答：机器人关节里装的是什么？减速比怎么选？为什么四足用"准直驱"、协作臂用谐波、人形腿开始用滚柱丝杠？<br />
+编写日期：2026-11-04 · 上一章：<a href="../lessons/02-kinematics.html">第 2 章 本体与运动学</a> · 下一章：<a href="../lessons/04-sensors.html">第 4 章 传感器</a> · 总览：00-overview.md<br />
+对应原文：<code>materials/text/modern-robotics-lynch-park.txt</code>（Lynch &amp; Park，<em>Modern Robotics</em>，2017 预印本） §8.9.1 L14558–L14590（<span class="arithmatex">\(\tau = k_t I\)</span>、<span class="arithmatex">\(P_{heat} = I^2R\)</span>、连续力矩受发热限制）；L14745–L14753（<span class="arithmatex">\(\tau_{gear} = \eta G \tau_{motor}\)</span>）；§8.9.2 L14782–L14810（apparent / reflected inertia <span class="arithmatex">\(G^2 I_{rotor}\)</span>）。QDD、谐波、丝杠的对比原文没有，对照附录推荐的 MIT Cheetah 执行器论文<br />
+本章缩写：MCU（第 1 章）；MOSFET = Metal-Oxide-Semiconductor Field-Effect Transistor（金属 / 氧化物 / 半导体 / 场效应 / 晶体管）；BLDC = Brushless Direct Current motor（无刷 / 直流电机）；PMSM = Permanent Magnet Synchronous Motor（永磁 / 同步 / 电机）；FOC（第 1 章）；QDD = Quasi-Direct Drive（准 / 直驱）；RV = Rotate Vector reducer（旋转矢量减速器，一种摆线减速器）；SEA = Series Elastic Actuator（串联 / 弹性 / 执行器）；rpm = revolutions per minute（每分钟 / 转数）；<span class="arithmatex">\(K_t\)</span>：t = torque（力矩常数）；<span class="arithmatex">\(J_m\)</span>：m = motor（电机转子惯量）；<span class="arithmatex">\(J_{refl}\)</span>：refl = reflected（反射惯量）；<span class="arithmatex">\(\eta\)</span> 读 eta（效率）；MIT = Massachusetts Institute of Technology（麻省理工学院）；IEEE T-RO = Transactions on Robotics（IEEE 机器人汇刊）。全部缩写见 <a href="../lessons/appendix-glossary.html">附录 · 缩写与术语表</a></p>
+</blockquote>
+<h2 id="_1">讲解</h2>
+<h3 id="1">第 1 步：一个关节模组里有什么</h3>
+<p>现代机器人关节通常做成一体化模组（joint module / actuator），从里到外：</p>
+<pre><code> 驱动板（MCU + 功率 MOSFET，跑 FOC）
+   └→ 无框力矩电机（BLDC / PMSM，定子 + 转子）
+        ├→ 电机端编码器（测转子角度，FOC 必需）
+        ├→ 抱闸（断电时锁住，防止手臂掉下来）
+        └→ 减速器（行星 / 谐波 / 摆线 / 丝杠）
+             ├→ 输出端编码器（测关节真实角度，消掉减速器误差）
+             ├→ 关节力矩传感器（可选：Franka、KUKA iiwa 每关节都有）
+             └→ 输出法兰 → 连杆
+</code></pre>
+<p><strong>电机</strong>：几乎都用无刷电机（BLDC / PMSM）——没有电刷磨损、力矩密度高、配合 FOC 能精确控力矩。电机输出力矩和电流近似成正比：<span class="arithmatex">\(\tau_m = K_t\, i\)</span>（<span class="arithmatex">\(K_t\)</span> 叫力矩常数）。</p>
+<p><strong>问题</strong>：电机天生"转得快、力气小"（几千转每分钟、零点几到几牛米），而关节需要"转得慢、力气大"（几十转每分钟、几十到几百牛米）。所以中间要加<strong>减速器</strong>。</p>
+<h3 id="2-n">第 2 步：减速比 N 的四个后果</h3>
+<p><strong>白话类比：自行车变速</strong>。骑上坡挂低速档（大减速比）：踩得很轻松，但腿要转很多圈车才走一点。挂高速档反过来。</p>
+<p>减速比为 <span class="arithmatex">\(N\)</span> 时（电机转 N 圈，关节转 1 圈）：</p>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>变化</th>
+<th>式子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输出力矩</td>
+<td>放大 N 倍（乘效率）</td>
+<td><span class="arithmatex">\(\tau_{\text{out}} = \eta N \tau_m\)</span></td>
+</tr>
+<tr>
+<td>输出转速</td>
+<td>缩小 N 倍</td>
+<td><span class="arithmatex">\(\omega_{\text{out}} = \omega_m / N\)</span></td>
+</tr>
+<tr>
+<td><strong>反射惯量</strong></td>
+<td>放大 <strong>N²</strong> 倍</td>
+<td><span class="arithmatex">\(J_{\text{refl}} = N^2 J_m\)</span></td>
+</tr>
+<tr>
+<td>反驱力矩（从外面推关节需要的力）</td>
+<td>大致随 N 增大</td>
+<td>摩擦 × N</td>
+</tr>
+</tbody>
+</table>
+<p>第三条最反直觉：电机转子本身很轻，但从关节外面看，它像是一个<strong>惯量放大 N² 倍</strong>的飞轮。N = 100 时放大一万倍。</p>
+<p>后果：</p>
+<ul>
+<li><strong>碰撞冲击大</strong>：手臂撞到东西时，这个"看不见的大飞轮"一下停不住，冲击力大。</li>
+<li><strong>反驱性差</strong>（backdrivability）：人用手推不动关节，外力也"传不回"电机，没法通过电流感知外力。</li>
+<li><strong>力控要额外传感器</strong>：所以高减速比的协作臂要么每关节装力矩传感器（Franka），要么用电流 + 模型估计外力（精度有限）。</li>
+</ul>
+<h3 id="3_1">第 3 步：主流减速方案对比</h3>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>典型减速比</th>
+<th>优点</th>
+<th>缺点</th>
+<th>谁在用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>准直驱（QDD）</strong>：大扭矩电机 + 单级行星</td>
+<td>约 6–10</td>
+<td>反驱好、抗冲击、电流即力矩（本体力感知）</td>
+<td>力矩密度受限、电机大、发热</td>
+<td>MIT Cheetah 路线的四足（Unitree、MIT Mini Cheetah）、人形腿部部分方案</td>
+</tr>
+<tr>
+<td><strong>多级行星</strong></td>
+<td>20–100</td>
+<td>便宜、刚度好、效率高</td>
+<td>有背隙（齿间间隙）</td>
+<td>移动底盘、人形大关节</td>
+</tr>
+<tr>
+<td><strong>谐波减速（strain wave）</strong></td>
+<td>50–160</td>
+<td>零背隙、体积小、单级大减速比</td>
+<td>柔性（刚度低）、怕冲击、寿命有限、反驱差</td>
+<td>协作臂（UR、Franka）、人形手臂</td>
+</tr>
+<tr>
+<td><strong>摆线 / RV</strong></td>
+<td>30–200</td>
+<td>刚度高、抗冲击、寿命长</td>
+<td>重、贵</td>
+<td>工业重载臂底座关节</td>
+</tr>
+<tr>
+<td><strong>滚柱丝杠 / 滚珠丝杠</strong>（旋转变直线）</td>
+<td>换算后很高</td>
+<td>直线推力大、刚度高、类似"人的肌肉"</td>
+<td>结构复杂，要配连杆机构</td>
+<td>人形膝 / 踝 / 肘的直线执行器（如 Optimus 公开展示的方案）</td>
+</tr>
+<tr>
+<td><strong>绳驱 / 腱驱</strong></td>
+<td>视设计</td>
+<td>电机放在躯干，末端轻</td>
+<td>绳伸长、预紧、维护</td>
+<td>灵巧手、部分轻量臂</td>
+</tr>
+<tr>
+<td><strong>液压</strong></td>
+<td>—</td>
+<td>功率密度极高</td>
+<td>漏油、噪声、维护、效率</td>
+<td>老款 Atlas（2024 起改为全电动）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么四足普遍选 QDD</strong>：腿每一步都在撞地。低减速比让冲击不传成大力矩、电机电流直接反映地面反力（不用力传感器就能"感觉"脚下），控制带宽也高。这条路线出自 MIT Cheetah 的"本体感知执行器"（proprioceptive actuator）设计。</p>
+<h3 id="4-sea">第 4 步：串联弹性执行器（SEA）</h3>
+<p>在减速器和负载之间故意串一根<strong>已知刚度的弹簧</strong> <span class="arithmatex">\(k\)</span>：</p>
+<div class="arithmatex">\[\tau = k\,(\theta_{\text{电机侧}} - \theta_{\text{关节侧}})\]</div>
+<p>测两边编码器的角度差就知道力矩——弹簧本身就是力传感器，还能吸收冲击。代价是带宽降低（弹簧会"软"）。Baxter 机器人、部分康复 / 人形机器人用过。</p>
+<h3 id="5">第 5 步：选型怎么算</h3>
+<p>给一个关节选执行器，至少要算三个数：</p>
+<ol>
+<li><strong>峰值力矩</strong>：最坏姿态下扛重力 + 加速度：<span class="arithmatex">\(\tau_{\text{peak}} \approx m g\, r + J\alpha\)</span>（<span class="arithmatex">\(r\)</span> 为质心到关节的距离）。</li>
+<li><strong>持续力矩</strong>：长时间工作时不过热（电机发热 <span class="arithmatex">\(\propto i^2 R\)</span>，所以持续力矩远小于峰值）。</li>
+<li><strong>最高转速</strong>：任务需要的关节最快速度 <span class="arithmatex">\(\times N \le\)</span> 电机额定转速。</li>
+</ol>
+<p>再看：力矩密度（N·m/kg，越高越好，因为每个关节的重量都要被前面的关节扛着）、背隙、反驱性、成本。</p>
+<h3 id="_2">动画演示</h3>
+<p><img alt="减速比的四个后果：力矩、速度、反射惯量、反驱" src="../animations/03-gear-ratio.gif" /></p>
+<p>可交互版：<a href="../animations/03-gear-ratio.html">animations/03-gear-ratio.html</a>（拖动减速比滑块）。</p>
+<p><strong>怎么看</strong>：</p>
+<ol>
+<li>横轴减速比 N 从 1 扫到 160（对数刻度），背景色带标出 QDD、多级行星、谐波的典型区间。</li>
+<li>四根柱子：输出力矩 ∝ N、最高转速 ∝ 1/N、反射惯量 ∝ N²、反驱力矩 ∝ N。</li>
+<li>注意反射惯量那根：N 翻 10 倍，它涨 100 倍。这就是高减速比的关节"撞上去停不住、推它推不动"的原因。</li>
+</ol>
+<h2 id="_3">公式</h2>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>式子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>电机力矩</td>
+<td><span class="arithmatex">\(\tau_m = K_t\,i\)</span></td>
+</tr>
+<tr>
+<td>输出力矩 / 转速</td>
+<td><span class="arithmatex">\(\tau_{out} = \eta N\tau_m\)</span>，<span class="arithmatex">\(\omega_{out} = \omega_m/N\)</span></td>
+</tr>
+<tr>
+<td>反射惯量</td>
+<td><span class="arithmatex">\(J_{refl} = N^2 J_m\)</span></td>
+</tr>
+<tr>
+<td>发热</td>
+<td><span class="arithmatex">\(P_{loss} = i^2 R\)</span></td>
+</tr>
+<tr>
+<td>SEA 测力</td>
+<td><span class="arithmatex">\(\tau = k(\theta_m/N - \theta_{joint})\)</span></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">练习与作答记录</h2>
+<p><strong>题 1</strong>：电机峰值力矩 2 N·m、最高转速 3000 rpm，配谐波 N = 100、效率 0.8。关节输出峰值力矩和最高转速各是多少？如果换成 N = 8 的 QDD 呢？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 2</strong>：电机转子惯量 <span class="arithmatex">\(J_m\)</span> 不变，N 从 10 换到 100，反射惯量变成原来的多少倍？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 3</strong>：一个四足机器人没有任何力传感器，却能"知道"脚什么时候踩到地。它可能是怎么做到的？这和它用什么减速器有关吗？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<h2 id="_5">口诀</h2>
+<blockquote>
+<p>电机快而弱，减速器换成慢而强；力矩乘 N，速度除 N，惯量乘 N 平方。<br />
+撞地多的腿选低减速比，要精度的臂选谐波，要大推力的选丝杠。</p>
+</blockquote>
+<h2 id="_6">本章复习卡片</h2>
+<p>A07 关节模组的组成、A08 减速比的四个后果（反射惯量 N²）、A09 QDD vs 谐波 vs 丝杠（见 <a href="../review.html">review.md</a>）</p>
+<h2 id="_7">附录 · 延伸阅读</h2>
+<blockquote>
+<p>留给以后深入学习用，不影响本章主线。★ 是建议先读的。</p>
+</blockquote>
+<h3 id="_8">推荐阅读</h3>
+<ul>
+<li>★ Wensing, Wang, Seok, Otten, Lang, Kim，"Proprioceptive Actuator Design in the MIT Cheetah: Impact Mitigation and High-Bandwidth Physical Interaction for Dynamic Legged Robots"，IEEE T-RO 2017：QDD 路线的出处，讲清反射惯量、冲击和本体力感知的关系。</li>
+<li>★ Katz，"A Low Cost Modular Actuator for Dynamic Robots"（MIT 硕士论文，2018）：Mini Cheetah 执行器的完整设计，开源驱动板可对照。</li>
+<li>Pratt &amp; Williamson，"Series Elastic Actuators"，IROS 1995：SEA 的出处。</li>
+<li>Seok et al.，"Design Principles for Energy-Efficient Legged Locomotion and Implementation on the MIT Cheetah Robot"，IEEE/ASME T-Mech 2015：从能耗和发热角度看电机与减速比选型。</li>
+<li>Lynch &amp; Park，<em>Modern Robotics</em> 第 8 章 Dynamics of Open Chains 末节：电机、减速器和反射惯量（"apparent inertia"）的推导。</li>
+<li>开源实现：ODrive（BLDC 驱动 + FOC）、moteus（mjbots）、MIT Mini Cheetah 驱动板。</li>
+</ul>
+<h3 id="_9">数学原理</h3>
+<ul>
+<li>能量守恒推减速器：<span class="arithmatex">\(\tau_m\omega_m\eta = \tau_{out}\omega_{out}\)</span>。</li>
+<li>动能等效推反射惯量：<span class="arithmatex">\(\tfrac12 J_m\omega_m^2 = \tfrac12 (N^2J_m)\omega_{out}^2\)</span>。</li>
+<li>焦耳热 <span class="arithmatex">\(i^2R\)</span>，热时间常数决定"峰值能撑多久"。</li>
+</ul>
+<h3 id="_10">公式清单</h3>
+<p>见正文"公式"一节的表。</p>
+<h3 id="_11">代码对照：把本章的数字用代码算一遍</h3>
+<blockquote>
+<p>用 Python + NumPy（Numerical Python：数值 / Python）把讲义里讲过的数算一遍，不算练习题。代码在仓库本地 <code>robot-system-architecture/solutions/chapter-code/ch03_actuators.py</code>，配套测试 <code>tests/test_ch03.py</code>，notebook 在 <code>notebooks/ch03_actuators.ipynb</code>。Mac 上直接能跑，不需要 GPU：</p>
+<p><code>bash  
+cd robot-system-architecture/solutions/chapter-code  
+uv run python ch03_actuators.py   # 一步一步打印  
+uv run pytest tests/test_ch03.py</code></p>
+</blockquote>
+<p><strong>讲义 ↔ 代码</strong>（电机 K_t = 0.1 N·m/A、转子惯量 1e-4 kg·m²、4000 rpm、效率 0.9 都是编的）：</p>
+<table>
+<thead>
+<tr>
+<th>讲义</th>
+<th>公式</th>
+<th>写法</th>
+<th>跑出来</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 1 步 电流即力矩</td>
+<td><span class="arithmatex">\(\tau_m = K_t i\)</span></td>
+<td><code>motor_torque(i)</code></td>
+<td>10 A → 1 N·m</td>
+</tr>
+<tr>
+<td>第 2 步 四个后果</td>
+<td><span class="arithmatex">\(\eta N\tau_m\)</span>、<span class="arithmatex">\(\omega_m/N\)</span>、<span class="arithmatex">\(N^2J_m\)</span>、∝ N</td>
+<td><code>gear(n, tau_m, rpm_m)</code></td>
+<td>N = 160：144 N·m、25 rpm、2.56 kg·m²</td>
+</tr>
+<tr>
+<td>第 2 步 N = 100</td>
+<td><span class="arithmatex">\(N^2\)</span></td>
+<td><code>100**2</code></td>
+<td>反射惯量放大 10000 倍</td>
+</tr>
+<tr>
+<td>数学原理 能量守恒</td>
+<td><span class="arithmatex">\(\tau_m\omega_m\eta = \tau_{out}\omega_{out}\)</span></td>
+<td><code>power_balance</code></td>
+<td>两边都是 376.99 W</td>
+</tr>
+<tr>
+<td>第 4 步 SEA</td>
+<td><span class="arithmatex">\(\tau = k(\theta_m/N - \theta_{joint})\)</span></td>
+<td><code>sea_torque</code></td>
+<td>300 N·m/rad × 0.01 rad = 3 N·m</td>
+</tr>
+<tr>
+<td>第 5 步 选型</td>
+<td><span class="arithmatex">\(mgr + J\alpha\)</span>、<span class="arithmatex">\(i^2R\)</span>、转速 × N</td>
+<td><code>peak_torque</code>、<code>heat</code></td>
+<td>7.886 N·m；电流翻倍发热 4 倍；N = 160 时转速不够</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键几行</strong>：</p>
+<pre><code class="language-python">return {
+    &quot;tau_out&quot;: eta * n * tau_m,     # 力矩放大 ηN
+    &quot;rpm_out&quot;: rpm_m / n,           # 转速缩小 N
+    &quot;j_refl&quot;: n**2 * J_ROTOR,       # 反射惯量放大 N²
+}
+</code></pre>
+<p><strong>代码里才看得到的 2 件事</strong>：</p>
+<ul>
+<li>能量守恒要用角速度 rad/s 而不是 rpm：<code>omega_m = rpm × 2π / 60</code>，否则两边功率对不上。</li>
+<li><code>sea_torque</code> 的"电机侧角度"要先除以 N 换算到减速器输出端，和讲义公式 <span class="arithmatex">\(\theta_m/N\)</span> 一致；代码里直接传换算后的值。</li>
+</ul>
+<p><strong>自己改一改</strong>（不影响练习答案）：</p>
+<ul>
+<li>在表里加一个 N = 30，看它落在哪种减速器的区间（对照动画的背景色带）。</li>
+<li>把 <code>ETA</code> 改成 0.7（谐波减速器效率偏低的情况），看输出力矩和能量守恒怎么变。</li>
+</ul><nav class="pager"><a href="02-kinematics.html">← 第 2 章 · 本体与运动学：关节角怎么变成手的位置</a><a href="04-sensors.html">第 4 章 · 传感器：知道自己在哪，看见外面的世界 →</a></nav>
+</main>
+<footer>来自个人学习仓库的对话讲义，含练习作答记录。源码：<a href="https://github.com/wikieden/robot-architecture">github.com/wikieden/robot-architecture</a></footer>
+</body></html>

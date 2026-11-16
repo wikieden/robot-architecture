@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 10 章 · 安全、可靠性与整机案例：怎么设计一台机器人 · 机器人软硬件架构</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}}
+:root[data-theme="dark"]{--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:14px}
+header.top .brand{font-weight:600;color:var(--fg);text-decoration:none;margin-right:auto}
+header.top a{text-decoration:none}
+main{max-width:860px;margin:0 auto;padding:24px 16px 72px;overflow-wrap:anywhere}
+h1{font-size:28px;line-height:1.35;margin:8px 0 16px} h2{font-size:22px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)} h3{font-size:18px;margin:28px 0 8px}
+img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+blockquote{margin:16px 0;padding:10px 16px;background:var(--quote);border-left:3px solid var(--acc);border-radius:4px;color:var(--mute)}
+blockquote p{margin:4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto} pre code{padding:0;background:none}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:12px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--code)}
+details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px} summary{cursor:pointer;color:var(--acc);font-weight:500}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.btn{display:inline-block;margin:4px 8px 4px 0;padding:6px 14px;border:1px solid var(--acc);border-radius:999px;text-decoration:none;font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;color:inherit;text-decoration:none}
+.card:hover{border-color:var(--acc)} .card img{border:0;border-bottom:1px solid var(--line);border-radius:0;aspect-ratio:16/10;object-fit:contain;width:100%}
+.card .no{color:var(--mute);font-size:13px;padding:8px 12px 0} .card .t{padding:0 12px 12px;font-weight:500;line-height:1.5}
+.lead{font-size:17px;color:var(--mute)}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-size:13px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true,processEnvironments:true}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body>
+<header class="top"><div class="in">
+<a class="brand" href="../index.html">机器人软硬件架构</a>
+<a href="../lessons/index.html">讲义目录</a>
+<a href="../animations/index.html">动画</a>
+<a href="../review.html">复习卡片</a>
+<a href="../lessons/appendix-glossary.html">缩写表</a>
+</div></header>
+<main>
+<h1 id="10">第 10 章 · 安全、可靠性与整机案例：怎么设计一台机器人</h1><p><a class="btn" href="../animations/10-safety-states.html">▶ 打开本章可交互动画</a></p>
+<blockquote>
+<p>本章回答：机器人安全是怎么分层设计的？有哪些标准？出故障时怎么"优雅地停下"？把前 9 章串起来，五类典型整机的软硬件架构各长什么样？<br />
+编写日期：2026-11-04 · 上一章：<a href="../lessons/09-sim-data-deploy.html">第 9 章 仿真、数据与部署</a> · 下一章：无（本书最后一章） · 总览：00-overview.md<br />
+对应原文：无本地原文。ISO 10218、ISO/TS 15066、IEC 61800-5-2 等标准需购买，本章的停止类别和协作模式按各标准公开的摘要与驱动器厂商手册整理；停止距离、碰撞检测是本书自己的推导<br />
+本章缩写：STO（第 5 章）；SS1 / SS2 = Safe Stop 1 / 2（安全停止类别 1 / 2）；SLS = Safely-Limited Speed（安全 / 限速）；SLP = Safely-Limited Position（安全 / 限位）；PLC（第 5 章）；IEC = International Electrotechnical Commission（国际电工委员会）；ISO（第 5 章）；ISO/TS：TS = Technical Specification（技术规范）；PL = Performance Level（性能 / 等级）；SIL = Safety Integrity Level（安全 / 完整性 / 等级）；AMR = Autonomous Mobile Robot（自主 / 移动 / 机器人）；AGV = Automated Guided Vehicle（自动 / 导引 / 车）；SSM = Speed and Separation Monitoring（速度与距离监控）；PFL = Power and Force Limiting（功率与力限制）；FCI = Franka Control Interface（Franka 控制接口）；SDK（第 7 章）；ABS = Anti-lock Braking System（防抱死 / 制动 / 系统）；TTL = Transistor-Transistor Logic（晶体管 / 晶体管 / 逻辑：舵机常用的单线串口电平）；EKF（第 4 章）；DoF（第 2 章）；QDD（第 3 章）；<span class="arithmatex">\(\tau_{th}\)</span>：th = threshold（阈值）。全部缩写见 <a href="../lessons/appendix-glossary.html">附录 · 缩写与术语表</a></p>
+</blockquote>
+<h2 id="_1">讲解</h2>
+<h3 id="1">第 1 步：安全是一层一层叠的</h3>
+<p><strong>白话类比：开车</strong>。你会小心驾驶（软件策略）；车有 ABS 和自动紧急刹车（监控层）；最后还有安全带和气囊（硬件）。不能因为"司机很小心"就拆掉安全带。</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>做什么</th>
+<th>例子</th>
+<th>依赖软件吗</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>本质安全</td>
+<td>从设计上让伤害变小</td>
+<td>轻量连杆、低减速比、圆角软包、限制最大力矩</td>
+<td>否</td>
+</tr>
+<tr>
+<td>硬件安全回路</td>
+<td>不经过主控直接切断动力</td>
+<td>急停 → 安全继电器 → STO；抱闸；双通道接线</td>
+<td>否</td>
+</tr>
+<tr>
+<td>安全控制器</td>
+<td>认证过的独立 CPU 监控速度 / 位置 / 力</td>
+<td>安全 PLC、驱动器内置安全功能（SLS 安全限速、SLP 安全限位）</td>
+<td>是，但独立且经认证</td>
+</tr>
+<tr>
+<td>软件监控</td>
+<td>看门狗、限幅、碰撞检测、状态机</td>
+<td>力矩超阈值 → 停；心跳丢失 → 停</td>
+<td>是</td>
+</tr>
+<tr>
+<td>策略层</td>
+<td>规划时就避开危险</td>
+<td>避障、速度规划、不确定时请求人工</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p><strong>原则</strong>：越靠下的层越简单、越独立、越不依赖上层。AI 模型只能放在最上层，永远不能当最后一道保险。</p>
+<h3 id="2">第 2 步：停机也分等级</h3>
+<p>IEC 61800-5-2（可调速驱动的功能安全）定义了几种停止方式：</p>
+<table>
+<thead>
+<tr>
+<th>停止类别</th>
+<th>做法</th>
+<th>用在</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>STO</strong>（Safe Torque Off，停止类别 0）</td>
+<td>立即切断电机出力，靠抱闸 / 惯性停</td>
+<td>急停、严重故障</td>
+</tr>
+<tr>
+<td><strong>SS1</strong>（类别 1）</td>
+<td>先受控减速，停下后再 STO</td>
+<td>大多数保护停止：比直接断电更不容易甩出去</td>
+</tr>
+<tr>
+<td><strong>SS2</strong>（类别 2）</td>
+<td>受控减速后保持出力停在原地（安全停止监控）</td>
+<td>暂停、等人离开后继续</td>
+</tr>
+</tbody>
+</table>
+<p><strong>腿足机器人的特殊难题</strong>：直接 STO 会让机器人摔倒，本身就可能伤人或砸坏东西。所以人形 / 四足通常先尝试"受控蹲下 / 坐下"再断电，相关标准（如针对动态稳定腿足机器人的 ISO 25785-1）还在制定中。</p>
+<h3 id="3">第 3 步：故障降级状态机</h3>
+<pre><code> 正常运行 ──(有人进入协作区)──→ 降速（速度与距离监控）──(人离开)──→ 正常
+    │                                 │
+    │(通信超时 / 力矩异常 / 温度过高)    │(人继续靠近 / 接触力超限)
+    ▼                                 ▼
+ 保护停止（SS1：减速 → 停）  ──(复位确认)──→ 正常
+    │
+    │(急停按下 / 安全回路断开 / 驱动器故障)
+    ▼
+ STO（切断动力，抱闸锁死）──(人工检查 + 复位)──→ 正常
+</code></pre>
+<p>关键机制：
+- <strong>看门狗</strong>：驱动板若连续几个周期没收到主站报文 → 自己进入保护停止。
+- <strong>限幅</strong>：任何上层给的指令都要过一遍速度、加速度、力矩、关节范围的硬限制。
+- <strong>碰撞检测</strong>：实际电流 / 力矩和动力学模型预测值差太多 → 判定碰撞。
+- <strong>状态与日志</strong>：每次降级都记录原因，回流到数据飞轮（第 9 章）。</p>
+<h3 id="4">第 4 步：安全相关标准（只需知道名字和管什么）</h3>
+<table>
+<thead>
+<tr>
+<th>标准</th>
+<th>管什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ISO 10218-1/-2</td>
+<td>工业机器人本体 / 系统集成安全（2025 年发布新版）</td>
+</tr>
+<tr>
+<td>ISO/TS 15066</td>
+<td>协作机器人：人机接触时允许的力和压力（按身体部位）</td>
+</tr>
+<tr>
+<td>ISO 13482</td>
+<td>服务机器人（个人护理机器人）安全</td>
+</tr>
+<tr>
+<td>ISO 13849-1</td>
+<td>安全相关控制系统，性能等级 PL a–e</td>
+</tr>
+<tr>
+<td>IEC 61508 / IEC 62061</td>
+<td>功能安全，安全完整性等级 SIL 1–4</td>
+</tr>
+<tr>
+<td>IEC 61800-5-2</td>
+<td>驱动器安全功能（STO、SS1、SLS…）</td>
+</tr>
+<tr>
+<td>ISO 3691-4</td>
+<td>无人驾驶工业车辆（AMR / AGV）</td>
+</tr>
+</tbody>
+</table>
+<p>协作的四种模式（ISO 10218 / TS 15066）：安全监控停止、手动引导、<strong>速度与距离监控</strong>（SSM）、<strong>功率与力限制</strong>（PFL）。</p>
+<h3 id="5">第 5 步：五类整机拆解</h3>
+<p><strong>① 协作臂（以 Franka 类为例）</strong>
+- 硬件：7 DoF，谐波减速，每关节力矩传感器；控制柜内实时控制器。
+- 软件：1 kHz 实时接口（Franka 的 FCI / libfranka）可直接下发关节力矩或阻抗参数；ROS 2 驱动走 ros2_control。
+- 要点：力矩传感器让它能做阻抗控制和碰撞检测，是 VLA 研究最常见的单臂平台之一。</p>
+<p><strong>② 四足（以 Unitree Go2 / ANYmal 类为例）</strong>
+- 硬件：12 个 QDD 关节；IMU；足端无力传感器（靠电流和运动学估计接触）；板载 ARM 计算 + 可选 Jetson。
+- 软件：RL 策略 50 Hz 输出关节目标，驱动板 PD 高频追踪；状态估计用 IMU + 腿部运动学 EKF；上层导航可接 ROS 2 / Nav2。</p>
+<p><strong>③ 人形（以 Unitree G1 / Figure / Optimus 类为例）</strong>
+- 硬件：20–40+ DoF；腿部大力矩关节（QDD 行星或丝杠直线执行器）、手臂谐波或行星、灵巧手（腱驱或微型电机）；多路 EtherCAT / CAN-FD；48 V 级电池；Jetson Orin / Thor 级主控。
+- 软件：底层全身 RL 策略或 MPC + WBC；上层 VLA / 双系统；ROS 2 或自研框架；安全上倾向"受控蹲下"。
+- 要点：散热（关节电机持续力矩）、手的可靠性、摔倒保护、成本是主要工程难点。</p>
+<p><strong>④ 移动操作（Mobile ALOHA / Stretch / Galaxea R1 类）</strong>
+- 硬件：轮式底盘（差速或全向）+ 1–2 条臂 + 升降；底盘 LiDAR + 多相机。
+- 软件：导航栈（定位、建图、规划）和操作策略分开或全身统一策略；任务层 LLM 规划把两者串起来。</p>
+<p><strong>⑤ 低成本研究平台（ALOHA / SO-100）</strong>
+- 硬件：舵机（内置位置环 + RS-485 / TTL 总线），USB 接 PC；主从臂遥操作。
+- 软件：LeRobot / ACT 等，PC 上直接跑策略，50 Hz 发位置指令。
+- 要点：精度和刚度差，靠学习策略 + 视觉闭环补偿；非常适合入门和数据采集研究。</p>
+<h3 id="6">第 6 步：选型清单（从零设计时逐条过）</h3>
+<ol>
+<li>任务、环境、负载、工作空间 → 构型和 DoF（第 2 章）</li>
+<li>每关节峰值 / 持续力矩、转速、是否频繁接触 → 电机 + 减速器（第 3 章）</li>
+<li>需要的感知 → 传感器清单 + 标定方案 + 时间同步方案（第 4 章）</li>
+<li>关节数 × 频率 → 总线；模型大小 × 推理频率 → 主控；功率 × 时间 → 电池（第 5 章）</li>
+<li>控制模式：位置 / 阻抗 / 力矩；平衡由谁负责（第 6 章）</li>
+<li>软件框架、实时隔离方案（第 7 章）</li>
+<li>自主架构：模块化 / 端到端 / 双系统（第 8 章）</li>
+<li>仿真模型、遥操作方式、数据格式、部署与 OTA（第 9 章）</li>
+<li>安全回路、停机策略、适用标准（本章）</li>
+</ol>
+<h3 id="_2">动画演示</h3>
+<p><img alt="故障降级：正常 → 降速 → 保护停止 → STO" src="../animations/10-safety-states.gif" /></p>
+<p>可交互版：<a href="../animations/10-safety-states.html">animations/10-safety-states.html</a>。</p>
+<p><strong>怎么看</strong>：</p>
+<ol>
+<li>上面是状态条：绿 = 正常，黄 = 降速，橙 = 保护停止（SS1），红 = STO。中间是关节速度，下面是主站心跳。</li>
+<li>第 1 个事件：有人进入协作区 → 速度降到一半，人离开后恢复。</li>
+<li>第 2 个事件：心跳连续丢了几拍 → 看门狗触发 SS1，速度沿斜坡降到 0（受控减速，不是瞬间断电）；复位后恢复。</li>
+<li>第 3 个事件：急停 → STO，动力立刻切断，速度靠抱闸很快归零，需要人工复位。</li>
+</ol>
+<h2 id="_3">公式</h2>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>式子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>停止距离（受控减速）</td>
+<td><span class="arithmatex">\(d = v\,t_{react} + \dfrac{v^2}{2a}\)</span></td>
+</tr>
+<tr>
+<td>速度与距离监控</td>
+<td>允许速度满足 <span class="arithmatex">\(S_{人} + S_{机器人} + C &lt; S_{p}\)</span>（<span class="arithmatex">\(S_p\)</span> = 当前分离距离，p = present）</td>
+</tr>
+<tr>
+<td>碰撞检测</td>
+<td><span class="arithmatex">\(\|\tau_{meas} - \tau_{model}\| &gt; \tau_{th}\)</span></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">练习与作答记录</h2>
+<p><strong>题 1</strong>：机械臂末端 1 m/s 运动，系统反应时间 50 ms，最大减速度 5 m/s²。从检测到危险到停下，末端还会走多远？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 2</strong>：为什么说"AI 模型不能当最后一道保险"？结合本章的安全分层说明。</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 3</strong>：人形机器人和工业臂在"急停"策略上为什么不同？如果你来设计人形的急停，会怎么做？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<h2 id="_5">口诀</h2>
+<blockquote>
+<p>安全一层叠一层，越往下越简单、越不靠软件；AI 只在最上面。<br />
+能减速就别断电（SS1），真危险立刻断（STO）；腿足机器人先蹲下再断。</p>
+</blockquote>
+<h2 id="_6">本章复习卡片</h2>
+<p>A28 安全分层、A29 STO / SS1 / SS2、A30 设计一台机器人的九步清单（见 <a href="../review.html">review.md</a>）</p>
+<h2 id="_7">附录 · 延伸阅读</h2>
+<blockquote>
+<p>留给以后深入学习用，不影响本章主线。★ 是建议先读的。</p>
+</blockquote>
+<h3 id="_8">推荐阅读</h3>
+<ul>
+<li>★ ISO/TS 15066:2016 Robots and robotic devices — Collaborative robots：附录里按身体部位的力 / 压力阈值表（标准需购买，可先读各厂商的协作安全白皮书）。</li>
+<li>★ Haddadin, De Luca, Albu-Schäffer，"Robot Collisions: A Survey on Detection, Isolation, and Identification"，IEEE T-RO 2017：碰撞检测方法综述。</li>
+<li>Haddadin, Albu-Schäffer, Hirzinger，"Requirements for Safe Robots: Measurements, Analysis and New Insights"，IJRR 2009：碰撞伤害实验。</li>
+<li>IEC 61800-5-2 安全功能介绍（各驱动器厂商手册通常有 STO / SS1 / SLS 的图解）。</li>
+<li>整机资料：Franka FCI 文档、Unitree 开发者文档（Go2 / G1 SDK）、ANYmal 论文（Hutter et al.，"ANYmal – a highly mobile and dynamic quadrupedal robot"，IROS 2016）、Zhao et al. ALOHA（2023）、Fu et al. Mobile ALOHA（2024）。</li>
+<li>本仓库：nvidia-cosmos3 家用机器人公司调研。</li>
+</ul>
+<h3 id="_9">数学原理</h3>
+<ul>
+<li>匀减速运动：<span class="arithmatex">\(d = v^2/(2a)\)</span>。</li>
+<li>可靠性直觉：独立冗余通道的失效概率相乘。</li>
+</ul>
+<h3 id="_10">公式清单</h3>
+<p>见正文"公式"一节的表。</p>
+<h3 id="_11">代码对照：把本章的数字用代码算一遍</h3>
+<blockquote>
+<p>用 Python + NumPy（Numerical Python：数值 / Python）把讲义里讲过的数算一遍，不算练习题。代码在仓库本地 <code>robot-system-architecture/solutions/chapter-code/ch10_safety_and_cases.py</code>，配套测试 <code>tests/test_ch10.py</code>，notebook 在 <code>notebooks/ch10_safety_and_cases.ipynb</code>。Mac 上直接能跑，不需要 GPU：</p>
+<p><code>bash  
+cd robot-system-architecture/solutions/chapter-code  
+uv run python ch10_safety_and_cases.py   # 一步一步打印  
+uv run pytest tests/test_ch10.py</code></p>
+</blockquote>
+<p><strong>讲义 ↔ 代码</strong>（停止距离、力矩序列、阈值、失效概率都是编的，不是练习题的数）：</p>
+<table>
+<thead>
+<tr>
+<th>讲义</th>
+<th>公式 / 说法</th>
+<th>写法</th>
+<th>跑出来</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>公式表 停止距离</td>
+<td><span class="arithmatex">\(v\,t_{react} + v^2/(2a)\)</span></td>
+<td><code>stop_distance(0.5, 0.1, 2.0)</code></td>
+<td>0.05 + 0.0625 = 0.1125 m</td>
+</tr>
+<tr>
+<td>第 3 步 碰撞检测</td>
+<td><span class="arithmatex">\(\lvert\tau_{meas}-\tau_{model}\rvert &gt; \tau_{th}\)</span></td>
+<td><code>detect_collision</code></td>
+<td>第 5 拍超过 2 N·m</td>
+</tr>
+<tr>
+<td>第 3 步 看门狗</td>
+<td>连续几拍没心跳</td>
+<td><code>watchdog(hb, 3)</code></td>
+<td>第 7 拍触发</td>
+</tr>
+<tr>
+<td>第 3 步 / 动画 状态机</td>
+<td>正常 → 降速 → SS1 → STO</td>
+<td><code>step(state, event)</code></td>
+<td>有人进入 → 降速；心跳丢失 → SS1；急停 → STO，要人工复位</td>
+</tr>
+<tr>
+<td>数学原理 冗余</td>
+<td>独立失效概率相乘</td>
+<td><code>1e-3 * 1e-3</code></td>
+<td>1e-6</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键几行</strong>：</p>
+<pre><code class="language-python">if event == &quot;急停&quot;:
+    return STO                                   # 急停在任何状态下都直接 STO
+if state == STO:
+    return NORMAL if event == &quot;人工复位&quot; else STO   # STO 只认人工复位，普通复位确认没用
+</code></pre>
+<p><strong>代码里才看得到的 2 件事</strong>：</p>
+<ul>
+<li>状态机里判断的<strong>顺序</strong>就是优先级：先查急停，再查 STO 要不要复位，再查故障，最后才是"有人进入"。顺序写反，急停就可能被别的分支吃掉。</li>
+<li>看门狗数的是"连续"丢了几拍：中间收到一次心跳，计数就清零。</li>
+</ul>
+<p><strong>自己改一改</strong>（不影响练习答案）：</p>
+<ul>
+<li>在 <code>step</code> 里加一条：降速状态下"人继续靠近" → SS1，对照讲义第 3 步的图。</li>
+<li>把看门狗的 <code>max_missed</code> 改成 2，看同一串心跳在第几拍触发。</li>
+</ul><nav class="pager"><a href="09-sim-data-deploy.html">← 第 9 章 · 仿真、数据与部署闭环</a><span></span></nav>
+</main>
+<footer>来自个人学习仓库的对话讲义，含练习作答记录。源码：<a href="https://github.com/wikieden/robot-architecture">github.com/wikieden/robot-architecture</a></footer>
+</body></html>

@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 9 章 · 仿真、数据与部署闭环 · 机器人软硬件架构</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}}
+:root[data-theme="dark"]{--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:14px}
+header.top .brand{font-weight:600;color:var(--fg);text-decoration:none;margin-right:auto}
+header.top a{text-decoration:none}
+main{max-width:860px;margin:0 auto;padding:24px 16px 72px;overflow-wrap:anywhere}
+h1{font-size:28px;line-height:1.35;margin:8px 0 16px} h2{font-size:22px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)} h3{font-size:18px;margin:28px 0 8px}
+img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+blockquote{margin:16px 0;padding:10px 16px;background:var(--quote);border-left:3px solid var(--acc);border-radius:4px;color:var(--mute)}
+blockquote p{margin:4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto} pre code{padding:0;background:none}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:12px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--code)}
+details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px} summary{cursor:pointer;color:var(--acc);font-weight:500}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.btn{display:inline-block;margin:4px 8px 4px 0;padding:6px 14px;border:1px solid var(--acc);border-radius:999px;text-decoration:none;font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;color:inherit;text-decoration:none}
+.card:hover{border-color:var(--acc)} .card img{border:0;border-bottom:1px solid var(--line);border-radius:0;aspect-ratio:16/10;object-fit:contain;width:100%}
+.card .no{color:var(--mute);font-size:13px;padding:8px 12px 0} .card .t{padding:0 12px 12px;font-weight:500;line-height:1.5}
+.lead{font-size:17px;color:var(--mute)}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-size:13px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true,processEnvironments:true}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body>
+<header class="top"><div class="in">
+<a class="brand" href="../index.html">机器人软硬件架构</a>
+<a href="../lessons/index.html">讲义目录</a>
+<a href="../animations/index.html">动画</a>
+<a href="../review.html">复习卡片</a>
+<a href="../lessons/appendix-glossary.html">缩写表</a>
+</div></header>
+<main>
+<h1 id="9">第 9 章 · 仿真、数据与部署闭环</h1><p><a class="btn" href="../animations/09-domain-randomization.html">▶ 打开本章可交互动画</a></p>
+<blockquote>
+<p>本章回答：机器人在"不开机"的时候需要哪些基础设施？仿真器怎么选？sim2real 差距从哪来、怎么缩小？遥操作数据怎么采、怎么存？模型怎么部署到机上、怎么持续迭代？<br />
+编写日期：2026-11-04 · 上一章：<a href="../lessons/08-autonomy-stack.html">第 8 章 自主栈</a> · 下一章：<a href="../lessons/10-safety-and-cases.html">第 10 章 安全与整机案例</a> · 总览：00-overview.md<br />
+对应原文：本地论文文本 <code>vla-deep-dive/materials/text/papers/</code>：<code>act-aloha-2304.13705.txt</code> L169（ALOHA 遥操作与录制 50 Hz）；<code>open-x-embodiment-2310.08864.txt</code> L295（RLDS 数据格式）；<code>lapa-2410.11758.txt</code>（人类视频隐动作预训练）。域随机化论文（Tobin 2017、Peng 2018）不在本地<br />
+本章缩写：BC = Behavior Cloning（行为 / 克隆）；RL（第 6 章）；VLA（第 1 章）；sim2real（第 6 章）；MJX = MuJoCo XLA（XLA = Accelerated Linear Algebra：加速 / 线性代数，MuJoCo 的 JAX 版）；SAPIEN = SimulAted Part-based Interactive ENvironment（基于部件的交互仿真环境）；CAD = Computer-Aided Design（计算机 / 辅助 / 设计）；VR = Virtual Reality（虚拟 / 现实）；ALOHA（第 5 章）；GELLO：Wu et al. 2023 的低成本主从臂遥操作框架名（论文标题 GELLO: A General, Low-Cost, and Intuitive Teleoperation Framework）；UMI = Universal Manipulation Interface（通用 / 操作 / 接口）；LAPA = Latent Action Pretraining from Videos（从视频做隐动作预训练）；RLDS = Reinforcement Learning Datasets（强化学习数据集格式）；TFDS = TensorFlow Datasets；HDF5 = Hierarchical Data Format 5（层级 / 数据 / 格式第 5 版）；ACT = Action Chunking with Transformers（用 Transformer 做动作分块）；ONNX = Open Neural Network Exchange（开放 / 神经网络 / 交换格式）；FP16 = 16-bit Floating Point（16 位浮点）；INT8 / FP4（第 5 章）；KV cache = Key–Value cache（键 / 值缓存）；OTA（第 5 章）；<span class="arithmatex">\(\xi\)</span> 读 xi（物理参数），<span class="arithmatex">\(J(\pi;\xi)\)</span>：策略 π 在参数 ξ 下的回报。全部缩写见 <a href="../lessons/appendix-glossary.html">附录 · 缩写与术语表</a></p>
+</blockquote>
+<h2 id="_1">讲解</h2>
+<h3 id="1">第 1 步：机器人软件的另一半在机器之外</h3>
+<p><strong>白话类比：飞行员训练</strong>。飞行员先在模拟器里练几百小时（仿真），再跟教员上真飞机（遥操作示范），每次飞完看黑匣子复盘（日志），航空公司统一给所有飞机升级软件（OTA）。</p>
+<pre><code>  ┌──→ 仿真（训练 RL、测试回归、生成数据）
+  │          │
+  │          ▼
+  │     训练集群（BC / RL / VLA 微调）──→ 评测（仿真基准 + 真机固定任务）
+  │                                         │
+  │                                         ▼
+  │                              部署（量化、TensorRT、OTA 推送）
+  │                                         │
+  │                                         ▼
+  └── 数据回流 ←── 真机运行日志 + 失败片段 + 人工干预 ←── 遥操作采集
+</code></pre>
+<p>这就是"数据飞轮"：部署 → 发现失败 → 针对性采集 → 再训练 → 再部署。</p>
+<h3 id="2">第 2 步：仿真器怎么选</h3>
+<table>
+<thead>
+<tr>
+<th>仿真器</th>
+<th>强项</th>
+<th>典型用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MuJoCo</strong>（含 MJX / MuJoCo Playground / MuJoCo Warp）</td>
+<td>接触动力学精确稳定、MJCF 模型简洁；JAX / GPU 版可并行数千环境</td>
+<td>运控 RL、操作研究、DeepMind 系</td>
+</tr>
+<tr>
+<td><strong>Isaac Sim / Isaac Lab</strong>（NVIDIA，基于 Omniverse + PhysX）</td>
+<td>GPU 大规模并行、照片级渲染、传感器仿真</td>
+<td>人形 / 四足 RL、合成视觉数据</td>
+</tr>
+<tr>
+<td><strong>Genesis</strong></td>
+<td>多物理（刚体、软体、流体）、GPU 并行</td>
+<td>研究</td>
+</tr>
+<tr>
+<td><strong>Gazebo（gz sim）</strong></td>
+<td>和 ROS 2 集成最好</td>
+<td>导航、系统集成测试</td>
+</tr>
+<tr>
+<td><strong>PyBullet / SAPIEN / ManiSkill</strong></td>
+<td>易上手、操作任务基准</td>
+<td>教学、基准</td>
+</tr>
+<tr>
+<td><strong>世界模型</strong>（Cosmos 等）</td>
+<td>视频级"想象"，不需要手工建模</td>
+<td>数据增强、策略评测（见 nvidia-cosmos3）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>模型资产</strong>：URDF / MJCF / USD 三种格式要保持一致（同一份 CAD 导出），否则仿真和真机"不是同一台机器人"。</p>
+<h3 id="3-sim2real">第 3 步：sim2real 差距从哪来</h3>
+<table>
+<thead>
+<tr>
+<th>差距</th>
+<th>例子</th>
+<th>缩小办法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>动力学参数</td>
+<td>质量、惯量、摩擦、关节阻尼不准</td>
+<td>系统辨识；<strong>域随机化</strong></td>
+</tr>
+<tr>
+<td>执行器</td>
+<td>电机力矩饱和、延迟、减速器背隙和柔性</td>
+<td>执行器网络（用真机数据学一个电机模型）、加延迟随机化</td>
+</tr>
+<tr>
+<td>接触</td>
+<td>仿真接触模型是近似</td>
+<td>随机化摩擦和刚度；接触丰富任务多用真机数据</td>
+</tr>
+<tr>
+<td>感知</td>
+<td>渲染图和真实图不一样；深度噪声</td>
+<td>视觉随机化（光照、纹理）、用深度 / 高度图代替 RGB、真实图微调</td>
+</tr>
+<tr>
+<td>时间</td>
+<td>仿真里没有通信延迟和控制抖动</td>
+<td>仿真里注入延迟、以真实频率控制</td>
+</tr>
+</tbody>
+</table>
+<p><strong>域随机化（domain randomization）</strong>：每个训练回合随机抽一组参数（摩擦 0.3–1.2、质量 ±20%、延迟 0–20 ms……），让策略在一大片参数里都能用。真实世界只是这片里的"又一个样本"。代价：策略在任何单一参数下都不是最优，偏保守。</p>
+<h3 id="4">第 4 步：遥操作采集：示范数据从哪来</h3>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>原理</th>
+<th>优点</th>
+<th>缺点</th>
+<th>代表</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主从臂（leader–follower）</td>
+<td>人推一台相同结构的小臂，从臂照着动</td>
+<td>直观、关节一一对应、便宜</td>
+<td>只适合同构机器人</td>
+<td>ALOHA、GELLO、SO-100</td>
+</tr>
+<tr>
+<td>VR / 手部追踪</td>
+<td>头显追踪手的位姿，IK 映射到机器人</td>
+<td>适配人形、灵巧手</td>
+<td>没有力反馈、延迟</td>
+<td>Open-TeleVision、Apple Vision Pro 方案</td>
+</tr>
+<tr>
+<td>动作捕捉 / 外骨骼</td>
+<td>穿戴设备测全身</td>
+<td>全身动作</td>
+<td>贵、要重定向</td>
+<td>人形全身遥操作</td>
+</tr>
+<tr>
+<td>手持采集器（无机器人）</td>
+<td>人拿着带相机的夹爪做任务</td>
+<td>便携、能在野外大量采</td>
+<td>要解决本体差异</td>
+<td>UMI</td>
+</tr>
+<tr>
+<td>人类视频</td>
+<td>第一人称视频</td>
+<td>规模最大</td>
+<td>没有动作标签</td>
+<td>隐动作预训练（LAPA 等）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="5">第 5 步：数据怎么存</h3>
+<table>
+<thead>
+<tr>
+<th>格式</th>
+<th>内容</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rosbag2（MCAP）</td>
+<td>所有话题原样录制</td>
+<td>调试回放、原始存档</td>
+</tr>
+<tr>
+<td><strong>LeRobot Dataset</strong>（parquet 存数值 + mp4 存视频）</td>
+<td>按 episode 组织：观测、动作、时间戳、任务描述</td>
+<td>训练（Hugging Face 生态）</td>
+</tr>
+<tr>
+<td>RLDS（TFDS）</td>
+<td>episode → steps</td>
+<td>Open X-Embodiment 等大数据集</td>
+</tr>
+<tr>
+<td>HDF5</td>
+<td>自定义层级数组</td>
+<td>ACT / ALOHA 早期</td>
+</tr>
+</tbody>
+</table>
+<p>每条数据至少要有：<strong>统一时间戳</strong>（第 4 章）、相机内外参、机器人型号与 URDF 版本、控制频率、动作的含义（关节角还是末端位姿、绝对还是增量）。少了这些，数据换一台机器人就没法用。</p>
+<h3 id="6">第 6 步：部署</h3>
+<ul>
+<li><strong>模型优化</strong>：导出 ONNX → TensorRT；FP16 / INT8 / FP4 量化；KV cache 复用（VLA 的前缀部分只算一次）。</li>
+<li><strong>运行时</strong>：推理进程和控制进程分开；推理输出 action chunk 放进缓冲，控制进程按自己的节拍取（第 1、8 章）。</li>
+<li><strong>版本管理</strong>：模型、配置、URDF、固件一起打版本；每次上线前跑固定回归任务。</li>
+<li><strong>OTA</strong>：分批灰度推送，能一键回滚；关节固件升级要在安全状态下进行。</li>
+<li><strong>监控</strong>：成功率、干预次数、温度、电流、延迟，异常片段自动上传回流到数据飞轮。</li>
+</ul>
+<h3 id="_2">动画演示</h3>
+<p><img alt="域随机化：窄参数训练 vs 宽参数训练在真机参数上的表现" src="../animations/09-domain-randomization.gif" /></p>
+<p>可交互版：<a href="../animations/09-domain-randomization.html">animations/09-domain-randomization.html</a>（拖动随机化范围和真机摩擦）。</p>
+<p><strong>怎么看</strong>：</p>
+<ol>
+<li>横轴是地面摩擦系数。上面的策略只在摩擦 = 0.5 训练（点都挤在一处），下面的在 0.2–1.4 里随机训练（点散开）。</li>
+<li>训练点一个个落下，曲线是"在这个摩擦下的成功率"。窄训练在 0.5 附近很高，往外掉得很快；宽训练整体平一些、峰值略低。</li>
+<li>红线是真机的摩擦（事先不知道）。真机在 0.9 时，窄训练的成功率很低，宽训练仍然可用。</li>
+</ol>
+<h2 id="_3">公式</h2>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>式子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>域随机化目标</td>
+<td><span class="arithmatex">\(\max_\pi\ \mathbb{E}_{\xi\sim p(\xi)}\big[J(\pi;\xi)\big]\)</span>，<span class="arithmatex">\(\xi\)</span> 为物理参数</td>
+</tr>
+<tr>
+<td>系统辨识</td>
+<td><span class="arithmatex">\(\hat\xi = \arg\min_\xi \sum_t\|s^{real}_{t+1} - f(s^{real}_t, a_t;\xi)\|^2\)</span></td>
+</tr>
+<tr>
+<td>数据量估算</td>
+<td>小时数 = episode 数 × 每条秒数 / 3600</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">练习与作答记录</h2>
+<p><strong>题 1</strong>：同一个任务，你可以选"花两周把仿真参数辨识得很准"或者"花两天加大域随机化范围"。各自的风险是什么？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 2</strong>：你采了 500 条 ALOHA 数据，后来把腕部相机往外挪了 2 cm。这些数据还能直接用吗？数据里应该记录什么，才能事后补救？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 3</strong>：为什么运控 RL（走路）常常纯仿真训练就能上真机，而叠衣服这种操作任务主要靠真机遥操作数据？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<h2 id="_5">口诀</h2>
+<blockquote>
+<p>仿真练、遥操作教、日志复盘、OTA 升级，转起来就是数据飞轮。<br />
+仿真不准就让它"随机地不准"；数据不记相机在哪、什么时候，就等于白采。</p>
+</blockquote>
+<h2 id="_6">本章复习卡片</h2>
+<p>A25 sim2real 差距的五个来源、A26 域随机化、A27 一条好数据要记录什么（见 <a href="../review.html">review.md</a>）</p>
+<h2 id="_7">附录 · 延伸阅读</h2>
+<blockquote>
+<p>留给以后深入学习用，不影响本章主线。★ 是建议先读的。</p>
+</blockquote>
+<h3 id="_8">推荐阅读</h3>
+<ul>
+<li>★ Tobin et al.，"Domain Randomization for Transferring Deep Neural Networks from Simulation to the Real World"，IROS 2017：视觉域随机化。</li>
+<li>★ Peng et al.，"Sim-to-Real Transfer of Robotic Control with Dynamics Randomization"，ICRA 2018：动力学域随机化。</li>
+<li>Hwangbo et al.，Science Robotics 2019：执行器网络（actuator net）缩小执行器差距。</li>
+<li>Rudin et al.，"Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning"，CoRL 2021：GPU 并行仿真训练四足。</li>
+<li>Todorov, Erez, Tassa，"MuJoCo: A physics engine for model-based control"，IROS 2012；Isaac Lab 文档。</li>
+<li>Zhao et al.，"Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware"（ALOHA / ACT，2023）；Fu et al.，"Mobile ALOHA"（2024）；Chi et al.，"Universal Manipulation Interface"（UMI，2024）；Wu et al.，"GELLO"（2023）。</li>
+<li>Open X-Embodiment Collaboration，"Open X-Embodiment: Robotic Learning Datasets and RT-X Models"（2023）：RLDS 与跨本体数据。</li>
+<li>LeRobot 文档（Hugging Face）：数据集格式、SO-100/101 低成本臂。</li>
+<li>本仓库：cs285 study-plan（RL）、nvidia-cosmos3（世界模型作仿真）。</li>
+</ul>
+<h3 id="_9">数学原理</h3>
+<ul>
+<li>期望与采样（域随机化是对参数分布求期望）。</li>
+<li>最小二乘参数辨识。</li>
+<li>鲁棒优化直觉：平均性能 vs 最坏性能。</li>
+</ul>
+<h3 id="_10">公式清单</h3>
+<p>见正文"公式"一节的表。</p>
+<h3 id="_11">代码对照：把本章的数字用代码算一遍</h3>
+<blockquote>
+<p>用 Python + NumPy（Numerical Python：数值 / Python）把讲义里讲过的数算一遍，不算练习题。代码在仓库本地 <code>robot-system-architecture/solutions/chapter-code/ch09_sim_data_deploy.py</code>，配套测试 <code>tests/test_ch09.py</code>，notebook 在 <code>notebooks/ch09_sim_data_deploy.ipynb</code>。Mac 上直接能跑，不需要 GPU：</p>
+<p><code>bash  
+cd robot-system-architecture/solutions/chapter-code  
+uv run python ch09_sim_data_deploy.py   # 一步一步打印  
+uv run pytest tests/test_ch09.py</code></p>
+</blockquote>
+<p><strong>讲义 ↔ 代码</strong>（成功率是动画里的玩具模型；系统辨识的一维模型和数据量的条数是编的）：</p>
+<table>
+<thead>
+<tr>
+<th>讲义</th>
+<th>公式 / 说法</th>
+<th>写法</th>
+<th>跑出来</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 3 步 / 动画</td>
+<td>窄训练 vs 宽训练</td>
+<td><code>success(mu, seen, lo, hi)</code></td>
+<td>μ = 0.5：窄 97%、宽 85%；μ = 0.9：窄 0%、宽 85%</td>
+</tr>
+<tr>
+<td>公式表 域随机化目标</td>
+<td><span class="arithmatex">\(\mathbb{E}_{\xi}[J(\pi;\xi)]\)</span></td>
+<td><code>expected_return</code></td>
+<td>0.2–1.4 里随机 2000 个：窄 24%、宽 83%</td>
+</tr>
+<tr>
+<td>公式表 系统辨识</td>
+<td><span class="arithmatex">\(\arg\min_\xi \sum\lVert s_{t+1} - f(s_t, a_t;\xi)\rVert^2\)</span></td>
+<td><code>sysid_damping()</code></td>
+<td>真值 0.8，估出 0.812</td>
+</tr>
+<tr>
+<td>公式表 数据量</td>
+<td>条数 × 秒 / 3600</td>
+<td><code>dataset_hours(200, 45)</code></td>
+<td>2.5 小时</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键几行</strong>：</p>
+<pre><code class="language-python">peak = 0.97 - 0.12 * width / 1.2                                 # 训练范围越宽，峰值越低（偏保守）
+best = np.max(np.exp(-((mu - seen) ** 2) / (2 * sig**2)))       # 离最近的训练参数越远，成功率掉得越快
+return peak * cover * best
+</code></pre>
+<p><strong>代码里才看得到的 2 件事</strong>：</p>
+<ul>
+<li>这里的成功率是动画用的<strong>玩具公式</strong>，不是真机测出来的；它只用来演示"窄而高 vs 宽而平"的形状。</li>
+<li>系统辨识把模型改写成 <span class="arithmatex">\(y = X\xi\)</span> 的形式后，最小二乘一行就解出来：<code>X @ y / (X @ X)</code>。估计值 0.812 和真值差一点，是因为加了噪声。</li>
+</ul>
+<p><strong>自己改一改</strong>（不影响练习答案）：</p>
+<ul>
+<li>把宽训练的范围改成 0.3–0.9，看真机 μ = 0.9 时成功率掉多少。</li>
+<li>把 <code>sysid_damping</code> 的噪声从 1e-4 加到 1e-3，看估计值偏多少。</li>
+</ul><nav class="pager"><a href="08-autonomy-stack.html">← 第 8 章 · 自主栈：从模块化流水线到端到端 VLA 与双系统</a><a href="10-safety-and-cases.html">第 10 章 · 安全、可靠性与整机案例：怎么设计一台机器人 →</a></nav>
+</main>
+<footer>来自个人学习仓库的对话讲义，含练习作答记录。源码：<a href="https://github.com/wikieden/robot-architecture">github.com/wikieden/robot-architecture</a></footer>
+</body></html>

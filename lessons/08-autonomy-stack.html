@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 8 章 · 自主栈：从模块化流水线到端到端 VLA 与双系统 · 机器人软硬件架构</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1f2328;--mute:#5d6470;--line:#e3e5e8;--card:#fff;--acc:#2f6fdf;--code:#f2f3f5;--quote:#f4f6fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}}
+:root[data-theme="dark"]{--bg:#15181d;--fg:#e4e7ec;--mute:#9aa3b2;--line:#2c323b;--card:#1c2026;--acc:#7aa7ff;--code:#22272f;--quote:#1b2029}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:14px}
+header.top .brand{font-weight:600;color:var(--fg);text-decoration:none;margin-right:auto}
+header.top a{text-decoration:none}
+main{max-width:860px;margin:0 auto;padding:24px 16px 72px;overflow-wrap:anywhere}
+h1{font-size:28px;line-height:1.35;margin:8px 0 16px} h2{font-size:22px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)} h3{font-size:18px;margin:28px 0 8px}
+img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+blockquote{margin:16px 0;padding:10px 16px;background:var(--quote);border-left:3px solid var(--acc);border-radius:4px;color:var(--mute)}
+blockquote p{margin:4px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto} pre code{padding:0;background:none}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%;margin:12px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:6px 10px;vertical-align:top} th{background:var(--code)}
+details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px} summary{cursor:pointer;color:var(--acc);font-weight:500}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.btn{display:inline-block;margin:4px 8px 4px 0;padding:6px 14px;border:1px solid var(--acc);border-radius:999px;text-decoration:none;font-size:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;color:inherit;text-decoration:none}
+.card:hover{border-color:var(--acc)} .card img{border:0;border-bottom:1px solid var(--line);border-radius:0;aspect-ratio:16/10;object-fit:contain;width:100%}
+.card .no{color:var(--mute);font-size:13px;padding:8px 12px 0} .card .t{padding:0 12px 12px;font-weight:500;line-height:1.5}
+.lead{font-size:17px;color:var(--mute)}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-size:13px}
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true,processEnvironments:true}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+</head><body>
+<header class="top"><div class="in">
+<a class="brand" href="../index.html">机器人软硬件架构</a>
+<a href="../lessons/index.html">讲义目录</a>
+<a href="../animations/index.html">动画</a>
+<a href="../review.html">复习卡片</a>
+<a href="../lessons/appendix-glossary.html">缩写表</a>
+</div></header>
+<main>
+<h1 id="8-vla">第 8 章 · 自主栈：从模块化流水线到端到端 VLA 与双系统</h1><p><a class="btn" href="../animations/08-latency-budget.html">▶ 打开本章可交互动画</a></p>
+<blockquote>
+<p>本章回答：机器人的"智能"部分有哪几种组织方式？经典流水线、端到端 VLA、双系统各自的延迟和失败方式是什么？<br />
+编写日期：2026-11-04 · 上一章：<a href="../lessons/07-ros2-middleware.html">第 7 章 ROS 2 与中间件</a> · 下一章：<a href="../lessons/09-sim-data-deploy.html">第 9 章 仿真、数据与部署</a> · 总览：00-overview.md<br />
+对应原文：本地论文文本 <code>vla-deep-dive/materials/text/papers/</code>：<code>pi0-2410.24164.txt</code> L255（action chunk H = 50）、L130–L135（最高 50 Hz）；<code>gr00t-n1-2503.14734.txt</code> L23–L24、L89（System 2 看图读指令，System 1 实时出动作）；<code>real-time-chunking-2506.07339.txt</code>（RTC，异步执行）<br />
+本章缩写：VLA / VLM / LLM（第 1 章）；S1 / S2 = System 1 / System 2（系统 1 快、系统 2 慢）；SAM 2 = Segment Anything Model 2（分割一切模型第 2 版）；6D = six-dimensional（六维位姿：3 个位置 + 3 个转角）；SLAM（第 1 章）；ORB = Oriented FAST and Rotated BRIEF（一种图像特征点）；PDDL = Planning Domain Definition Language（规划 / 领域 / 定义 / 语言）；OMPL（第 7 章）；RT-2 = Robotics Transformer 2（机器人 Transformer 第 2 版）；GR00T = Generalist Robot 00 Technology（NVIDIA 的通用机器人模型）；RTC = Real-Time Chunking（实时 / 分块）；<span class="arithmatex">\(T_a\)</span>：a = action（一段 chunk 执行多久）；<span class="arithmatex">\(t_{react}\)</span>：react = reaction（反应时间）。全部缩写见 <a href="../lessons/appendix-glossary.html">附录 · 缩写与术语表</a></p>
+</blockquote>
+<h2 id="_1">讲解</h2>
+<h3 id="1">第 1 步：三种组织方式</h3>
+<p><strong>白话类比：做菜</strong>。
+- <strong>流水线</strong>：洗菜工 → 切菜工 → 厨师 → 摆盘，每人只会一件事，交接要有标准格式（中间表示）。
+- <strong>端到端</strong>：一个全能厨师从头做到尾，看一眼食材直接出菜。
+- <strong>双系统</strong>：主厨想菜单、下指令（慢），帮厨手上快速执行，看到锅要溢出马上关火，不用问主厨。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>经典模块化</th>
+<th>端到端 VLA</th>
+<th>双系统（System 2 + System 1）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>结构</td>
+<td>感知 → 状态估计 → 规划 → 控制，各模块独立</td>
+<td>图像 + 指令 → 网络 → 动作</td>
+<td>慢 VLM（推理、规划）+ 快策略（视觉运动控制）</td>
+</tr>
+<tr>
+<td>中间表示</td>
+<td>人定义：物体位姿、地图、轨迹</td>
+<td>无（网络内部隐变量）</td>
+<td>隐向量 / 语言子任务 / 子目标</td>
+</tr>
+<tr>
+<td>优点</td>
+<td>可解释、可单独测试、可验证</td>
+<td>不用手工设计表示，能学到难描述的技能（叠衣服）</td>
+<td>兼顾泛化（大模型）和反应速度（小模型）</td>
+</tr>
+<tr>
+<td>缺点</td>
+<td>接口外的情况处理不了（透明物体、可变形物体）</td>
+<td>要大量数据、难调试、推理慢</td>
+<td>两层如何对齐、如何联合训练</td>
+</tr>
+<tr>
+<td>代表</td>
+<td>MoveIt + 位姿估计 + 抓取规划；Nav2</td>
+<td>RT-2、OpenVLA、π0 / π0.5</td>
+<td>Figure Helix、NVIDIA GR00T N1、Hi Robot、Gemini Robotics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2">第 2 步：经典流水线的模块</h3>
+<pre><code> 相机 / LiDAR / IMU
+    → 感知：检测、分割、6D 位姿（Grounding DINO + SAM 2、FoundationPose）
+    → 状态估计 / SLAM：机器人在哪、地图长什么样（ORB-SLAM3、FAST-LIO、slam_toolbox）
+    → 世界模型（这里指&quot;场景表示&quot;）：物体列表、占据地图、3D 场景图
+    → 任务规划：行为树 / 状态机 / PDDL / LLM
+    → 运动规划：抓取位姿选择 → 无碰撞路径（OMPL / CuRobo）→ 轨迹时间参数化
+    → 控制（第 6 章）
+</code></pre>
+<p>优势是每一步都能单独看对不对。弱点是<strong>累积延迟</strong>（一个个串行跑）和<strong>接口脆弱</strong>（位姿估计一错，后面全错，且下游无法补救）。</p>
+<h3 id="3-vla">第 3 步：端到端 VLA</h3>
+<p>VLA 把"感知 → 规划 → 运动生成"合成一个网络：VLM 骨干（看图 + 读指令）+ 动作头（输出一段 action chunk）。细节见 VLA 讲义。</p>
+<p>在系统里的位置：</p>
+<ul>
+<li>输入：多路相机图像 + 指令 + 机器人本体状态（关节角）；</li>
+<li>输出：未来 H 步的关节角 / 末端位姿（例如 π0 是 50 步）；</li>
+<li>频率：推理 5–15 Hz，动作执行 50 Hz 左右，靠 action chunk + 插补补上（第 1 章）；</li>
+<li><strong>下面仍然是</strong>阻抗 / PD 控制（第 6 章）和安全层（第 10 章）。</li>
+</ul>
+<h3 id="4">第 4 步：双系统</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>System 2（慢）</th>
+<th>System 1（快）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>模型</td>
+<td>大 VLM（数十亿参数）</td>
+<td>小策略网络（几千万到几亿）</td>
+</tr>
+<tr>
+<td>频率</td>
+<td>约 1–10 Hz</td>
+<td>约 50–200 Hz</td>
+</tr>
+<tr>
+<td>做什么</td>
+<td>理解场景和指令、拆子任务、给出隐向量 / 子目标</td>
+<td>根据最新图像 + 本体状态 + System 2 的指令，输出动作</td>
+</tr>
+<tr>
+<td>例子</td>
+<td>Figure Helix 公开介绍为 S2 约 7–9 Hz、S1 约 200 Hz；GR00T N1 也分 System 2 / System 1</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>关键：<strong>System 1 不用等 System 2</strong>。System 2 异步更新"意图"，System 1 用最新的意图和最新的画面持续出动作，所以遇到突发变化，反应时间由 System 1 决定。更多架构模板见 VLA 面试资料 06。</p>
+<h3 id="5">第 5 步：延迟预算：从"发生"到"反应"要多久</h3>
+<p><strong>反应时间</strong> = 等下一次采样 + 感知 + 推理 + 传输 + 开始执行。串行流水线里各段相加；并行 / 异步架构里，只看"最快那条闭环"。</p>
+<p>一个示意（数字是量级，不是某个产品的实测）：</p>
+<table>
+<thead>
+<tr>
+<th>架构</th>
+<th>闭环里有什么</th>
+<th>一圈时间</th>
+<th>物体被碰走后多久开始转向</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>模块化串行</td>
+<td>相机 33 + 检测 30 + 位姿 40 + 规划 200 + 下发 5 ms</td>
+<td>~300 ms</td>
+<td>0.3–0.6 s</td>
+</tr>
+<tr>
+<td>端到端 VLA（chunk，Tₐ = 0.2 s）</td>
+<td>编码 + VLM + 动作头 ~120 ms，每 0.2 s 重想一次</td>
+<td>200 ms</td>
+<td>0.2–0.4 s</td>
+</tr>
+<tr>
+<td>双系统</td>
+<td>S1：编码 + 小网络 ~10 ms，100 Hz</td>
+<td>10 ms</td>
+<td>~0.01–0.05 s（S2 晚些更新意图）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>降低延迟的手段</strong>：异步推理（执行旧 chunk 的同时算新 chunk）、实时分块（RTC）、模型量化 / TensorRT、把相机和推理放同一块板子避免拷贝、降低图像分辨率。</p>
+<h3 id="6">第 6 步：怎么选</h3>
+<ul>
+<li>任务结构清楚、对象固定、需要可验证（工厂、仓储）→ 模块化为主，局部用学习（抓取检测、位姿估计）。</li>
+<li>任务难以描述、接触丰富、对象多变（家务、叠衣服）→ 端到端 VLA 或双系统。</li>
+<li>移动操作 / 长任务 → 上层 LLM/VLM 规划 + 导航栈（Nav2 或导航基础模型）+ 操作 VLA，底层统一的全身控制。</li>
+<li>无论哪种：安全层、底层控制、状态估计都保留经典做法。</li>
+</ul>
+<h3 id="_2">动画演示</h3>
+<p><img alt="延迟预算：三种架构对突发事件的反应时间" src="../animations/08-latency-budget.gif" /></p>
+<p>可交互版：<a href="../animations/08-latency-budget.html">animations/08-latency-budget.html</a>。</p>
+<p><strong>怎么看</strong>：</p>
+<ol>
+<li>三条时间轴分别是模块化串行、端到端 VLA、双系统。彩色块是"在算"，块的长度就是耗时。</li>
+<li>第 0.30 秒红线处杯子被碰走。每条轴上的绿色三角是"第一次用上了新画面的动作开始执行"的时刻。</li>
+<li>模块化必须等当前这一圈跑完、下一圈从拍照开始（约 316 ms）；VLA 要等下一次重想（约 220 ms）；双系统的 S1 每 10 ms 就看一次新画面（约 8 ms），S2 慢慢跟上更新意图。动画没算相机曝光和传输，真实系统各再加几十毫秒。</li>
+</ol>
+<h2 id="_3">公式</h2>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>式子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>串行一圈</td>
+<td><span class="arithmatex">\(T_{cycle} = \sum_i t_i\)</span></td>
+</tr>
+<tr>
+<td>最坏反应时间（串行）</td>
+<td><span class="arithmatex">\(t_{react} \lesssim 2\,T_{cycle}\)</span>（刚错过本圈采样）</td>
+</tr>
+<tr>
+<td>异步双系统</td>
+<td><span class="arithmatex">\(t_{react} \approx T_{S1} + t_{S1}\)</span>，与 <span class="arithmatex">\(T_{S2}\)</span> 基本无关</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">练习与作答记录</h2>
+<p><strong>题 1</strong>：一条流水线：相机 33 ms、检测 30 ms、位姿 40 ms、规划 200 ms、下发 5 ms，串行执行。一圈多久？最高能以多少 Hz 更新目标？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 2</strong>：端到端 VLA 不需要"物体位姿"这种中间表示。这是优点还是缺点？各举一个场景。</p>
+<p><strong>作答</strong>：（待作答）</p>
+<p><strong>题 3</strong>：双系统里，如果 System 2 给的子任务是错的（"去拿蓝杯子"，其实该拿红杯子），System 1 能纠正吗？这说明两层各自该负责什么？</p>
+<p><strong>作答</strong>：（待作答）</p>
+<h2 id="_5">口诀</h2>
+<blockquote>
+<p>流水线可解释但串行慢，端到端省接口但要数据，双系统一个想一个做。<br />
+反应快慢看最快那条闭环；VLA 底下照样有控制和安全。</p>
+</blockquote>
+<h2 id="_6">本章复习卡片</h2>
+<p>A22 三种自主架构对比、A23 双系统为什么反应快、A24 延迟预算怎么算（见 <a href="../review.html">review.md</a>）</p>
+<h2 id="_7">附录 · 延伸阅读</h2>
+<blockquote>
+<p>留给以后深入学习用，不影响本章主线。★ 是建议先读的。</p>
+</blockquote>
+<h3 id="_8">推荐阅读</h3>
+<ul>
+<li>★ VLA 讲义 第 1、3、8 章：策略接口、action chunking、π0 推理时间。</li>
+<li>★ VLA 面试资料 06 · 自主架构：五种架构模板与层间接口。</li>
+<li>Black et al.，"π0: A Vision-Language-Action Flow Model for General Robot Control"（2024）；Physical Intelligence，"π0.5"（2025）。</li>
+<li>NVIDIA，"GR00T N1: An Open Foundation Model for Generalist Humanoid Robots"（2025）：System 1 / System 2 设计。</li>
+<li>Figure AI，"Helix: A Vision-Language-Action Model for Generalist Humanoid Control"（2025 技术博客）：S1/S2 频率与部署。</li>
+<li>Shi et al.，"Hi Robot: Open-Ended Instruction Following with Hierarchical Vision-Language-Action Models"（2025）。</li>
+<li>Black et al.，"Real-Time Execution of Action Chunking Flow Policies"（RTC，2025）：异步执行与延迟。</li>
+<li>Sundaralingam et al.，"cuRobo: Parallelized Collision-Free Robot Motion Generation"（2023）：GPU 运动规划。</li>
+<li>导航侧：embodied-navigation-vln 综述。</li>
+</ul>
+<h3 id="_9">数学原理</h3>
+<ul>
+<li>延迟求和、采样等待的期望（均匀分布期望 <span class="arithmatex">\(T/2\)</span>）。</li>
+<li>流水线吞吐 vs 延迟：并行化提高吞吐，不一定降低单次延迟。</li>
+</ul>
+<h3 id="_10">公式清单</h3>
+<p>见正文"公式"一节的表。</p>
+<h3 id="_11">代码对照：把本章的数字用代码算一遍</h3>
+<blockquote>
+<p>用 Python + NumPy（Numerical Python：数值 / Python）把讲义里讲过的数算一遍，不算练习题。代码在仓库本地 <code>robot-system-architecture/solutions/chapter-code/ch08_autonomy_stack.py</code>，配套测试 <code>tests/test_ch08.py</code>，notebook 在 <code>notebooks/ch08_autonomy_stack.ipynb</code>。Mac 上直接能跑，不需要 GPU：</p>
+<p><code>bash  
+cd robot-system-architecture/solutions/chapter-code  
+uv run python ch08_autonomy_stack.py   # 一步一步打印  
+uv run pytest tests/test_ch08.py</code></p>
+</blockquote>
+<p><strong>讲义 ↔ 代码</strong>（各段耗时照动画；模块化串行那一条是练习题 1，代码里不算）：</p>
+<table>
+<thead>
+<tr>
+<th>讲义</th>
+<th>公式 / 说法</th>
+<th>写法</th>
+<th>跑出来</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 5 步 / 动画 VLA</td>
+<td>等下一次重想 + 一次推理</td>
+<td><code>reaction_time([0.02, 0.06, 0.04], 0.2, 0.30)</code></td>
+<td>220 ms</td>
+</tr>
+<tr>
+<td>第 5 步 / 动画 S1</td>
+<td>每 10 ms 看一次</td>
+<td><code>reaction_time([0.008], 0.01, 0.30)</code></td>
+<td>8 ms</td>
+</tr>
+<tr>
+<td>第 5 步 事件时刻不同</td>
+<td>0.21 / 0.30 / 0.39 s</td>
+<td>同上</td>
+<td>310 / 220 / 130 ms</td>
+</tr>
+<tr>
+<td>数学原理 平均等多久</td>
+<td>均匀分布期望 <span class="arithmatex">\(T/2\)</span></td>
+<td><code>mean_wait(0.2)</code></td>
+<td>0.1001 s ≈ 0.1 s</td>
+</tr>
+<tr>
+<td>公式表 双系统</td>
+<td><span class="arithmatex">\(T_{S1} + t_{S1}\)</span>，和 <span class="arithmatex">\(T_{S2}\)</span> 无关</td>
+<td><code>dual_system_react</code></td>
+<td>都是 18 ms</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键几行</strong>：</p>
+<pre><code class="language-python">c = int(np.ceil(event_s / period_s - 1e-9))      # 事件之后开始的第一圈是第 c 圈
+return c * period_s + sum(segments_s) - event_s   # 那一圈结束（开始执行新动作）减去事件时刻
+</code></pre>
+<p><strong>代码里才看得到的 2 件事</strong>：</p>
+<ul>
+<li><code>- 1e-9</code> 是为了防浮点误差：0.30 / 0.01 在电脑里算出来是 30.000000000000004，不减一点 <code>ceil</code> 会多算一圈。</li>
+<li>动画里 S1 的 8 ms 是"刚好在事件那一刻开始一圈"的最好情况；公式表的 18 ms 是"刚错过"的最坏情况。两个数都对，问的不是同一件事。</li>
+</ul>
+<p><strong>自己改一改</strong>（不影响练习答案）：</p>
+<ul>
+<li>把 VLA 的重想周期从 0.2 改成 0.1，看反应时间的范围怎么变。</li>
+<li>用 <code>reaction_time</code> 自己编一条两段的流水线（比如 50 ms + 50 ms、每 100 ms 一圈），看最好和最坏情况各是多少。</li>
+</ul><nav class="pager"><a href="07-ros2-middleware.html">← 第 7 章 · 软件框架：ROS 2、中间件与实时系统</a><a href="09-sim-data-deploy.html">第 9 章 · 仿真、数据与部署闭环 →</a></nav>
+</main>
+<footer>来自个人学习仓库的对话讲义，含练习作答记录。源码：<a href="https://github.com/wikieden/robot-architecture">github.com/wikieden/robot-architecture</a></footer>
+</body></html>
