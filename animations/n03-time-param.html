@@ -43,4 +43,5 @@ function draw(){const m=Math.min(NSTEP,k*FR);plots.forEach(P=>{P.lines.forEach((
   const mx=si=>{let s=0;for(let i=1;i<m;i++)s=Math.max(s,Math.abs(series[si].a[i]));return s};
   $('st').textContent=(m*DT).toFixed(2)+' s';$('a1').textContent=m>1?mx(0).toFixed(0)+' rad/s²':'—';$('a2').textContent=m>1?mx(1).toFixed(1)+' rad/s²':'—'}
 setupPlayer({captureSeed:1,reset,next},50);
-</script></body></html>
+</script><a href="https://wikieden.github.io/ai-books/" style="position:fixed;right:12px;bottom:12px;z-index:99;padding:4px 10px;border-radius:14px;background:rgba(127,127,127,.18);color:inherit;font:13px/1.6 system-ui,sans-serif;text-decoration:none">← 全部讲义书</a>
+</body></html>

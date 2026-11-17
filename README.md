@@ -1,6 +1,6 @@
 # 机器人软硬件架构
 
-**在线阅读：<https://wikieden.github.io/robot-architecture/>** · [讲义目录](https://wikieden.github.io/robot-architecture/lessons/index.html) · [全部动画](https://wikieden.github.io/robot-architecture/animations/index.html) · [复习卡片](https://wikieden.github.io/robot-architecture/review.html)
+**在线阅读：<https://wikieden.github.io/robot-architecture/>** · [讲义目录](https://wikieden.github.io/robot-architecture/lessons/index.html) · [全部动画](https://wikieden.github.io/robot-architecture/animations/index.html) · [复习卡片](https://wikieden.github.io/robot-architecture/review.html) · [全部讲义书](https://wikieden.github.io/ai-books/)
 
 > 10 章 · 10 个动画（GIF + 可交互页面）· 40 张复习卡片（A01–A40，本书 10 章对应 A01–A30）· 覆盖 Lynch & Park《Modern Robotics》第 2、4–6 章与 §8.9、第 11 章里和整机架构有关的部分，其余（传感器、总线、ROS 2、自主栈、数据、安全）为自编
 
