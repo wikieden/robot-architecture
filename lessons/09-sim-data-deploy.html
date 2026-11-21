@@ -94,6 +94,8 @@ jupyter lab ch09_sim_data_deploy.ipynb</code></pre><p>也可以下载后直接�
   └── 数据回流 ←── 真机运行日志 + 失败片段 + 人工干预 ←── 遥操作采集
 </code></pre>
 <p>这就是"数据飞轮"：部署 → 发现失败 → 针对性采集 → 再训练 → 再部署。</p>
+<p><img alt="数据飞轮：采集、训练、评测、部署、运行、回流，仿真在中间" src="../figures/09-sim-data-flywheel.png" /></p>
+<p><em>图 9-1 · 数据飞轮：采集 → 训练 → 评测 → 部署 → 运行 → 回流，转一圈修一批失败；仿真在中间便宜地多转几圈。</em></p>
 <h3 id="2">第 2 步：仿真器怎么选</h3>
 <table>
 <thead>
@@ -257,6 +259,8 @@ jupyter lab ch09_sim_data_deploy.ipynb</code></pre><p>也可以下载后直接�
 </tbody>
 </table>
 <p>每条数据至少要有：<strong>统一时间戳</strong>（第 4 章）、相机内外参、机器人型号与 URDF 版本、控制频率、动作的含义（关节角还是末端位姿、绝对还是增量）。少了这些，数据换一台机器人就没法用。</p>
+<p><img alt="一条示范数据的结构：episode 元数据、逐步记录与四种存储格式" src="../figures/09-sim-data-episode.png" /></p>
+<p><em>图 9-2 · 一条示范数据：每个 episode 一份元数据，每一步按统一时间戳记一行；存成 LeRobot / RLDS / HDF5 / MCAP。</em></p>
 <h3 id="6">第 6 步：部署</h3>
 <ul>
 <li><strong>模型优化</strong>：导出 ONNX → TensorRT；FP16 / INT8 / FP4 量化；KV cache 复用（VLA 的前缀部分只算一次）。</li>

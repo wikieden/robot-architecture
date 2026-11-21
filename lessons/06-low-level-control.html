@@ -97,6 +97,10 @@ jupyter lab ch06_low_level_control.ipynb</code></pre><p>也可以下载后直接
 - <span class="arithmatex">\(i_q\)</span>：产生力矩的分量，<span class="arithmatex">\(\tau = K_t\,i_q\)</span>；
 - <span class="arithmatex">\(i_d\)</span>：不产生力矩，通常控制为 0（高速时弱磁才用）。</p>
 <p>两个 PI 控制器分别管 <span class="arithmatex">\(i_d\)</span>、<span class="arithmatex">\(i_q\)</span>，再反变换回三相 PWM。这就是"电流即力矩"的由来，也是第 3 章 QDD 能"用电流感觉地面"的基础。</p>
+<p><img alt="级联控制：位置环包速度环包电流环，各自的反馈来源" src="../figures/06-low-level-control-cascade.png" /></p>
+<p><em>图 6-1 · 级联：位置环 1 kHz 套速度环 5–10 kHz 套电流环 10–40 kHz，三条反馈分别来自输出编码器、电机编码器和相电流。</em></p>
+<p><img alt="FOC：三相电流经 Clarke 和 Park 变换变成 dq 直流量" src="../figures/06-low-level-control-foc.png" /></p>
+<p><em>图 6-2 · FOC：三相交流经 Clarke 变成 αβ 两轴，再按转子角经 Park 转成 dq 直流量，iq 正比于力矩。</em></p>
 <h3 id="3">第 3 步：三种控制模式</h3>
 <table>
 <thead>
@@ -151,6 +155,10 @@ jupyter lab ch06_low_level_control.ipynb</code></pre><p>也可以下载后直接
 <p>每个"任务"（手跟踪、重心保持、躯干姿态、关节回中）有一个权重或优先级。1 kHz 左右求解，输出每个关节的力矩。</p>
 <p><strong>MPC（模型预测控制）</strong>：往前看一段时间（比如 0.5 秒），用简化模型（单刚体、倒立摆、质心动力学）预测未来，优化一串控制量，只执行第一步，下个周期重来——和 VLA 的 receding horizon（<a href="https://wikieden.github.io/vla-from-scratch/lessons/03-action-chunking.html">VLA 第 3 章</a>）是同一个思想。四足 / 人形常用"MPC 规划接触力 + WBC 分配到关节"。</p>
 <p><strong>RL 路线</strong>：2020 年后，越来越多四足和人形直接用强化学习训练策略：在仿真里用 PPO 训练，50 Hz 输出每个关节的目标角度，再由驱动板上的 PD（固定 Kp/Kd）在 1 kHz 以上追踪。WBC / MPC 的"模型 + 优化"被一个学出来的网络替代，但最底层的 PD + FOC 不变。</p>
+<p><img alt="三条控制路线：MPC+WBC、RL+PD、VLA+阻抗，共用底层电流环" src="../figures/06-low-level-control-stack.png" /></p>
+<p><em>图 6-3 · 三条控制路线：上层可以是 MPC + WBC、RL 策略 + PD 或 VLA + 阻抗，最底下的电流环都一样。</em></p>
+<p><img alt="线性倒立摆：迈步接住重心" src="../animations/n02-lipm-walking.gif" /></p>
+<p><em>图 6-4 · MPC 常用的简化模型之一：线性倒立摆（LIPM）把几十个关节压成一个质心，迈步接住正在倒下的重心（细节见专题笔记 02 运控细化 §5.3）。</em> 可交互版：<a href="../animations/n02-lipm-walking.html">animations/n02-lipm-walking.html</a>（浏览器打开，可拖滑块改步长）。</p>
 <h3 id="_2">动画演示</h3>
 <p><img alt="阻抗控制：硬弹簧 vs 软弹簧撞墙" src="../animations/06-impedance.gif" /></p>
 <p>可交互版：<a href="../animations/06-impedance.html">animations/06-impedance.html</a>（拖动刚度 K）。</p>

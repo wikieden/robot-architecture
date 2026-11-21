@@ -170,11 +170,17 @@ jupyter lab ch01_layered_loops.ipynb</code></pre><p>也可以下载后直接用 
 </tr>
 </tbody>
 </table>
+<p><img alt="分层与硬件：五层软件、三块硬件、对数频率条" src="../figures/01-layered-loops-hardware.png" /></p>
+<p><em>图 1-1 · 每层软件坐在一块硬件上：L4–L2 共用主控，L1 在实时核，L0 在每个关节的驱动板；右边频率条每往下约快 10 倍。</em></p>
 <h3 id="4">第 4 步：插补：慢目标怎么变成快指令</h3>
 <p>L2 每 100 ms 给一个新目标，L1 每 1 ms 要一个指令，中间 99 次怎么办？<strong>插补</strong>（interpolation）：在两个目标之间用直线、三次样条或最小加加速度（minimum jerk）曲线补点，再交给一个跟踪控制器追。</p>
 <p>一个最简单的跟踪器是一阶追赶：</p>
 <div class="arithmatex">\[x_{k+1} = x_k + \alpha\,(x^{\text{目标}}_k - x_k),\quad 0&lt;\alpha&lt;1\]</div>
-<p><span class="arithmatex">\(\alpha\)</span> 越大追得越快，但太大会过冲、抖动。下面的动画就是这件事。</p>
+<p><span class="arithmatex">\(\alpha\)</span> 越大追得越快，但太大会过冲、抖动。本章末的动画演示就是这件事。</p>
+<p><img alt="插补：10 Hz 目标点、阶梯保持、1 kHz 线性插补和一阶追赶" src="../figures/01-layered-loops-interp.png" /></p>
+<p><em>图 1-2 · 插补：L2 的稀疏目标先补成 1 kHz 的密集指令，再由跟踪器平滑地追；直接保持会出现阶梯硬跳。</em></p>
+<p><img alt="时间参数化：直线连点 vs 三次样条的速度与加速度" src="../animations/n03-time-param.gif" /></p>
+<p><em>图 1-3 · 补点方式决定了速度和加速度是否连续：直线连点在拐角处加速度突变，三次样条处处平滑（细节见专题笔记 03 规划细化 §4）。</em> 可交互版：<a href="../animations/n03-time-param.html">animations/n03-time-param.html</a>（浏览器打开，可播放、单步对比两种插值的速度和加速度）。</p>
 <h3 id="_2">动画演示</h3>
 <p><img alt="分层闭环：慢层给目标，快层追目标" src="../animations/01-layered-loops.gif" /></p>
 <p>可交互版：<a href="../animations/01-layered-loops.html">animations/01-layered-loops.html</a>（浏览器打开，可播放、单步、拖滑块改策略频率）。</p>

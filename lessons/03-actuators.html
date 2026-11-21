@@ -93,6 +93,8 @@ jupyter lab ch03_actuators.ipynb</code></pre><p>也可以下载后直接用 VS C
 </code></pre>
 <p><strong>电机</strong>：几乎都用无刷电机（BLDC / PMSM）——没有电刷磨损、力矩密度高、配合 FOC 能精确控力矩。电机输出力矩和电流近似成正比：<span class="arithmatex">\(\tau_m = K_t\, i\)</span>（<span class="arithmatex">\(K_t\)</span> 叫力矩常数）。</p>
 <p><strong>问题</strong>：电机天生"转得快、力气小"（几千转每分钟、零点几到几牛米），而关节需要"转得慢、力气大"（几十转每分钟、几十到几百牛米）。所以中间要加<strong>减速器</strong>。</p>
+<p><img alt="关节模组：驱动板、电机、减速器、力矩传感器、输出法兰与编码器、抱闸" src="../figures/03-actuators-module.png" /></p>
+<p><em>图 3-1 · 一个关节模组：力从左往右经过减速器被放大 N 倍，两个编码器和相电流把状态报回驱动板和 L1。</em></p>
 <h3 id="2-n">第 2 步：减速比 N 的四个后果</h3>
 <p><strong>白话类比：自行车变速</strong>。骑上坡挂低速档（大减速比）：踩得很轻松，但腿要转很多圈车才走一点。挂高速档反过来。</p>
 <p>减速比为 <span class="arithmatex">\(N\)</span> 时（电机转 N 圈，关节转 1 圈）：</p>
@@ -198,6 +200,8 @@ jupyter lab ch03_actuators.ipynb</code></pre><p>也可以下载后直接用 VS C
 </tbody>
 </table>
 <p><strong>为什么四足普遍选 QDD</strong>：腿每一步都在撞地。低减速比让冲击不传成大力矩、电机电流直接反映地面反力（不用力传感器就能"感觉"脚下），控制带宽也高。这条路线出自 MIT Cheetah 的"本体感知执行器"（proprioceptive actuator）设计。</p>
+<p><img alt="减速比地图：QDD、行星、摆线、谐波的减速比范围与 N² 反射惯量" src="../figures/03-actuators-ratio-map.png" /></p>
+<p><em>图 3-2 · 减速比地图：越往右力矩密度越高，但反射惯量按 N² 增长（上方刻度），反驱和抗冲击越差。</em></p>
 <h3 id="4-sea">第 4 步：串联弹性执行器（SEA）</h3>
 <p>在减速器和负载之间故意串一根<strong>已知刚度的弹簧</strong> <span class="arithmatex">\(k\)</span>：</p>
 <div class="arithmatex">\[\tau = k\,(\theta_{\text{电机侧}} - \theta_{\text{关节侧}})\]</div>

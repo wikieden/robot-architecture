@@ -2,7 +2,7 @@
 
 **在线阅读：<https://wikieden.github.io/robot-architecture/>** · [讲义目录](https://wikieden.github.io/robot-architecture/lessons/index.html) · [全部动画](https://wikieden.github.io/robot-architecture/animations/index.html) · [复习卡片](https://wikieden.github.io/robot-architecture/review.html) · [全部讲义书](https://wikieden.github.io/ai-books/)
 
-> 10 章 · 10 个动画（GIF + 可交互页面）· 40 张复习卡片（A01–A40，本书 10 章对应 A01–A30）· 覆盖 Lynch & Park《Modern Robotics》第 2、4–6 章与 §8.9、第 11 章里和整机架构有关的部分，其余（传感器、总线、ROS 2、自主栈、数据、安全）为自编
+> 10 章 · 10 个动画（GIF + 可交互页面）+ 4 个细化笔记动画 · 24 张静态配图 · 40 张复习卡片（A01–A40，本书 10 章对应 A01–A30）· 覆盖 Lynch & Park《Modern Robotics》第 2、4–6 章与 §8.9、第 11 章里和整机架构有关的部分，其余（传感器、总线、ROS 2、自主栈、数据、安全）为自编
 
 ## 这本书讲什么
 
@@ -15,6 +15,7 @@
 ## 讲解的特点
 
 - **一次一小步**：每个概念按"白话类比 → 公式（每个符号说清楚怎么读）→ 小数字亲手算一遍"讲：端水走路讲分层、自行车变速讲减速比、星光讲相机延迟、开门讲阻抗控制。
+- **关键环节都配图**：每章 2–3 张静态图（架构图、流程图、按真实数字画的曲线），挨着它解释的那一步放，每张一行图注；分层、拓扑、急停回路、坐标树这类“一图胜千字”的地方都画成了图。
 - **每章一个动画**：关键原理做成可交互页面，▶ 播放、→ 单步、↺ 从头开始，有滑块的可以拖动参数看结果怎么变（减速比、延迟、刚度、丢包率、随机化范围）；GIF 版直接嵌在正文里。
 - **对照原文**：每章开头的"对应原文"标了本地文本的行号（Modern Robotics 的 `materials/text/`、ROS 2 官方文档、VLA 论文文本），原文没讲的部分写明去哪查。
 - **保留真实的学习过程**：练习与作答记录会记下学习时的原话、对错和点评；答错、卡住的地方变成复习卡片。（目前 30 道练习还没作答。）

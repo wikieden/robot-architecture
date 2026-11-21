@@ -127,6 +127,8 @@ jupyter lab ch08_autonomy_stack.ipynb</code></pre><p>也可以下载后直接用
 </tr>
 </tbody>
 </table>
+<p><img alt="三种自主栈：模块化流水线、端到端 VLA、双系统" src="../figures/08-autonomy-archs.png" /></p>
+<p><em>图 8-1 · 三种自主栈：区别在中间表示由谁定义、最快那条闭环跑多快；下面都共用底层控制和安全层。</em></p>
 <h3 id="2">第 2 步：经典流水线的模块</h3>
 <pre><code> 相机 / LiDAR / IMU
     → 感知：检测、分割、6D 位姿（Grounding DINO + SAM 2、FoundationPose）
@@ -137,6 +139,8 @@ jupyter lab ch08_autonomy_stack.ipynb</code></pre><p>也可以下载后直接用
     → 控制（第 6 章）
 </code></pre>
 <p>优势是每一步都能单独看对不对。弱点是<strong>累积延迟</strong>（一个个串行跑）和<strong>接口脆弱</strong>（位姿估计一错，后面全错，且下游无法补救）。</p>
+<p><img alt="RRT-Connect：两棵树相向生长，再捷径化" src="../animations/n03-rrt-connect.gif" /></p>
+<p><em>图 8-2 · 流水线里“无碰撞路径”这一步的典型做法：OMPL 的 RRT-Connect 从起点和终点各长一棵树，连上后再捷径化（细节见专题笔记 03 规划细化 §3.2）。</em> 可交互版：<a href="../animations/n03-rrt-connect.html">animations/n03-rrt-connect.html</a>（浏览器打开，可单步看树生长，↺ 换一组随机数重新生长）。</p>
 <h3 id="3-vla">第 3 步：端到端 VLA</h3>
 <p>VLA 把"感知 → 规划 → 运动生成"合成一个网络：VLM 骨干（看图 + 读指令）+ 动作头（输出一段 action chunk）。细节见 <a href="https://wikieden.github.io/vla-from-scratch/lessons/index.html">VLA 讲义</a>。</p>
 <p>在系统里的位置：</p>
@@ -213,6 +217,8 @@ jupyter lab ch08_autonomy_stack.ipynb</code></pre><p>也可以下载后直接用
 </tbody>
 </table>
 <p><strong>降低延迟的手段</strong>：异步推理（执行旧 chunk 的同时算新 chunk）、实时分块（RTC）、模型量化 / TensorRT、把相机和推理放同一块板子避免拷贝、降低图像分辨率。</p>
+<p><img alt="延迟预算：模块化、VLA、双系统一圈闭环的时间" src="../figures/08-autonomy-latency.png" /></p>
+<p><em>图 8-3 · 延迟预算（量级示意）：模块化串行一圈约 300 ms，VLA 每 200 ms 重想一次，双系统的 S1 约 10 ms 一圈。</em></p>
 <h3 id="6">第 6 步：怎么选</h3>
 <ul>
 <li>任务结构清楚、对象固定、需要可验证（工厂、仓储）→ 模块化为主，局部用学习（抓取检测、位姿估计）。</li>

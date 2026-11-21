@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="330" viewBox="0 0 860 330">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="16.0" y="26.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="17" fill="#1f2937" text-anchor="start" font-weight="bold">级联：三个环一层套一层，内环比外环快 5–10 倍</text>
+<text x="16.0" y="320.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="normal">内环先把快扰动（电压波动、反电动势）压掉，外环看到的是一个“听话的”下层，所以可以从里往外一层层调参。</text>
+<rect x="150.0" y="56.0" width="690.0" height="210.0" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.4" stroke-dasharray="5 4" opacity="0.55"/>
+<text x="160.0" y="74.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#7c3aed" text-anchor="start" font-weight="bold">位置环 1 kHz</text>
+<rect x="330.0" y="84.0" width="500.0" height="150.0" rx="10" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="5 4" opacity="0.55"/>
+<text x="340.0" y="102.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#2563eb" text-anchor="start" font-weight="bold">速度环 5–10 kHz</text>
+<rect x="520.0" y="110.0" width="300.0" height="96.0" rx="10" fill="#ffedd5" stroke="#ea580c" stroke-width="1.4" stroke-dasharray="5 4" opacity="0.55"/>
+<text x="530.0" y="128.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#ea580c" text-anchor="start" font-weight="bold">电流环 10–40 kHz（FOC）</text>
+<rect x="20.0" y="140.0" width="90.0" height="40.0" rx="8" fill="#ffffff" stroke="#9ca3af" stroke-width="1.4" opacity="1"/>
+<text x="65.0" y="163.6" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="bold">位置目标 q*</text>
+<rect x="190.0" y="140.0" width="100.0" height="40.0" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.4" opacity="1"/>
+<text x="240.0" y="163.6" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="bold">位置 P / PD</text>
+<rect x="370.0" y="140.0" width="100.0" height="40.0" rx="8" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" opacity="1"/>
+<text x="420.0" y="163.6" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="bold">速度 PI</text>
+<rect x="540.0" y="140.0" width="100.0" height="40.0" rx="8" fill="#ffedd5" stroke="#ea580c" stroke-width="1.4" opacity="1"/>
+<text x="590.0" y="163.6" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="bold">电流 PI</text>
+<rect x="700.0" y="140.0" width="100.0" height="40.0" rx="8" fill="#f3f4f6" stroke="#6b7280" stroke-width="1.4" opacity="1"/>
+<text x="750.0" y="163.6" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="bold">PWM → 电机</text>
+<line x1="110.0" y1="160.0" x2="190.0" y2="160.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="190.0,160.0 182.1,164.2 182.1,155.8" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<line x1="290.0" y1="160.0" x2="370.0" y2="160.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="370.0,160.0 362.1,164.2 362.1,155.8" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="305.0" y="144.5" width="50.0" height="15.5" rx="3" fill="#ffffff" stroke="none" stroke-width="1.4" opacity="0.9"/>
+<text x="330.0" y="155.5" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#4b5563" text-anchor="middle" font-weight="normal">速度目标</text>
+<line x1="470.0" y1="160.0" x2="540.0" y2="160.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="540.0,160.0 532.1,164.2 532.1,155.8" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="480.0" y="144.5" width="50.0" height="15.5" rx="3" fill="#ffffff" stroke="none" stroke-width="1.4" opacity="0.9"/>
+<text x="505.0" y="155.5" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#4b5563" text-anchor="middle" font-weight="normal">电流目标</text>
+<line x1="640.0" y1="160.0" x2="700.0" y2="160.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="700.0,160.0 692.1,164.2 692.1,155.8" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polyline points="750.0,180.0 750.0,196.0 590.0,196.0 590.0,180.0" fill="none" stroke="#ea580c" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 3" opacity="1"/>
+<polygon points="590.0,180.0 594.2,187.9 585.8,187.9" fill="#ea580c" stroke="#ea580c" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="639.8" y="190.5" width="60.5" height="15.5" rx="3" fill="#ffffff" stroke="none" stroke-width="1.4" opacity="0.9"/>
+<text x="670.0" y="201.5" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#ea580c" text-anchor="middle" font-weight="normal">相电流采样</text>
+<polyline points="770.0,180.0 770.0,224.0 420.0,224.0 420.0,180.0" fill="none" stroke="#2563eb" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 3" opacity="1"/>
+<polygon points="420.0,180.0 424.2,187.9 415.8,187.9" fill="#2563eb" stroke="#2563eb" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="545.1" y="218.5" width="99.8" height="15.5" rx="3" fill="#ffffff" stroke="none" stroke-width="1.4" opacity="0.9"/>
+<text x="595.0" y="229.5" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#2563eb" text-anchor="middle" font-weight="normal">电机编码器 → 速度</text>
+<polyline points="790.0,180.0 790.0,254.0 240.0,254.0 240.0,180.0" fill="none" stroke="#7c3aed" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 3" opacity="1"/>
+<polygon points="240.0,180.0 244.2,187.9 235.8,187.9" fill="#7c3aed" stroke="#7c3aed" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="465.1" y="248.5" width="99.8" height="15.5" rx="3" fill="#ffffff" stroke="none" stroke-width="1.4" opacity="0.9"/>
+<text x="515.0" y="259.5" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#7c3aed" text-anchor="middle" font-weight="normal">输出编码器 → 位置</text>
+<text x="40.0" y="290.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#374151" text-anchor="start" font-weight="normal">关节里最常见的写法：τ = Kp(q* − q) + Kd(dq* − dq) + τff（dq = 关节速度；前馈抵消重力那部分）</text>
+</svg>

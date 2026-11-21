@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="460" viewBox="0 0 880 460">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="16.0" y="26.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="17" fill="#1f2937" text-anchor="start" font-weight="bold">三种自主栈：区别在“中间表示由谁定”和“最快那条闭环有多快”</text>
+<text x="16.0" y="450.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="normal">三种架构下面都还压着第 6 章的阻抗 / PD 控制和第 10 章的安全层。频率为公开资料里的典型量级。</text>
+<text x="160.0" y="64.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#1f2937" text-anchor="middle" font-weight="bold">经典模块化（流水线）</text>
+<text x="445.0" y="64.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#1f2937" text-anchor="middle" font-weight="bold">端到端 VLA</text>
+<text x="730.0" y="64.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#1f2937" text-anchor="middle" font-weight="bold">双系统（System 2 + System 1）</text>
+<rect x="40.0" y="78.0" width="240.0" height="42.0" rx="8" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" opacity="1"/>
+<text x="160.0" y="95.7" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#1f2937" text-anchor="middle" font-weight="bold">感知</text>
+<text x="160.0" y="111.9" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#4b5563" text-anchor="middle" font-weight="normal">检测 · 6D 位姿</text>
+<rect x="40.0" y="134.0" width="240.0" height="42.0" rx="8" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" opacity="1"/>
+<text x="160.0" y="158.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#1f2937" text-anchor="middle" font-weight="bold">状态估计 / SLAM</text>
+<line x1="160.0" y1="120.0" x2="160.0" y2="134.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="160.0,134.0 155.8,126.1 164.2,126.1" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="40.0" y="190.0" width="240.0" height="42.0" rx="8" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" opacity="1"/>
+<text x="160.0" y="207.7" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#1f2937" text-anchor="middle" font-weight="bold">场景表示</text>
+<text x="160.0" y="223.9" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#4b5563" text-anchor="middle" font-weight="normal">物体列表 · 地图</text>
+<line x1="160.0" y1="176.0" x2="160.0" y2="190.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="160.0,190.0 155.8,182.1 164.2,182.1" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="176.5" y="177.5" width="71.0" height="15.5" rx="3" fill="#ffffff" stroke="none" stroke-width="1.4" opacity="0.9"/>
+<text x="212.0" y="188.5" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#4b5563" text-anchor="middle" font-weight="normal">人定义的接口</text>
+<rect x="40.0" y="246.0" width="240.0" height="42.0" rx="8" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" opacity="1"/>
+<text x="160.0" y="263.7" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#1f2937" text-anchor="middle" font-weight="bold">任务 + 运动规划</text>
+<text x="160.0" y="279.9" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#4b5563" text-anchor="middle" font-weight="normal">行为树 · OMPL</text>
+<line x1="160.0" y1="232.0" x2="160.0" y2="246.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="160.0,246.0 155.8,238.1 164.2,238.1" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="40.0" y="302.0" width="240.0" height="42.0" rx="8" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" opacity="1"/>
+<text x="160.0" y="326.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#1f2937" text-anchor="middle" font-weight="bold">轨迹</text>
+<line x1="160.0" y1="288.0" x2="160.0" y2="302.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="160.0,302.0 155.8,294.1 164.2,294.1" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="325.0" y="120.0" width="240.0" height="150.0" rx="8" fill="#ffedd5" stroke="#ea580c" stroke-width="1.4" opacity="1"/>
+<text x="445.0" y="160.4" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="bold">一个大网络</text>
+<text x="445.0" y="178.6" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">VLM 骨干（看图 + 读指令）</text>
+<text x="445.0" y="194.1" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">+ 动作头</text>
+<text x="445.0" y="209.6" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal"></text>
+<text x="445.0" y="225.2" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">推理 5–15 Hz</text>
+<text x="445.0" y="240.7" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">输出 H 步 action chunk</text>
+<rect x="325.0" y="78.0" width="240.0" height="32.0" rx="8" fill="#ffffff" stroke="#9ca3af" stroke-width="1.4" opacity="1"/>
+<text x="445.0" y="97.6" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="normal">图像 + 指令 + 本体状态</text>
+<line x1="445.0" y1="110.0" x2="445.0" y2="120.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="445.0,120.0 440.8,112.1 449.2,112.1" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="325.0" y="292.0" width="240.0" height="38.0" rx="8" fill="#ffffff" stroke="#9ca3af" stroke-width="1.4" opacity="1"/>
+<text x="445.0" y="314.6" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="normal">插补 → 约 50 Hz 执行</text>
+<line x1="445.0" y1="270.0" x2="445.0" y2="292.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="445.0,292.0 440.8,284.1 449.2,284.1" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="610.0" y="84.0" width="240.0" height="74.0" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.4" opacity="1"/>
+<text x="730.0" y="109.4" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="bold">System 2：大 VLM</text>
+<text x="730.0" y="126.3" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">理解场景、拆子任务</text>
+<text x="730.0" y="141.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">约 1–10 Hz</text>
+<rect x="610.0" y="218.0" width="240.0" height="84.0" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.4" opacity="1"/>
+<text x="730.0" y="248.4" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="bold">System 1：小策略</text>
+<text x="730.0" y="265.3" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">最新图像 + 本体 + 意图</text>
+<text x="730.0" y="280.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">约 50–200 Hz</text>
+<line x1="700.0" y1="158.0" x2="700.0" y2="218.0" stroke="#7c3aed" stroke-width="1.6"/>
+<polygon points="700.0,218.0 695.8,210.1 704.2,210.1" fill="#7c3aed" stroke="#7c3aed" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="649.4" y="182.5" width="89.3" height="15.5" rx="3" fill="#ffffff" stroke="none" stroke-width="1.4" opacity="0.9"/>
+<text x="694.0" y="193.5" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#7c3aed" text-anchor="middle" font-weight="normal">隐向量 / 子目标</text>
+<text x="790.0" y="196.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11" fill="#16a34a" text-anchor="middle" font-weight="normal">异步：S1 不等 S2</text>
+<polyline points="850.0,280.0 866.0,280.0 866.0,240.0 850.0,240.0" fill="none" stroke="#16a34a" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<polygon points="850.0,240.0 857.9,235.8 857.9,244.2" fill="#16a34a" stroke="#16a34a" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="40.0" y="352.0" width="810.0" height="50.0" rx="8" fill="#f3f4f6" stroke="#6b7280" stroke-width="1.4" opacity="1"/>
+<text x="445.0" y="380.9" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="bold">底层控制（阻抗 / PD / WBC）+ 安全层 —— 三种架构共用</text>
+<line x1="160.0" y1="344.0" x2="160.0" y2="352.0" stroke="#6b7280" stroke-width="1.6"/>
+<polygon points="160.0,352.0 155.8,344.1 164.2,344.1" fill="#6b7280" stroke="#6b7280" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<line x1="445.0" y1="336.0" x2="445.0" y2="352.0" stroke="#6b7280" stroke-width="1.6"/>
+<polygon points="445.0,352.0 440.8,344.1 449.2,344.1" fill="#6b7280" stroke="#6b7280" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<line x1="730.0" y1="302.0" x2="730.0" y2="352.0" stroke="#6b7280" stroke-width="1.6"/>
+<polygon points="730.0,352.0 725.8,344.1 734.2,344.1" fill="#6b7280" stroke="#6b7280" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+</svg>

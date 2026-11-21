@@ -71,7 +71,7 @@ footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-
 <div class="layout"><nav class="side" aria-label="章节"><div class="h">机器人软硬件架构</div><a href="index.html" class="cur">讲义目录</a><a href="01-layered-loops.html"><span class="n">1</span>总图：一台机器人 = 一组快慢嵌套的闭环</a><a href="02-kinematics.html"><span class="n">2</span>本体与运动学：关节角怎么变成手的位置</a><a href="03-actuators.html"><span class="n">3</span>执行器：电机 + 减速器 = 一个关节</a><a href="04-sensors.html"><span class="n">4</span>传感器：知道自己在哪，看见外面的世界</a><a href="05-electrical-compute.html"><span class="n">5</span>电气与计算架构：大脑、小脑、神经和血管</a><a href="06-low-level-control.html"><span class="n">6</span>底层控制：电流环 → 速度环 → 位置环，再到阻抗与全身控制</a><a href="07-ros2-middleware.html"><span class="n">7</span>软件框架：ROS 2、中间件与实时系统</a><a href="08-autonomy-stack.html"><span class="n">8</span>自主栈：从模块化流水线到端到端 VLA 与双系统</a><a href="09-sim-data-deploy.html"><span class="n">9</span>仿真、数据与部署闭环</a><a href="10-safety-and-cases.html"><span class="n">10</span>安全、可靠性与整机案例：怎么设计一台机器人</a><a href="appendix-glossary.html">附录 · 缩写与术语表</a></nav><main>
 <h1 id="_1">机器人软硬件架构 · 讲义目录</h1>
 <blockquote>
-<p>10 章 · 10 个动画（GIF + 可交互页面）· 40 张复习卡片（A01–A40，本书 10 章对应 A01–A30）· 覆盖 Lynch &amp; Park《Modern Robotics》第 2、4–6 章与 §8.9、第 11 章里和整机架构有关的部分，其余（传感器、总线、ROS 2、自主栈、数据、安全）为自编</p>
+<p>10 章 · 10 个动画（GIF + 可交互页面）+ 4 个细化笔记动画 · 24 张静态配图 · 40 张复习卡片（A01–A40，本书 10 章对应 A01–A30）· 覆盖 Lynch &amp; Park《Modern Robotics》第 2、4–6 章与 §8.9、第 11 章里和整机架构有关的部分，其余（传感器、总线、ROS 2、自主栈、数据、安全）为自编</p>
 </blockquote>
 <h2 id="_2">这本书讲什么</h2>
 <p>从"一台机器人 = 一组快慢嵌套的闭环"这张总图讲起，按"骨肉 → 神经 → 反射 → 思考 → 机器之外"的顺序，一层层拆开：关节角怎么变成手的位置、电机和减速器怎么选、传感器怎么标定和对时、几块电脑和几条总线怎么接、关节怎么"听话"、ROS 2 怎么把模块串起来、VLA 和双系统放在哪一层、仿真和数据怎么转成飞轮，最后讲安全分层，并拆五类整机。</p>
@@ -83,6 +83,7 @@ footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-
 <h2 id="_3">讲解的特点</h2>
 <ul>
 <li><strong>一次一小步</strong>：每个概念按"白话类比 → 公式（每个符号说清楚怎么读）→ 小数字亲手算一遍"讲：端水走路讲分层、自行车变速讲减速比、星光讲相机延迟、开门讲阻抗控制。</li>
+<li><strong>关键环节都配图</strong>：每章 2–3 张静态图（架构图、流程图、按真实数字画的曲线），挨着它解释的那一步放，每张一行图注；分层、拓扑、急停回路、坐标树这类“一图胜千字”的地方都画成了图。</li>
 <li><strong>每章一个动画</strong>：关键原理做成可交互页面，▶ 播放、→ 单步、↺ 从头开始，有滑块的可以拖动参数看结果怎么变（减速比、延迟、刚度、丢包率、随机化范围）；GIF 版直接嵌在正文里。</li>
 <li><strong>对照原文</strong>：每章开头的"对应原文"标了本地文本的行号（Modern Robotics 的 <code>materials/text/</code>、ROS 2 官方文档、VLA 论文文本），原文没讲的部分写明去哪查。</li>
 <li><strong>保留真实的学习过程</strong>：练习与作答记录会记下学习时的原话、对错和点评；答错、卡住的地方变成复习卡片。（目前 30 道练习还没作答。）</li>
@@ -301,7 +302,190 @@ L0 电机驱动：FOC 电流环（10–40 kHz）→ 电机 → 减速器 → 连
 </tr>
 </tbody>
 </table>
-<h2 id="_8">后续大纲</h2>
+<h2 id="_8">配图清单</h2>
+<p>2026-11-21 按“关键环节都配图”的规则补图：24 张静态图（<code>notes/figures/</code>，SVG 原图 + PNG）+ 把 4 个细化笔记动画嵌进对应章节。图由 <code>work/figures/robot-system-architecture/gen.py</code> 生成，改图改脚本后重跑（见脚本开头）。</p>
+<table>
+<thead>
+<tr>
+<th>章</th>
+<th>图</th>
+<th>放在哪一步</th>
+<th>画的是什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>图 1-1 分层与硬件</td>
+<td>第 3 步</td>
+<td>五层软件坐在三块硬件上，右侧对数频率条</td>
+</tr>
+<tr>
+<td>1</td>
+<td>图 1-2 插补</td>
+<td>第 4 步</td>
+<td>10 Hz 目标 → 1 kHz 线性插补 → 一阶追赶</td>
+</tr>
+<tr>
+<td>1</td>
+<td>图 1-3 时间参数化（GIF）</td>
+<td>第 4 步</td>
+<td>直线连点 vs 三次样条的速度、加速度</td>
+</tr>
+<tr>
+<td>2</td>
+<td>图 2-1 FK / IK</td>
+<td>第 4 步</td>
+<td>工作空间环、肘上 / 肘下两组解</td>
+</tr>
+<tr>
+<td>2</td>
+<td>图 2-2 可操作度椭圆</td>
+<td>第 6 步</td>
+<td>θ₂ 从 90° 到 2°，速度椭圆逐渐压扁</td>
+</tr>
+<tr>
+<td>3</td>
+<td>图 3-1 关节模组</td>
+<td>第 1 步</td>
+<td>驱动板 → 电机 → 减速器 → 法兰，编码器与抱闸</td>
+</tr>
+<tr>
+<td>3</td>
+<td>图 3-2 减速比地图</td>
+<td>第 3 步</td>
+<td>四种方案的减速比范围和 N² 反射惯量</td>
+</tr>
+<tr>
+<td>4</td>
+<td>图 4-1 传感器节拍</td>
+<td>第 1 步</td>
+<td>11 种传感器的更新频率（对数刻度）</td>
+</tr>
+<tr>
+<td>4</td>
+<td>图 4-2 一帧画面的年龄</td>
+<td>第 3 步</td>
+<td>延迟分解与 e = v·Δt</td>
+</tr>
+<tr>
+<td>4</td>
+<td>图 4-3 互补滤波</td>
+<td>第 4 步</td>
+<td>陀螺漂移、加速度计噪声与融合结果（模拟数据）</td>
+</tr>
+<tr>
+<td>5</td>
+<td>图 5-1 总线账</td>
+<td>第 2 步</td>
+<td>1 ms 周期里 CAN 与 EtherCAT 的时间占用</td>
+</tr>
+<tr>
+<td>5</td>
+<td>图 5-2 急停回路</td>
+<td>第 4 步</td>
+<td>双通道 → 安全继电器 → STO / 抱闸，看门狗</td>
+</tr>
+<tr>
+<td>5</td>
+<td>图 5-3 人形拓扑</td>
+<td>第 5 步</td>
+<td>数据网、电源网、安全回路三张网</td>
+</tr>
+<tr>
+<td>6</td>
+<td>图 6-1 级联</td>
+<td>第 2 步</td>
+<td>位置环套速度环套电流环，三路反馈</td>
+</tr>
+<tr>
+<td>6</td>
+<td>图 6-2 FOC</td>
+<td>第 2 步</td>
+<td>三相 → αβ → dq，iq 即力矩</td>
+</tr>
+<tr>
+<td>6</td>
+<td>图 6-3 三条控制路线</td>
+<td>第 5 步</td>
+<td>MPC + WBC、RL + PD、VLA + 阻抗，共用电流环</td>
+</tr>
+<tr>
+<td>6</td>
+<td>图 6-4 线性倒立摆（GIF）</td>
+<td>第 5 步</td>
+<td>迈步接住重心</td>
+</tr>
+<tr>
+<td>7</td>
+<td>图 7-1 ROS 2 节点图</td>
+<td>第 2 步</td>
+<td>话题 / 服务 / 动作 / 参数与 rmw</td>
+</tr>
+<tr>
+<td>7</td>
+<td>图 7-2 tf2 坐标树</td>
+<td>第 4 步</td>
+<td>map → odom → base_link → 各连杆、相机</td>
+</tr>
+<tr>
+<td>7</td>
+<td>图 7-3 ros2_control</td>
+<td>第 5 步</td>
+<td>控制器插件、接口、hardware_interface、真机或仿真</td>
+</tr>
+<tr>
+<td>8</td>
+<td>图 8-1 三种自主栈</td>
+<td>第 1 步</td>
+<td>模块化 / 端到端 VLA / 双系统</td>
+</tr>
+<tr>
+<td>8</td>
+<td>图 8-2 RRT-Connect（GIF）</td>
+<td>第 2 步</td>
+<td>两棵树相向生长再捷径化</td>
+</tr>
+<tr>
+<td>8</td>
+<td>图 8-3 延迟预算</td>
+<td>第 5 步</td>
+<td>三种架构一圈闭环的时间</td>
+</tr>
+<tr>
+<td>9</td>
+<td>图 9-1 数据飞轮</td>
+<td>第 1 步</td>
+<td>采集 → 训练 → 评测 → 部署 → 运行 → 回流</td>
+</tr>
+<tr>
+<td>9</td>
+<td>图 9-2 一条示范数据</td>
+<td>第 5 步</td>
+<td>episode 元数据、逐步记录、四种存储格式</td>
+</tr>
+<tr>
+<td>10</td>
+<td>图 10-1 安全分层</td>
+<td>第 1 步</td>
+<td>五层安全，越往下越不靠软件</td>
+</tr>
+<tr>
+<td>10</td>
+<td>图 10-2 三种停机</td>
+<td>第 2 步</td>
+<td>STO / SS1 / SS2 的速度曲线与出力时间</td>
+</tr>
+<tr>
+<td>10</td>
+<td>图 10-3 动量观测器（GIF）</td>
+<td>第 3 步</td>
+<td>碰撞检测与退让</td>
+</tr>
+</tbody>
+</table>
+<p>还没有真实照片：本书的整机、关节模组适合配实物照片，但要找到许可清楚（CC 协议或厂商允许转载）的图再加，出处和许可写在图注里。</p>
+<h2 id="_9">后续大纲</h2>
 <p>10 章已经覆盖整机的每一层。下一步不是加章，而是：</p>
 <table>
 <thead>
@@ -333,7 +517,7 @@ L0 电机驱动：FOC 电流环（10–40 kHz）→ 电机 → 减速器 → 连
 </tr>
 </tbody>
 </table>
-<h2 id="_9">口诀汇总</h2>
+<h2 id="_10">口诀汇总</h2>
 <ul>
 <li><strong>第 1 章</strong>：大脑给目标，脊髓追目标；越往下越快、越简单、越不能迟到。每一层软件都坐在一块硬件上，层和层之间是一条总线加一种消息。</li>
 <li><strong>第 2 章</strong>：正解一路加角度，逆解要猜要迭代；雅可比管速度也管力。手臂伸直就奇异：往外一毫米，关节转疯掉。</li>

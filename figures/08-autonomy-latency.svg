@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="335" viewBox="0 0 860 335">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="16.0" y="26.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="17" fill="#1f2937" text-anchor="start" font-weight="bold">延迟预算：反应时间看“最快那条闭环”一圈要多久</text>
+<text x="16.0" y="325.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="normal">数字是量级示意（第 5 步表格），不是某个产品的实测。双系统里 S2 也会晚些更新意图，但先反应的是 S1。</text>
+<text x="208.0" y="94.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="end" font-weight="bold">模块化串行</text>
+<rect x="220.0" y="72.0" width="59.4" height="32.0" rx="3" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" opacity="1"/>
+<text x="249.7" y="87.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11" fill="#1f2937" text-anchor="middle" font-weight="normal">相机</text>
+<text x="249.7" y="100.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="normal">33</text>
+<rect x="279.4" y="72.0" width="54.0" height="32.0" rx="3" fill="#ccfbf1" stroke="#0d9488" stroke-width="1.4" opacity="1"/>
+<text x="306.4" y="87.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11" fill="#1f2937" text-anchor="middle" font-weight="normal">检测</text>
+<text x="306.4" y="100.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="normal">30</text>
+<rect x="333.4" y="72.0" width="72.0" height="32.0" rx="3" fill="#dcfce7" stroke="#16a34a" stroke-width="1.4" opacity="1"/>
+<text x="369.4" y="87.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11" fill="#1f2937" text-anchor="middle" font-weight="normal">位姿</text>
+<text x="369.4" y="100.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="normal">40</text>
+<rect x="405.4" y="72.0" width="360.0" height="32.0" rx="3" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.4" opacity="1"/>
+<text x="585.4" y="87.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11" fill="#1f2937" text-anchor="middle" font-weight="normal">规划</text>
+<text x="585.4" y="100.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="normal">200</text>
+<rect x="765.4" y="72.0" width="9.0" height="32.0" rx="3" fill="#f3f4f6" stroke="#6b7280" stroke-width="1.4" opacity="1"/>
+<text x="784.4" y="93.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#374151" text-anchor="start" font-weight="normal">≈ 300 ms</text>
+<text x="208.0" y="160.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="end" font-weight="bold">端到端 VLA</text>
+<rect x="220.0" y="138.0" width="216.0" height="32.0" rx="3" fill="#ffedd5" stroke="#ea580c" stroke-width="1.4" opacity="1"/>
+<text x="328.0" y="153.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11" fill="#1f2937" text-anchor="middle" font-weight="normal">编码 + VLM + 动作头</text>
+<text x="328.0" y="166.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="normal">120</text>
+<rect x="436.0" y="138.0" width="144.0" height="32.0" rx="3" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.4" opacity="1"/>
+<text x="508.0" y="153.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11" fill="#1f2937" text-anchor="middle" font-weight="normal">执行旧 chunk</text>
+<text x="508.0" y="166.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="normal">80</text>
+<text x="590.0" y="159.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#374151" text-anchor="start" font-weight="normal">每 200 ms 重想一次</text>
+<text x="208.0" y="226.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="end" font-weight="bold">双系统 · S1</text>
+<rect x="220.0" y="204.0" width="18.0" height="32.0" rx="3" fill="#dcfce7" stroke="#16a34a" stroke-width="1.4" opacity="1"/>
+<text x="248.0" y="225.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#374151" text-anchor="start" font-weight="normal">≈ 10 ms（100 Hz）</text>
+<line x1="220.0" y1="268.0" x2="220.0" y2="274.0" stroke="#1f2937" stroke-width="1.4"/>
+<text x="220.0" y="290.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="normal">0 ms</text>
+<line x1="400.0" y1="268.0" x2="400.0" y2="274.0" stroke="#1f2937" stroke-width="1.4"/>
+<text x="400.0" y="290.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="normal">100 ms</text>
+<line x1="580.0" y1="268.0" x2="580.0" y2="274.0" stroke="#1f2937" stroke-width="1.4"/>
+<text x="580.0" y="290.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="normal">200 ms</text>
+<line x1="760.0" y1="268.0" x2="760.0" y2="274.0" stroke="#1f2937" stroke-width="1.4"/>
+<text x="760.0" y="290.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="normal">300 ms</text>
+<line x1="220.0" y1="268.0" x2="814.0" y2="268.0" stroke="#1f2937" stroke-width="1.4"/>
+</svg>

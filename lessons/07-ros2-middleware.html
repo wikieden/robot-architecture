@@ -127,6 +127,8 @@ jupyter lab ch07_ros2_middleware.ipynb</code></pre><p>也可以下载后直接�
 </tbody>
 </table>
 <p>底层传输：ROS 2 通过 <code>rmw</code> 抽象层接 <strong>DDS</strong>（Fast DDS、Cyclone DDS 等）；<strong>Zenoh</strong>（rmw_zenoh）是近两年的新选择，跨网络、穿 NAT 更方便。同机大数据（图像、点云）可用共享内存 / 零拷贝（如 iceoryx、Fast DDS SHM）。</p>
+<p><img alt="ROS 2 节点图：话题、服务、动作、参数与 rmw 传输层" src="../figures/07-ros2-graph.png" /></p>
+<p><em>图 7-1 · ROS 2 的四种通信：话题一对多广播、服务一问一答、动作有目标 / 反馈 / 结果、参数是节点配置；底下统一走 rmw。</em></p>
 <h3 id="3-qos">第 3 步：QoS：每个话题要什么样的"快递服务"</h3>
 <table>
 <thead>
@@ -167,6 +169,8 @@ jupyter lab ch07_ros2_middleware.ipynb</code></pre><p>也可以下载后直接�
 <li>动态变换（关节角）由 <code>robot_state_publisher</code> 根据 <code>/joint_states</code> 和 URDF 做 FK（第 2 章）实时发布；</li>
 <li><code>map → odom → base_link</code> 是导航的标准约定（REP-105）。</li>
 </ul>
+<p><img alt="tf2 坐标树：map、odom、base_link 到各连杆和相机" src="../figures/07-ros2-tf.png" /></p>
+<p><em>图 7-2 · tf2 坐标树：每条边来源不同，定位和里程计是动态的，关节链由 robot_state_publisher 做 FK，相机是标定出来的静态变换。</em></p>
 <h3 id="5-ros2_control">第 5 步：ros2_control：硬件抽象层</h3>
 <pre><code> 上层（MoveIt 2 / Nav2 / 你的 VLA 节点）
         │  action / topic：轨迹、速度指令
@@ -181,6 +185,8 @@ jupyter lab ch07_ros2_middleware.ipynb</code></pre><p>也可以下载后直接�
       真实硬件，或仿真（Gazebo / MuJoCo / Isaac 的 ros2_control 插件）
 </code></pre>
 <p>好处：同一套控制器和上层代码，换硬件只换 <code>hardware_interface</code> 插件；仿真和真机切换也只改一行配置。</p>
+<p><img alt="ros2_control 分层：controller_manager、控制器插件、hardware_interface、真机或仿真" src="../figures/07-ros2-control.png" /></p>
+<p><em>图 7-3 · ros2_control：控制器只认 command / state 接口，换硬件或切仿真只换最底下的 hardware_interface 插件。</em></p>
 <h3 id="6-ros-2">第 6 步：ROS 2 生态里的大模块</h3>
 <table>
 <thead>

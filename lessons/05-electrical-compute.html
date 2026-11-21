@@ -166,6 +166,8 @@ jupyter lab ch05_electrical_compute.ipynb</code></pre><p>也可以下载后直�
 </table>
 <p><strong>估算 CAN 的瓶颈</strong>（一问一答）：一帧标准 CAN 报文约 110–130 位，1 Mbps 下约 0.13 ms。每个关节"发 1 帧 + 回 1 帧"约 0.26 ms。6 个关节一路 CAN 就要约 1.6 ms，跑不到 1 kHz；所以人形常用 4–8 路 CAN 并行，或者换 EtherCAT。</p>
 <p><strong>EtherCAT</strong>：一帧几百字节的报文，100 Mbps 下传输只要十几微秒，每个从站只加不到 1 µs 的延迟，几十个关节也能轻松做到 1 kHz 甚至更高。</p>
+<p><img alt="1 ms 周期内 CAN 与 EtherCAT 的时间占用对比" src="../figures/05-electrical-bus-budget.png" /></p>
+<p><em>图 5-1 · 1 ms 周期的总线账：CAN 一路 6 个关节就超时，要拆成多路；EtherCAT 一帧走全场只占几十微秒。</em></p>
 <h3 id="3">第 3 步：电源：峰值电流和回馈能量</h3>
 <table>
 <thead>
@@ -215,6 +217,8 @@ jupyter lab ch05_electrical_compute.ipynb</code></pre><p>也可以下载后直�
 <li><strong>看门狗</strong>：驱动板如果一段时间（例如几个控制周期）收不到主站报文，自己进入安全状态。</li>
 </ul>
 <p>第 10 章细讲安全分级和标准。</p>
+<p><img alt="急停硬件回路：双通道按钮、安全继电器、STO、抱闸与看门狗" src="../figures/05-electrical-estop.png" /></p>
+<p><em>图 5-2 · 急停回路：按钮经双通道和安全继电器直接切 STO、断抱闸，全程不经过软件；主控只是被通知。</em></p>
 <h3 id="5_1">第 5 步：一台人形的典型拓扑</h3>
 <pre><code>               ┌──────────── 主控：Jetson Thor / Orin ─────────────┐
  相机 ×N ─GMSL─┤  感知 · VLA · ROS 2 · 日志                        │── Wi-Fi / 5G ── 云（大模型、遥操作、OTA）
@@ -233,6 +237,8 @@ jupyter lab ch05_electrical_compute.ipynb</code></pre><p>也可以下载后直�
  电池 48 V ── BMS ── 母线 ── 各关节驱动；DC-DC ── 计算与传感器
  急停 ── 安全继电器 ── 所有驱动器 STO
 </code></pre>
+<p><img alt="人形机器人典型拓扑：主控、实时控制器、EtherCAT 链、电源与急停" src="../figures/05-electrical-topology.png" /></p>
+<p><em>图 5-3 · 一台人形的典型拓扑：蓝色数据网、橙色电源网、红色安全回路是三张独立的网。</em></p>
 <h3 id="_2">动画演示</h3>
 <p><img alt="总线周期：CAN 一问一答 vs EtherCAT 一帧穿过" src="../animations/05-bus-cycle.gif" /></p>
 <p>可交互版：<a href="../animations/05-bus-cycle.html">animations/05-bus-cycle.html</a>（可改关节数）。</p>

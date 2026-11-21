@@ -172,6 +172,8 @@ jupyter lab ch02_kinematics.ipynb</code></pre><p>也可以下载后直接用 VS 
 <li><strong>解析解</strong>：某些构型（腕部三轴交于一点的 6 轴臂）能推出闭式公式，快且稳定，工具如 IKFast。</li>
 <li><strong>数值迭代</strong>：用雅可比矩阵一步步修正。</li>
 </ol>
+<p><img alt="两连杆 FK 与 IK：工作空间环、肘上肘下两组解" src="../figures/02-kinematics-fk-ik.png" /></p>
+<p><em>图 2-1 · 两连杆：FK 一路把角度加起来；IK 对环内同一个目标点有肘上 / 肘下两组解，环外无解。</em></p>
 <h3 id="5-jacobian">第 5 步：雅可比（Jacobian）：关节转一点点，手动多少</h3>
 <div class="arithmatex">\[\dot{x} = J(\theta)\,\dot\theta\]</div>
 <p><span class="arithmatex">\(J\)</span> 是一个矩阵：第 j 列表示"只转第 j 个关节，手会往哪个方向动、动多快"。</p>
@@ -189,6 +191,8 @@ jupyter lab ch02_kinematics.ipynb</code></pre><p>也可以下载后直接用 VS 
 <li>那个方向上，很小的关节力矩就能扛住很大的外力（反过来，外力传不进关节，力控变差）。</li>
 </ul>
 <p>判断：两连杆 <span class="arithmatex">\(\det J = L_1 L_2 \sin\theta_2\)</span>，<span class="arithmatex">\(\theta_2 \to 0\)</span> 或 <span class="arithmatex">\(\pi\)</span> 时为 0。一般用可操作度 <span class="arithmatex">\(w = \sqrt{\det(JJ^\top)}\)</span> 衡量离奇异有多远。</p>
+<p><img alt="可操作度椭圆：θ2 从 90° 到 2°，椭圆逐渐压扁" src="../figures/02-kinematics-manip.png" /></p>
+<p><em>图 2-2 · 雅可比把关节速度映射成手的速度：手臂越接近伸直，椭圆越扁，w = L₁L₂|sinθ₂| 趋近 0，沿手臂方向动不了。</em></p>
 <h3 id="_2">动画演示</h3>
 <p><img alt="两连杆机械臂：正逆运动学、工作空间与奇异" src="../animations/02-two-link-ik.gif" /></p>
 <p>可交互版：<a href="../animations/02-two-link-ik.html">animations/02-two-link-ik.html</a>。</p>

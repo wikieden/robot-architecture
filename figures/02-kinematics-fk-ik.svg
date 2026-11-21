@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="430" viewBox="0 0 800 430">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="16.0" y="26.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="17" fill="#1f2937" text-anchor="start" font-weight="bold">两连杆：FK 一路把角度加起来；IK 同一个点有肘上 / 肘下两组解</text>
+<circle cx="220" cy="262" r="166.6" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1.2"/>
+<circle cx="220" cy="262" r="29.400000000000006" fill="#ffffff" stroke="#bae6fd" stroke-width="1.2"/>
+<text x="45.0" y="112.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#0369a1" text-anchor="start" font-weight="normal">工作空间（够得着的环）</text>
+<line x1="190.0" y1="262.0" x2="470.0" y2="262.0" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4 3"/>
+<polyline points="220.0,262.0 265.4,175.2 332.7,188.5" fill="none" stroke="#9ca3af" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="7 5" opacity="1"/>
+<circle cx="220.0" cy="262.0" r="6" fill="#fff" stroke="#9ca3af" stroke-width="2"/>
+<circle cx="265.4" cy="175.2" r="5" fill="#fff" stroke="#9ca3af" stroke-width="2"/>
+<polyline points="220.0,262.0 317.8,255.5 332.7,188.5" fill="none" stroke="#2563eb" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="220.0" cy="262.0" r="6" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+<circle cx="317.8" cy="255.5" r="5" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+<circle cx="332.7" cy="188.5" r="7" fill="#dc2626" stroke="#fff" stroke-width="2"/>
+<text x="344.7" y="180.5" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#dc2626" text-anchor="start" font-weight="normal">目标 (x, y)</text>
+<polyline points="262.0,262.0 262.0,261.9 262.0,261.8 262.0,261.6 262.0,261.5 262.0,261.4 262.0,261.3 262.0,261.2 262.0,261.1 262.0,260.9 262.0,260.8 262.0,260.7 262.0,260.6 262.0,260.5 262.0,260.4 262.0,260.2 262.0,260.1 262.0,260.0 261.9,259.9 261.9,259.8 261.9,259.7 261.9,259.5 261.9,259.4 261.9,259.3 261.9,259.2" fill="none" stroke="#2563eb" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<text x="276.0" y="264.1" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#2563eb" text-anchor="middle" font-weight="normal" font-style="italic">θ₁</text>
+<line x1="317.8" y1="255.5" x2="362.7" y2="252.5" stroke="#93c5fd" stroke-width="1.2" stroke-dasharray="3 3"/>
+<polyline points="347.7,253.5 347.6,251.9 347.3,250.3 347.0,248.7 346.6,247.1 346.1,245.6 345.6,244.1 344.9,242.6 344.2,241.2 343.4,239.8 342.5,238.5 341.6,237.2 340.5,235.9 339.5,234.7 338.3,233.6 337.1,232.5 335.9,231.5 334.6,230.6 333.2,229.7 331.8,228.9 330.4,228.2 328.9,227.6 327.4,227.0 325.9,226.6 324.3,226.2" fill="none" stroke="#2563eb" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<text x="351.2" y="230.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#2563eb" text-anchor="middle" font-weight="normal" font-style="italic">θ₂</text>
+<text x="268.9" y="280.7" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1e3a8a" text-anchor="middle" font-weight="normal" font-style="italic">L₁</text>
+<text x="341.2" y="226.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1e3a8a" text-anchor="middle" font-weight="normal" font-style="italic">L₂</text>
+<rect x="205.4" y="150.7" width="100.0" height="16.5" rx="3" fill="#ffffff" stroke="none" stroke-width="1.4" opacity="0.9"/>
+<text x="255.4" y="162.7" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#6b7280" text-anchor="middle" font-weight="normal">另一组解（肘上）</text>
+<text x="321.8" y="279.5" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#2563eb" text-anchor="middle" font-weight="normal">肘下</text>
+<rect x="480.0" y="70.0" width="300.0" height="120.0" rx="8" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" opacity="1"/>
+<text x="630.0" y="109.6" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="bold">正运动学 FK：唯一解、很便宜</text>
+<text x="630.0" y="126.5" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#4b5563" text-anchor="middle" font-weight="normal">x = L₁cosθ₁ + L₂cos(θ₁+θ₂)</text>
+<text x="630.0" y="142.7" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#4b5563" text-anchor="middle" font-weight="normal">y = L₁sinθ₁ + L₂sin(θ₁+θ₂)</text>
+<text x="630.0" y="158.9" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#4b5563" text-anchor="middle" font-weight="normal">三维：T = T₁(θ₁)·T₂(θ₂)···Tₙ(θₙ)</text>
+<rect x="480.0" y="210.0" width="300.0" height="140.0" rx="8" fill="#ffedd5" stroke="#ea580c" stroke-width="1.4" opacity="1"/>
+<text x="630.0" y="251.5" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="bold">逆运动学 IK：可能无解 / 多解</text>
+<text x="630.0" y="268.4" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#4b5563" text-anchor="middle" font-weight="normal">点在环外 → 够不着，无解</text>
+<text x="630.0" y="284.6" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#4b5563" text-anchor="middle" font-weight="normal">环内 → 肘上、肘下 2 组解</text>
+<text x="630.0" y="300.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#4b5563" text-anchor="middle" font-weight="normal">6 轴工业臂最多 8 组</text>
+<text x="630.0" y="317.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#4b5563" text-anchor="middle" font-weight="normal">7 轴冗余臂 → 无穷多组</text>
+</svg>

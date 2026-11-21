@@ -180,6 +180,7 @@ footer{max-width:860px;margin:0 auto;padding:0 16px 40px;color:var(--mute);font-
 </tr>
 </tbody>
 </table>
+<p>这 4 个动画也嵌进了讲义：时间参数化 → 第 1 章第 4 步，线性倒立摆 → 第 6 章第 5 步，RRT-Connect → 第 8 章第 2 步，动量观测器 → 第 10 章第 3 步。静态配图在 <code>../figures/</code>，清单见 <a href="../lessons/index.html#配图清单">讲义目录 · 配图清单</a>。</p>
 <h2 id="_2">新增或修改一个动画</h2>
 <ol>
 <li>页面引用 <code>anim.css</code> 和 <code>anim.js</code>（与 vla-deep-dive 同一套），提供 <code>reset(seed)</code> 和 <code>next()</code>（返回 <code>false</code> 表示播完），用 <code>setupPlayer({captureSeed, reset, next}, 毫秒)</code> 挂上播放按钮。随机数用 <code>rnd()</code> / <code>gauss()</code>。</li>

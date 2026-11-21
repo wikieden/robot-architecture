@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="445" viewBox="0 0 860 445">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="16.0" y="26.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="17" fill="#1f2937" text-anchor="start" font-weight="bold">ros2_control：控制器只认“接口”，换硬件只换最下面那块插件</text>
+<text x="16.0" y="435.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="normal">command / state interfaces 统一成 position / velocity / effort 三种；仿真和真机切换只改 hardware 插件这一行配置。</text>
+<rect x="200.0" y="52.0" width="460.0" height="46.0" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.4" opacity="1"/>
+<text x="430.0" y="78.9" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="bold">上层：MoveIt 2 / Nav2 / 你的 VLA 节点</text>
+<rect x="60.0" y="120.0" width="740.0" height="196.0" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="1.4" stroke-dasharray="5 4" opacity="0.55"/>
+<text x="70.0" y="138.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#16a34a" text-anchor="start" font-weight="bold">controller_manager（实时循环）</text>
+<rect x="84.0" y="146.0" width="160.0" height="50.0" rx="8" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" opacity="1"/>
+<text x="164.0" y="166.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="bold">joint_trajectory</text>
+<text x="164.0" y="182.4" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="bold">_controller</text>
+<rect x="262.0" y="146.0" width="160.0" height="50.0" rx="8" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" opacity="1"/>
+<text x="342.0" y="166.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="bold">diff_drive</text>
+<text x="342.0" y="182.4" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="bold">_controller</text>
+<rect x="440.0" y="146.0" width="160.0" height="50.0" rx="8" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" opacity="1"/>
+<text x="520.0" y="166.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="bold">admittance</text>
+<text x="520.0" y="182.4" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="bold">_controller</text>
+<rect x="618.0" y="146.0" width="160.0" height="50.0" rx="8" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" opacity="1"/>
+<text x="698.0" y="174.6" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#1f2937" text-anchor="middle" font-weight="bold">自定义控制器</text>
+<line x1="430.0" y1="98.0" x2="430.0" y2="146.0" stroke="#7c3aed" stroke-width="1.6"/>
+<polygon points="430.0,146.0 425.8,138.1 434.2,138.1" fill="#7c3aed" stroke="#7c3aed" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="443.3" y="105.9" width="193.4" height="16.5" rx="3" fill="#ffffff" stroke="none" stroke-width="1.4" opacity="0.9"/>
+<text x="540.0" y="117.9" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#7c3aed" text-anchor="middle" font-weight="normal">action / topic：轨迹、速度指令</text>
+<line x1="300.0" y1="196.0" x2="300.0" y2="236.0" stroke="#2563eb" stroke-width="1.6"/>
+<polygon points="300.0,236.0 295.8,228.1 304.2,228.1" fill="#2563eb" stroke="#2563eb" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="294.4" y="209.5" width="271.1" height="16.5" rx="3" fill="#ffffff" stroke="none" stroke-width="1.4" opacity="0.9"/>
+<text x="430.0" y="221.5" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#2563eb" text-anchor="middle" font-weight="normal">command：写 position / velocity / effort</text>
+<line x1="560.0" y1="236.0" x2="560.0" y2="196.0" stroke="#0d9488" stroke-width="1.6"/>
+<polygon points="560.0,196.0 564.2,203.9 555.8,203.9" fill="#0d9488" stroke="#0d9488" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="569.1" y="209.5" width="121.8" height="16.5" rx="3" fill="#ffffff" stroke="none" stroke-width="1.4" opacity="0.9"/>
+<text x="630.0" y="221.5" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#0d9488" text-anchor="middle" font-weight="normal">state：读回同样三种</text>
+<rect x="84.0" y="236.0" width="692.0" height="56.0" rx="8" fill="#ffedd5" stroke="#ea580c" stroke-width="1.4" opacity="1"/>
+<text x="430.0" y="260.1" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="bold">hardware_interface 插件</text>
+<text x="430.0" y="277.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">每周期：read() → update() → write()</text>
+<rect x="110.0" y="344.0" width="280.0" height="50.0" rx="8" fill="#f3f4f6" stroke="#6b7280" stroke-width="1.4" opacity="1"/>
+<text x="250.0" y="365.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#1f2937" text-anchor="middle" font-weight="bold">真实硬件</text>
+<text x="250.0" y="381.2" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">厂商 SDK / EtherCAT / CAN</text>
+<rect x="470.0" y="344.0" width="280.0" height="50.0" rx="8" fill="#f3f4f6" stroke="#6b7280" stroke-width="1.4" stroke-dasharray="5 4" opacity="1"/>
+<text x="610.0" y="365.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#1f2937" text-anchor="middle" font-weight="bold">仿真</text>
+<text x="610.0" y="381.2" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">Gazebo / MuJoCo / Isaac 插件</text>
+<line x1="250.0" y1="292.0" x2="250.0" y2="344.0" stroke="#ea580c" stroke-width="1.6"/>
+<polygon points="250.0,344.0 245.8,336.1 254.2,336.1" fill="#ea580c" stroke="#ea580c" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<line x1="610.0" y1="292.0" x2="610.0" y2="344.0" stroke="#ea580c" stroke-width="1.6" stroke-dasharray="5 4"/>
+<polygon points="610.0,344.0 605.8,336.1 614.2,336.1" fill="#ea580c" stroke="#ea580c" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<text x="430.0" y="374.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#ea580c" text-anchor="middle" font-weight="bold">二选一</text>
+</svg>

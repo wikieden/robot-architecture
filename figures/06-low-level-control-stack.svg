@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="380" viewBox="0 0 860 380">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="16.0" y="26.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="17" fill="#1f2937" text-anchor="start" font-weight="bold">人形 / 四足的三条控制路线：上面换来换去，最底下的电流环不变</text>
+<text x="16.0" y="370.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="normal">MPC = Model Predictive Control；WBC = Whole-Body Control；RL = Reinforcement Learning。各路线频率为典型量级。</text>
+<text x="155.0" y="66.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#374151" text-anchor="middle" font-weight="bold">模型 + 优化</text>
+<rect x="30.0" y="80.0" width="250.0" height="72.0" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.4" opacity="1"/>
+<text x="155.0" y="104.4" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="bold">MPC</text>
+<text x="155.0" y="121.3" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">简化模型往前看 ~0.5 s</text>
+<text x="155.0" y="136.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">规划接触力</text>
+<rect x="30.0" y="176.0" width="250.0" height="72.0" rx="8" fill="#e0ecff" stroke="#2563eb" stroke-width="1.4" opacity="1"/>
+<text x="155.0" y="200.4" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="bold">WBC（QP）</text>
+<text x="155.0" y="217.3" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">~1 kHz 分配到每个关节</text>
+<text x="155.0" y="232.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">输出关节力矩</text>
+<line x1="155.0" y1="152.0" x2="155.0" y2="176.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="155.0,176.0 150.8,168.1 159.2,168.1" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<line x1="155.0" y1="248.0" x2="155.0" y2="270.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="155.0,270.0 150.8,262.1 159.2,262.1" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<text x="435.0" y="66.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#374151" text-anchor="middle" font-weight="bold">强化学习</text>
+<rect x="310.0" y="80.0" width="250.0" height="72.0" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.4" opacity="1"/>
+<text x="435.0" y="104.4" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="bold">RL 策略网络</text>
+<text x="435.0" y="121.3" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">仿真里 PPO 训练</text>
+<text x="435.0" y="136.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">50 Hz 输出关节目标角</text>
+<rect x="310.0" y="176.0" width="250.0" height="72.0" rx="8" fill="#ccfbf1" stroke="#0d9488" stroke-width="1.4" opacity="1"/>
+<text x="435.0" y="200.4" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="bold">关节 PD</text>
+<text x="435.0" y="217.3" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">固定 Kp / Kd</text>
+<text x="435.0" y="232.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">1 kHz 以上追踪</text>
+<line x1="435.0" y1="152.0" x2="435.0" y2="176.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="435.0,176.0 430.8,168.1 439.2,168.1" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<line x1="435.0" y1="248.0" x2="435.0" y2="270.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="435.0,270.0 430.8,262.1 439.2,262.1" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<text x="715.0" y="66.0" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#374151" text-anchor="middle" font-weight="bold">操作臂 + VLA</text>
+<rect x="590.0" y="80.0" width="250.0" height="72.0" rx="8" fill="#ffedd5" stroke="#ea580c" stroke-width="1.4" opacity="1"/>
+<text x="715.0" y="104.4" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="bold">VLA / 规划器</text>
+<text x="715.0" y="121.3" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">输出目标位姿或</text>
+<text x="715.0" y="136.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">action chunk</text>
+<rect x="590.0" y="176.0" width="250.0" height="72.0" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.4" opacity="1"/>
+<text x="715.0" y="200.4" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="bold">阻抗控制</text>
+<text x="715.0" y="217.3" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">τ = Jᵀ[K(x*−x) + D(dx*−dx)] + g(q)</text>
+<text x="715.0" y="232.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">接触时像弹簧</text>
+<line x1="715.0" y1="152.0" x2="715.0" y2="176.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="715.0,176.0 710.8,168.1 719.2,168.1" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<line x1="715.0" y1="248.0" x2="715.0" y2="270.0" stroke="#4b5563" stroke-width="1.6"/>
+<polygon points="715.0,270.0 710.8,262.1 719.2,262.1" fill="#4b5563" stroke="#4b5563" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<rect x="30.0" y="270.0" width="810.0" height="62.0" rx="8" fill="#f3f4f6" stroke="#6b7280" stroke-width="1.4" opacity="1"/>
+<text x="435.0" y="297.3" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#1f2937" text-anchor="middle" font-weight="bold">驱动板：电流环 FOC（10–40 kHz）→ 电机</text>
+<text x="435.0" y="314.8" font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#4b5563" text-anchor="middle" font-weight="normal">所有路线共用：最快、最简单、最可验证的一层</text>
+</svg>

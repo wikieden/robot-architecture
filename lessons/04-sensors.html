@@ -172,6 +172,8 @@ jupyter lab ch04_sensors.ipynb</code></pre><p>也可以下载后直接用 VS Cod
 </tr>
 </tbody>
 </table>
+<p><img alt="各传感器的更新频率对比（对数刻度）" src="../figures/04-sensors-rates.png" /></p>
+<p><em>图 4-1 · 传感器的节拍：本体传感器跑在 kHz 级，相机、LiDAR 只有几十 Hz；绿线是 L1 控制周期，紫线是策略频率。</em></p>
 <h3 id="2-calibration">第 2 步：标定（calibration）：传感器在哪、朝哪</h3>
 <p>传感器的读数要变成"机器人坐标系里的东西"才能用，所以必须知道：</p>
 <table>
@@ -228,6 +230,8 @@ jupyter lab ch04_sensors.ipynb</code></pre><p>也可以下载后直接用 VS Cod
 <li><strong>延迟补偿</strong>：知道了 <span class="arithmatex">\(\Delta t\)</span>，就用运动模型往前预测 <span class="arithmatex">\(\hat{x} = x_{\text{观测}} + v\,\Delta t\)</span>。</li>
 <li><strong>对齐再融合</strong>：多个传感器的数据按时间戳插值到同一时刻再用（ROS 2 里 <code>message_filters</code> 的近似时间同步）。</li>
 </ol>
+<p><img alt="一帧画面从曝光到被用上的延迟分解，以及 v·Δt 的位置误差" src="../figures/04-sensors-latency.png" /></p>
+<p><em>图 4-2 · 一帧画面的“年龄”：曝光、读出、传输、解码、排队加起来约 60 ms，传送带上的物体已经走了 3 cm。</em></p>
 <h3 id="4_1">第 4 步：传感器融合：取长补短</h3>
 <p>每种传感器都有短板，融合就是让它们互补：</p>
 <table>
@@ -269,6 +273,8 @@ jupyter lab ch04_sensors.ipynb</code></pre><p>也可以下载后直接用 VS Cod
 <p>最简单的互补滤波（一维姿态角）：</p>
 <div class="arithmatex">\[\hat\theta_{k} = \alpha\,(\hat\theta_{k-1} + \omega_k\,\Delta t) + (1-\alpha)\,\theta^{\text{acc}}_k\]</div>
 <p>陀螺仪负责"短期准"（高频），加速度计负责"长期不漂"（低频）。卡尔曼滤波是它的"自动调 <span class="arithmatex">\(\alpha\)</span>"版本：按两边的不确定度加权。</p>
+<p><img alt="互补滤波：陀螺积分漂移、加速度计噪声与融合结果" src="../figures/04-sensors-complementary.png" /></p>
+<p><em>图 4-3 · 互补滤波（模拟数据）：陀螺积分平滑但越漂越远，加速度计不漂但噪声大，融合后两头都占。</em></p>
 <h3 id="_2">动画演示</h3>
 <p><img alt="时间同步：延迟 Δt 让抓取差 v·Δt" src="../animations/04-time-sync.gif" /></p>
 <p>可交互版：<a href="../animations/04-time-sync.html">animations/04-time-sync.html</a>（拖动延迟滑块）。</p>

@@ -125,6 +125,8 @@ jupyter lab ch10_safety_and_cases.ipynb</code></pre><p>也可以下载后直接�
 </tbody>
 </table>
 <p><strong>原则</strong>：越靠下的层越简单、越独立、越不依赖上层。AI 模型只能放在最上层，永远不能当最后一道保险。</p>
+<p><img alt="安全分层：策略层、软件监控、安全控制器、硬件安全回路、本质安全" src="../figures/10-safety-layers.png" /></p>
+<p><em>图 10-1 · 安全一层层叠：越往下越简单、越独立、越不依赖软件；AI 只在最上层。</em></p>
 <h3 id="2">第 2 步：停机也分等级</h3>
 <p>IEC 61800-5-2（可调速驱动的功能安全）定义了几种停止方式：</p>
 <table>
@@ -154,6 +156,8 @@ jupyter lab ch10_safety_and_cases.ipynb</code></pre><p>也可以下载后直接�
 </tbody>
 </table>
 <p><strong>腿足机器人的特殊难题</strong>：直接 STO 会让机器人摔倒，本身就可能伤人或砸坏东西。所以人形 / 四足通常先尝试"受控蹲下 / 坐下"再断电，相关标准（如针对动态稳定腿足机器人的 ISO 25785-1）还在制定中。</p>
+<p><img alt="STO、SS1、SS2 三种停机的速度曲线与出力时间" src="../figures/10-safety-stops.png" /></p>
+<p><em>图 10-2 · 三种停机（示意曲线）：STO 立即断力矩、自由停；SS1 受控减速后再断电；SS2 停住后保持出力。</em></p>
 <h3 id="3">第 3 步：故障降级状态机</h3>
 <pre><code> 正常运行 ──(有人进入协作区)──→ 降速（速度与距离监控）──(人离开)──→ 正常
     │                                 │
@@ -170,6 +174,8 @@ jupyter lab ch10_safety_and_cases.ipynb</code></pre><p>也可以下载后直接�
 - <strong>限幅</strong>：任何上层给的指令都要过一遍速度、加速度、力矩、关节范围的硬限制。
 - <strong>碰撞检测</strong>：实际电流 / 力矩和动力学模型预测值差太多 → 判定碰撞。
 - <strong>状态与日志</strong>：每次降级都记录原因，回流到数据飞轮（第 9 章）。</p>
+<p><img alt="动量观测器：碰撞检测与退让" src="../animations/n02-momentum-observer.gif" /></p>
+<p><em>图 10-3 · 碰撞检测怎么做：动量观测器比较“模型算出该用的力矩”和“实际用的力矩”，残差约等于外力矩，超过阈值就判定碰撞并退让（细节见专题笔记 02 运控细化 §4.2）。</em> 可交互版：<a href="../animations/n02-momentum-observer.html">animations/n02-momentum-observer.html</a>（浏览器打开，可拖滑块改观测器增益 K）。</p>
 <h3 id="4">第 4 步：安全相关标准（只需知道名字和管什么）</h3>
 <table>
 <thead>
